@@ -1,0 +1,26 @@
+{
+  "name": "topsort.js",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "packageManager": "bun@1.1.17",
+  "main": "src/index.ts",
+  "author": "Márcio Barbosa <marcio@topsort.com>",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "bun build",
+    "test": "bun test",
+    "lint": "bun lint",
+    "format": "bun format",
+    "prepublish": "bun prepublish",
+    "doctest": "bun run src/lib/doctest.test.ts"
+  },
+  "devDependencies": {
+    "@supabase/doctest-js": "^0.1.0",
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {}
+}

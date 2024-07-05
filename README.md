@@ -1,5 +1,18 @@
-# Topsort.js
+# topsort.js
 
-This repository holds the official Topsort.js client library. It is built using [TypeScript][typescript].
+This repository holds the official Topsort.js client library. It is built using TypeScript.
 
-[typescript]: https://www.typescriptlang.org
+To install dependencies:
+
+```bash
+bun install
+```
+
+To run:
+
+```bash
+bun run src/index.ts
+```
+
+
+
