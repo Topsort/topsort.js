@@ -2,14 +2,14 @@ import { extractJSDocComments } from "./extract-comments";
 
 interface TestCase {
 	code: string;
-	expected: any;
+	expected: unknown;
 }
 
 export async function generateTestCases(filePath: string): Promise<TestCase[]> {
 	const comments = await extractJSDocComments(filePath);
 	const testCases: TestCase[] = [];
 
-	comments.forEach((comment) => {
+	for (const comment of comments) {
 		const exampleMatch = comment.match(
 			/@example\s+\*?\s*```js([\s\S]*?)\s*\*?\s*```/,
 		);
@@ -34,7 +34,7 @@ export async function generateTestCases(filePath: string): Promise<TestCase[]> {
 				}
 			}
 		}
-	});
+	}
 
 	return testCases;
 }

@@ -4,9 +4,10 @@ export async function extractJSDocComments(
 	const content = await Bun.file(filePath).text();
 	const comments = [];
 	const regex = /\/\*\*([\s\S]*?)\*\//g;
-	let match;
-	while ((match = regex.exec(content)) !== null) {
+	let match = regex.exec(content);
+	while (match !== null) {
 		comments.push(match[1].trim());
+		match = regex.exec(content);
 	}
 	return comments;
 }

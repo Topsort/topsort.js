@@ -15,8 +15,8 @@ describe("reportEvent", () => {
 	it("should handle network error and retry", async () => {
 		await expect(
 			reportEvent({} as TopsortEvent, {
-				token: "token",
-				url: "https://error.api.topsort.com",
+				apiKey: "token",
+				host: "https://error.api.topsort.com",
 			}),
 		).rejects.toEqual({
 			status: 500,
@@ -28,7 +28,7 @@ describe("reportEvent", () => {
 	it("should handle permanent error", async () => {
 		returnStatus(400, server, `${baseURL}/${apis.events}`);
 		await expect(
-			reportEvent({} as TopsortEvent, { token: "token" }),
+			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
 		).resolves.toEqual({
 			ok: false,
 			retry: false,
@@ -38,7 +38,7 @@ describe("reportEvent", () => {
 	it("should handle authentication error", async () => {
 		returnStatus(401, server, `${baseURL}/${apis.events}`);
 		await expect(
-			reportEvent({} as TopsortEvent, { token: "token" }),
+			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
 		).resolves.toEqual({
 			ok: false,
 			retry: false,
@@ -48,7 +48,7 @@ describe("reportEvent", () => {
 	it("should handle retryable error", async () => {
 		returnStatus(429, server, `${baseURL}/${apis.events}`);
 		await expect(
-			reportEvent({} as TopsortEvent, { token: "token" }),
+			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
 		).resolves.toEqual({
 			ok: false,
 			retry: true,
@@ -58,7 +58,7 @@ describe("reportEvent", () => {
 	it("should handle server error", async () => {
 		returnStatus(500, server, `${baseURL}/${apis.events}`);
 		await expect(
-			reportEvent({} as TopsortEvent, { token: "token" }),
+			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
 		).resolves.toEqual({
 			ok: false,
 			retry: true,
@@ -69,8 +69,8 @@ describe("reportEvent", () => {
 		returnStatus(200, server, `https://demo.api.topsort.com/${apis.events}`);
 		await expect(
 			reportEvent({} as TopsortEvent, {
-				token: "token",
-				url: "https://demo.api.topsort.com",
+				apiKey: "apiKey",
+				host: "https://demo.api.topsort.com",
 			}),
 		).resolves.toEqual({ ok: true, retry: false });
 	});

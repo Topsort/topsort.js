@@ -47,6 +47,6 @@ export interface TopsortEvent {
 }
 
 export interface Config {
-	token: string;
-	url?: string;
+	apiKey: string;
+	host?: string;
 }

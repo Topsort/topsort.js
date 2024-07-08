@@ -23,7 +23,7 @@ export async function reportEvent(
 	config: Config,
 ): Promise<{ ok: boolean; retry: boolean }> {
 	try {
-		const url = `${config.url || baseURL}/${apis.events}`;
+		const url = `${config.host || baseURL}/${apis.events}`;
 		const response = await fetch(url, {
 			method: "POST",
 			headers: {
@@ -31,7 +31,7 @@ export async function reportEvent(
 				// Can't use User-Agent header because of
 				// https://bugs.chromium.org/p/chromium/issues/detail?id=571722
 				"X-UA": `ts.js/${version}`,
-				Authorization: "Bearer " + config.token,
+				Authorization: `Bearer ${config.apiKey}`,
 			},
 			body: JSON.stringify(event),
 			// This parameter ensures in most browsers that the request is performed even in case the browser navigates to another page.
