@@ -1,13 +1,12 @@
-import * as fs from "fs";
-
-export function extractJSDocComments(filePath: string): string[] {
-    const content = fs.readFileSync(filePath, "utf-8");
-    const comments = [];
-    const regex = /\/\*\*([\s\S]*?)\*\//g;
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-        console.log("JSDoc Comment:", match[1]); // Log each extracted JSDoc comment
-        comments.push(match[1].trim());
-    }
-    return comments;
+export async function extractJSDocComments(
+	filePath: string,
+): Promise<string[]> {
+	const content = await Bun.file(filePath).text();
+	const comments = [];
+	const regex = /\/\*\*([\s\S]*?)\*\//g;
+	let match;
+	while ((match = regex.exec(content)) !== null) {
+		comments.push(match[1].trim());
+	}
+	return comments;
 }

@@ -1,2 +1,2 @@
-export * from './functions/report-event';
-export * from './interfaces/events.interface';
+export * from "./functions/report-event";
+export * from "./interfaces/events.interface";
