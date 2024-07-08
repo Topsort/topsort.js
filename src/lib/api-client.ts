@@ -1,6 +1,7 @@
+import { baseURL } from "../constants/apis.constant";
 import AppError from "./app-error";
 
-class ApiClient {
+class APIClient {
 	private baseUrl: string;
 
 	constructor(baseUrl: string) {
@@ -27,18 +28,27 @@ class ApiClient {
 		endpoint: string,
 		options: RequestInit,
 	): Promise<unknown> {
-		const response = await fetch(`${this.baseUrl}${endpoint}`, options);
-		return await this.handleResponse(response);
+		try {
+			const response = await fetch(`${this.baseUrl}${endpoint}`, options);
+			return await this.handleResponse(response);
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw error;
+			}
+
+			const message = error instanceof Error ? error.message : 'Unknown error';
+			throw new AppError(500, 'Internal server error', message);
+		}
 	}
 
 	public async get(endpoint: string): Promise<unknown> {
-		return await this.request(endpoint, {
+		return this.request(endpoint, {
 			method: "GET",
 		});
 	}
 
 	public async post(endpoint: string, body: unknown): Promise<unknown> {
-		return await this.request(endpoint, {
+		return this.request(endpoint, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -48,4 +58,4 @@ class ApiClient {
 	}
 }
 
-export { ApiClient };
+export default new APIClient(`${baseURL}`)
