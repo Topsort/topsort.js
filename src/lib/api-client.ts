@@ -1,4 +1,6 @@
+import { version } from "../../package.json";
 import { baseURL } from "../constants/apis.constant";
+import type { Config } from "../interfaces/events.interface";
 import AppError from "./app-error";
 
 class APIClient {
@@ -24,10 +26,7 @@ class APIClient {
 		return data;
 	}
 
-	private async request(
-		endpoint: string,
-		options: RequestInit,
-	): Promise<unknown> {
+	private async request(endpoint: string, options: RequestInit): Promise<unknown> {
 		try {
 			const response = await fetch(`${this.baseUrl}${endpoint}`, options);
 			return await this.handleResponse(response);
@@ -36,8 +35,8 @@ class APIClient {
 				throw error;
 			}
 
-			const message = error instanceof Error ? error.message : 'Unknown error';
-			throw new AppError(500, 'Internal server error', message);
+			const message = error instanceof Error ? error.message : "Unknown error";
+			throw new AppError(500, "Internal server error", message);
 		}
 	}
 
@@ -47,15 +46,18 @@ class APIClient {
 		});
 	}
 
-	public async post(endpoint: string, body: unknown): Promise<unknown> {
+	public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
 		return this.request(endpoint, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				Accept: "application/json",
+				"X-UA": `ts.js/${version}`,
+				Authorization: `Bearer ${config.apiKey}`,
 			},
 			body: JSON.stringify(body),
 		});
 	}
 }
 
-export default new APIClient(`${baseURL}`)
+export default new APIClient(`${baseURL}`);

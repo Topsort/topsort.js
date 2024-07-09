@@ -27,9 +27,7 @@ describe("reportEvent", () => {
 
 	it("should handle permanent error", async () => {
 		returnStatus(400, server, `${baseURL}/${apis.events}`);
-		await expect(
-			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
-		).resolves.toEqual({
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
 			ok: false,
 			retry: false,
 		});
@@ -37,9 +35,7 @@ describe("reportEvent", () => {
 
 	it("should handle authentication error", async () => {
 		returnStatus(401, server, `${baseURL}/${apis.events}`);
-		await expect(
-			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
-		).resolves.toEqual({
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
 			ok: false,
 			retry: false,
 		});
@@ -47,9 +43,7 @@ describe("reportEvent", () => {
 
 	it("should handle retryable error", async () => {
 		returnStatus(429, server, `${baseURL}/${apis.events}`);
-		await expect(
-			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
-		).resolves.toEqual({
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
 			ok: false,
 			retry: true,
 		});
@@ -57,9 +51,7 @@ describe("reportEvent", () => {
 
 	it("should handle server error", async () => {
 		returnStatus(500, server, `${baseURL}/${apis.events}`);
-		await expect(
-			reportEvent({} as TopsortEvent, { apiKey: "apiKey" }),
-		).resolves.toEqual({
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
 			ok: false,
 			retry: true,
 		});

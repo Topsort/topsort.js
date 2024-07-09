@@ -13,11 +13,7 @@ export const handlers = {
 	}),
 };
 
-export const returnStatus = (
-	status: number,
-	server: SetupServerApi,
-	url: string,
-) => {
+export const returnStatus = (status: number, server: SetupServerApi, url: string) => {
 	return server.use(
 		http.post(url, () => {
 			return HttpResponse.json({}, { status: status });

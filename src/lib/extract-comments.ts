@@ -1,6 +1,4 @@
-export async function extractJSDocComments(
-	filePath: string,
-): Promise<string[]> {
+export async function extractJSDocComments(filePath: string): Promise<string[]> {
 	const content = await Bun.file(filePath).text();
 	const comments = [];
 	const regex = /\/\*\*([\s\S]*?)\*\//g;

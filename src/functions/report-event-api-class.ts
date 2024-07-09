@@ -22,7 +22,7 @@ export async function reportEvent(
 	config: Config,
 ): Promise<{ ok: boolean; retry: boolean }> {
 	const url = `${config.host || baseURL}/${apis.events}`;
-	await APIClient.post(url, event);
+	await APIClient.post(url, event, config);
 
 	return {
 		ok: true,

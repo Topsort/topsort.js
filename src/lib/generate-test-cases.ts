@@ -10,14 +10,10 @@ export async function generateTestCases(filePath: string): Promise<TestCase[]> {
 	const testCases: TestCase[] = [];
 
 	for (const comment of comments) {
-		const exampleMatch = comment.match(
-			/@example\s+\*?\s*```js([\s\S]*?)\s*\*?\s*```/,
-		);
+		const exampleMatch = comment.match(/@example\s+\*?\s*```js([\s\S]*?)\s*\*?\s*```/);
 		if (exampleMatch) {
 			const exampleCode = exampleMatch[1].trim();
-			const expectedMatch = exampleCode.match(
-				/console\.log\((.*)\);?\s*\/\/\s*(.*)/,
-			);
+			const expectedMatch = exampleCode.match(/console\.log\((.*)\);?\s*\/\/\s*(.*)/);
 			if (expectedMatch) {
 				try {
 					const expectedOutput = JSON.parse(expectedMatch[2].trim());
@@ -26,11 +22,7 @@ export async function generateTestCases(filePath: string): Promise<TestCase[]> {
 						expected: expectedOutput,
 					});
 				} catch (error) {
-					console.error(
-						"Failed to parse expected output:",
-						expectedMatch[2].trim(),
-						error,
-					);
+					console.error("Failed to parse expected output:", expectedMatch[2].trim(), error);
 				}
 			}
 		}
