@@ -1,7 +1,6 @@
-import { version } from "../../package.json";
 import { apis, baseURL } from "../constants/apis.constant";
 import type { Config, TopsortEvent } from "../interfaces/events.interface";
-import AppError from "../lib/app-error";
+import APIClient from "../lib/api-client";
 
 /**
  * Reports an event to the Topsort API.
@@ -11,7 +10,7 @@ import AppError from "../lib/app-error";
  * const event = { eventType: "test", eventData: {} };
  * const config = { token: "my-token" };
  * const result = await reportEvent(event, config);
- * console.log(result); // { ok: true, retry: false }
+ * console.log(result); // { "ok": true, "retry": false }
  * ```
  *
  * @param event - The event to report.
@@ -22,28 +21,11 @@ export async function reportEvent(
 	event: TopsortEvent,
 	config: Config,
 ): Promise<{ ok: boolean; retry: boolean }> {
-	try {
-		const url = `${config.host || baseURL}/${apis.events}`;
-		const response = await fetch(url, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				// Can't use User-Agent header because of
-				// https://bugs.chromium.org/p/chromium/issues/detail?id=571722
-				"X-UA": `ts.js/${version}`,
-				Authorization: `Bearer ${config.apiKey}`,
-			},
-			body: JSON.stringify(event),
-			// This parameter ensures in most browsers that the request is performed even in case the browser navigates to another page.
-			keepalive: true,
-		});
+	const url = `${config.host || baseURL}/${apis.events}`;
+	await APIClient.post(url, event, config);
 
-		return {
-			ok: response.ok,
-			retry: response.status === 429 || response.status >= 500,
-		};
-	} catch (error) {
-		// Just leave this way for now, as we are wrapping up the skeleton
-		throw new AppError(500, "", "");
-	}
+	return {
+		ok: true,
+		retry: false,
+	};
 }
