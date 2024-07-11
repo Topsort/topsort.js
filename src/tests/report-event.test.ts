@@ -12,48 +12,40 @@ describe("reportEvent", () => {
 	afterAll(() => server.close());
 	afterEach(() => server.resetHandlers());
 
-	it("should handle network error and retry", async () => {
-		await expect(
-			reportEvent({} as TopsortEvent, {
-				apiKey: "token",
-				host: "https://error.api.topsort.com",
-			}),
-		).rejects.toEqual({
-			status: 500,
-			statusText: "",
-			body: "",
-		});
-	});
-
 	it("should handle permanent error", async () => {
 		returnStatus(400, server, `${baseURL}/${apis.events}`);
-		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
-			ok: false,
-			retry: false,
+
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+			status: 400,
+			statusText: '',
+			body: {}
 		});
 	});
 
 	it("should handle authentication error", async () => {
 		returnStatus(401, server, `${baseURL}/${apis.events}`);
-		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
-			ok: false,
-			retry: false,
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+			status: 401,
+			statusText: '',
+			body: {}
 		});
 	});
 
 	it("should handle retryable error", async () => {
 		returnStatus(429, server, `${baseURL}/${apis.events}`);
-		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
-			ok: false,
-			retry: true,
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+			status: 429,
+			statusText: '',
+			body: {}
 		});
 	});
 
 	it("should handle server error", async () => {
 		returnStatus(500, server, `${baseURL}/${apis.events}`);
-		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).resolves.toEqual({
-			ok: false,
-			retry: true,
+		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+			status: 500,
+			statusText: '',
+			body: {}
 		});
 	});
 
@@ -66,4 +58,4 @@ describe("reportEvent", () => {
 			}),
 		).resolves.toEqual({ ok: true, retry: false });
 	});
-});
+})

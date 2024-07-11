@@ -23,20 +23,23 @@ class APIClient {
 			throw new AppError(response.status, response.statusText, data);
 		}
 
-		return data;
+		return {
+			ok: response.ok,
+			retry: response.status === 429 || response.status === 500,
+		}
 	}
 
 	private async request(endpoint: string, options: RequestInit): Promise<unknown> {
 		try {
-			const response = await fetch(`${this.baseUrl}${endpoint}`, options);
-			return await this.handleResponse(response);
+			const response = await fetch(`${endpoint ?? this.baseUrl}`, options);
+			return this.handleResponse(response);
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw error;
 			}
 
 			const message = error instanceof Error ? error.message : "Unknown error";
-			throw new AppError(500, "Internal server error", message);
+			throw new AppError(500, "Internal Server Error", message);
 		}
 	}
 

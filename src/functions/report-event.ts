@@ -18,14 +18,20 @@ import APIClient from "../lib/api-client";
  * @returns {Promise<{ok: boolean, retry: boolean}>} The result of the report, indicating success and if a retry is needed.
  */
 export async function reportEvent(
-	event: TopsortEvent,
-	config: Config,
+  event: TopsortEvent,
+  config: Config,
 ): Promise<{ ok: boolean; retry: boolean }> {
-	const url = `${config.host || baseURL}/${apis.events}`;
-	await APIClient.post(url, event, config);
+  let url: URL;
+  try {
+    url = new URL(`${config.host || baseURL}/${apis.events}`);
+  } catch (error) {
+    throw new Error(`Invalid URL: ${config.host || baseURL}/${apis.events}`);
+  }
 
-	return {
-		ok: true,
-		retry: false,
-	};
+  await APIClient.post(url.toString(), event, config);
+
+  return {
+    ok: true,
+    retry: false,
+  };
 }
