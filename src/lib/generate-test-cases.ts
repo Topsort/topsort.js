@@ -17,7 +17,10 @@ function parseExpectedOutput(output: string): unknown {
 
 // Helper function to clean up extracted code by removing leading '*' characters
 function cleanCode(code: string): string {
-	return code.split('\n').map(line => line.replace(/^\s*\*/, '').trim()).join('\n');
+	return code
+		.split("\n")
+		.map((line) => line.replace(/^\s*\*/, "").trim())
+		.join("\n");
 }
 
 export async function generateTestCases(filePath: string): Promise<TestCase[]> {

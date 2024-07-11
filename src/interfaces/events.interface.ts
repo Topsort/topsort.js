@@ -45,8 +45,3 @@ export interface TopsortEvent {
 	clicks?: Click[];
 	purchases?: Purchase[];
 }
-
-export interface Config {
-	apiKey: string;
-	host?: string;
-}

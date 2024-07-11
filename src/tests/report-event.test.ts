@@ -17,8 +17,8 @@ describe("reportEvent", () => {
 
 		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
 			status: 400,
-			statusText: '',
-			body: {}
+			statusText: "",
+			body: {},
 		});
 	});
 
@@ -26,8 +26,8 @@ describe("reportEvent", () => {
 		returnStatus(401, server, `${baseURL}/${apis.events}`);
 		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
 			status: 401,
-			statusText: '',
-			body: {}
+			statusText: "",
+			body: {},
 		});
 	});
 
@@ -35,8 +35,8 @@ describe("reportEvent", () => {
 		returnStatus(429, server, `${baseURL}/${apis.events}`);
 		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
 			status: 429,
-			statusText: '',
-			body: {}
+			statusText: "",
+			body: {},
 		});
 	});
 
@@ -44,8 +44,8 @@ describe("reportEvent", () => {
 		returnStatus(500, server, `${baseURL}/${apis.events}`);
 		await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
 			status: 500,
-			statusText: '',
-			body: {}
+			statusText: "",
+			body: {},
 		});
 	});
 
@@ -56,6 +56,6 @@ describe("reportEvent", () => {
 				apiKey: "apiKey",
 				host: "https://demo.api.topsort.com",
 			}),
-		).resolves.toEqual({ ok: true, retry: false });
+		).resolves.toEqual({ ok: true });
 	});
-})
+});

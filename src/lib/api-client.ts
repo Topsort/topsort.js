@@ -1,6 +1,6 @@
 import { version } from "../../package.json";
 import { baseURL } from "../constants/apis.constant";
-import type { Config } from "../interfaces/events.interface";
+import type { Config } from "../interfaces/shared.interface";
 import AppError from "./app-error";
 
 class APIClient {
@@ -23,10 +23,7 @@ class APIClient {
 			throw new AppError(response.status, response.statusText, data);
 		}
 
-		return {
-			ok: response.ok,
-			retry: response.status === 429 || response.status === 500,
-		}
+		return data;
 	}
 
 	private async request(endpoint: string, options: RequestInit): Promise<unknown> {
