@@ -1,27 +1,27 @@
 {
-	"name": "topsort.js",
-	"version": "1.0.0",
-	"description": "",
-	"private": true,
-	"packageManager": "bun@1.1.17",
-	"main": "src/index.ts",
-	"author": "Márcio Barbosa <marcio@topsort.com>",
-	"license": "UNLICENSED",
-	"scripts": {
-		"build": "bun build",
-		"test": "bun test",
-		"doctest": "bun run src/lib/doctest.test.ts",
-		"format": "biome check",
-		"format:fix": "biome check --write"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.8.3",
-		"@supabase/doctest-js": "^0.1.0",
-		"@types/bun": "^1.1.6",
-		"msw": "^2.3.1"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"dependencies": {}
+  "name": "topsort.js",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "packageManager": "bun@1.1.17",
+  "main": "src/index.ts",
+  "author": "Márcio Barbosa <marcio@topsort.com>",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "bun build",
+    "test": "bun test",
+    "doctest": "bun run src/lib/doctest.test.ts",
+    "format": "biome check",
+    "format:fix": "biome check --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@supabase/doctest-js": "^0.1.0",
+    "@types/bun": "^1.1.6",
+    "msw": "^2.3.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {}
 }

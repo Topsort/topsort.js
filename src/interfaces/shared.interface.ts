@@ -1,4 +1,4 @@
 export interface Config {
-	apiKey: string;
-	host?: string;
+  apiKey: string;
+  host?: string;
 }
