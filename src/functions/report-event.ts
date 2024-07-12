@@ -2,6 +2,7 @@ import { apis, baseURL } from "../constants/apis.constant";
 import type { TopsortEvent } from "../interfaces/events.interface";
 import type { Config } from "../interfaces/shared.interface";
 import APIClient from "../lib/api-client";
+import { withValidation } from "../lib/with-validation";
 
 /**
  * Reports an event to the Topsort API.
@@ -9,16 +10,16 @@ import APIClient from "../lib/api-client";
  * @example
  * ```js
  * const event = { eventType: "test", eventData: {} };
- * const config = { token: "my-token" };
+ * const config = { apiKey: "api-key" };
  * const result = await reportEvent(event, config);
- * console.log(result); // { "ok": true, "retry": false }
+ * console.log(result); // { "ok": true }
  * ```
  *
  * @param event - The event to report.
- * @param config - The configuration object containing URL and token.
- * @returns {Promise<{ok: boolean}>} The result of the report, indicating success and if a retry is needed.
+ * @param config - The configuration object containing the API Key and optionally, the Host.
+ * @returns {Promise<{ok: boolean}>} The result of the report, indicating success.
  */
-export async function reportEvent(event: TopsortEvent, config: Config): Promise<{ ok: boolean }> {
+async function handler(config: Config, event: TopsortEvent): Promise<{ ok: boolean }> {
   let url: URL;
   try {
     url = new URL(`${config.host || baseURL}/${apis.events}`);
@@ -32,3 +33,5 @@ export async function reportEvent(event: TopsortEvent, config: Config): Promise<
     ok: true,
   };
 }
+
+export const reportEvent = withValidation(handler);

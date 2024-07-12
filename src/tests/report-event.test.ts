@@ -15,7 +15,7 @@ describe("reportEvent", () => {
   it("should handle permanent error", async () => {
     returnStatus(400, server, `${baseURL}/${apis.events}`);
 
-    await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 400,
       statusText: "",
       body: {},
@@ -24,7 +24,7 @@ describe("reportEvent", () => {
 
   it("should handle authentication error", async () => {
     returnStatus(401, server, `${baseURL}/${apis.events}`);
-    await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 401,
       statusText: "",
       body: {},
@@ -33,7 +33,7 @@ describe("reportEvent", () => {
 
   it("should handle retryable error", async () => {
     returnStatus(429, server, `${baseURL}/${apis.events}`);
-    await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 429,
       statusText: "",
       body: {},
@@ -42,7 +42,7 @@ describe("reportEvent", () => {
 
   it("should handle server error", async () => {
     returnStatus(500, server, `${baseURL}/${apis.events}`);
-    await expect(reportEvent({} as TopsortEvent, { apiKey: "apiKey" })).rejects.toEqual({
+    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 500,
       statusText: "",
       body: {},
@@ -52,10 +52,13 @@ describe("reportEvent", () => {
   it("should handle custom url", async () => {
     returnStatus(200, server, `https://demo.api.topsort.com/${apis.events}`);
     await expect(
-      reportEvent({} as TopsortEvent, {
-        apiKey: "apiKey",
-        host: "https://demo.api.topsort.com",
-      }),
+      reportEvent(
+        {
+          apiKey: "apiKey",
+          host: "https://demo.api.topsort.com",
+        },
+        {} as TopsortEvent,
+      ),
     ).resolves.toEqual({ ok: true });
   });
 });
