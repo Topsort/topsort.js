@@ -10,11 +10,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist/**/*.js", "dist/**/*.d.ts", "package.json", "README.md"],
+  "files": ["dist/*"],
   "scripts": {
     "build": "bun build src/index.ts --outdir=dist",
     "test": "bun test",

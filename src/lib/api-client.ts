@@ -52,7 +52,7 @@ class APIClient {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-UA": `ts.js/${version}`,
+        "X-UA": `topsort.js ${version}`,
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(body),
