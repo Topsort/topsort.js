@@ -7,7 +7,6 @@ import AppError from "../lib/app-error";
 
 describe("reportEvent", () => {
   beforeAll(() => mswServer.listen());
-  afterAll(() => mswServer.close());
   afterEach(() => mswServer.resetHandlers());
 
   it("should handle authentication error", async () => {
