@@ -1,22 +1,20 @@
 import { http, HttpResponse } from "msw";
-import type { SetupServerApi } from "msw/node";
-import { apis, baseURL } from "./apis.constant";
+import { setupServer } from "msw/node";
 
-const errorBaseURL = "https://error.api.topsort.com/";
+export const mswServer = setupServer();
 
-export const handlers = {
-  events: http.post(`${baseURL}/${apis.events}`, () => {
-    return HttpResponse.json({}, { status: 200 });
-  }),
-  eventsError: http.post(`${errorBaseURL}/${apis.events}`, () => {
-    return HttpResponse.error();
-  }),
+export const returnStatus = (status: number, url: string) => {
+  return mswServer.use(
+    http.post(url, () => {
+      return HttpResponse.json({}, { status });
+    }),
+  );
 };
 
-export const returnStatus = (status: number, server: SetupServerApi, url: string) => {
-  return server.use(
+export const returnError = (url: string) => {
+  return mswServer.use(
     http.post(url, () => {
-      return HttpResponse.json({}, { status: status });
+      return HttpResponse.error();
     }),
   );
 };

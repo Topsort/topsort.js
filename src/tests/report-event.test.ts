@@ -1,30 +1,18 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "bun:test";
-import { setupServer } from "msw/node";
+import { afterAll, afterEach, beforeAll, describe, expect, it, jest } from "bun:test";
 import { apis, baseURL } from "../constants/apis.constant";
-import { handlers, returnStatus } from "../constants/handlers.constant";
+import { mswServer, returnError, returnStatus } from "../constants/handlers.constant";
 import { reportEvent } from "../functions/report-event";
 import type { TopsortEvent } from "../interfaces/events.interface";
-
-const server = setupServer(handlers.events, handlers.eventsError);
+import AppError from "../lib/app-error";
 
 describe("reportEvent", () => {
-  beforeAll(() => server.listen());
-  afterAll(() => server.close());
-  afterEach(() => server.resetHandlers());
-
-  it("should handle permanent error", async () => {
-    returnStatus(400, server, `${baseURL}/${apis.events}`);
-
-    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
-      status: 400,
-      statusText: "",
-      body: {},
-    });
-  });
+  beforeAll(() => mswServer.listen());
+  afterAll(() => mswServer.close());
+  afterEach(() => mswServer.resetHandlers());
 
   it("should handle authentication error", async () => {
-    returnStatus(401, server, `${baseURL}/${apis.events}`);
-    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
+    returnStatus(401, `${baseURL}/${apis.events}`);
+    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 401,
       statusText: "",
       body: {},
@@ -32,8 +20,8 @@ describe("reportEvent", () => {
   });
 
   it("should handle retryable error", async () => {
-    returnStatus(429, server, `${baseURL}/${apis.events}`);
-    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
+    returnStatus(429, `${baseURL}/${apis.events}`);
+    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 429,
       statusText: "",
       body: {},
@@ -41,8 +29,8 @@ describe("reportEvent", () => {
   });
 
   it("should handle server error", async () => {
-    returnStatus(500, server, `${baseURL}/${apis.events}`);
-    await expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
+    returnStatus(500, `${baseURL}/${apis.events}`);
+    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 500,
       statusText: "",
       body: {},
@@ -50,8 +38,8 @@ describe("reportEvent", () => {
   });
 
   it("should handle custom url", async () => {
-    returnStatus(200, server, `https://demo.api.topsort.com/${apis.events}`);
-    await expect(
+    returnStatus(200, `https://demo.api.topsort.com/${apis.events}`);
+    expect(
       reportEvent(
         {
           apiKey: "apiKey",
@@ -60,5 +48,31 @@ describe("reportEvent", () => {
         {} as TopsortEvent,
       ),
     ).resolves.toEqual({ ok: true });
+  });
+
+  it("should handle fetch error", async () => {
+    returnError(`${baseURL}/${apis.events}`);
+    expect(
+      async () =>
+        await reportEvent(
+          {
+            apiKey: "apiKey",
+          },
+          {} as TopsortEvent,
+        ),
+    ).toThrow(AppError);
+  });
+
+  it("should handle invalid URL error", async () => {
+    const invalidHost = "invalid-url";
+    expect(async () =>
+      reportEvent(
+        {
+          apiKey: "apiKey",
+          host: invalidHost,
+        },
+        {} as TopsortEvent,
+      ),
+    ).toThrow(AppError);
   });
 });

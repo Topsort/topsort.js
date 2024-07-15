@@ -2,6 +2,7 @@ import { apis, baseURL } from "../constants/apis.constant";
 import type { TopsortEvent } from "../interfaces/events.interface";
 import type { Config } from "../interfaces/shared.interface";
 import APIClient from "../lib/api-client";
+import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
 
 /**
@@ -24,7 +25,9 @@ async function handler(config: Config, event: TopsortEvent): Promise<{ ok: boole
   try {
     url = new URL(`${config.host || baseURL}/${apis.events}`);
   } catch (error) {
-    throw new Error(`Invalid URL: ${config.host || baseURL}/${apis.events}`);
+    throw new AppError(400, "Invalid URL", {
+      error: `Invalid URL: ${config.host || baseURL}/${apis.events}`,
+    });
   }
 
   await APIClient.post(url.toString(), event, config);

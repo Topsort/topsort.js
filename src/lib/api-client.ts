@@ -31,20 +31,16 @@ class APIClient {
       const response = await fetch(`${endpoint ?? this.baseUrl}`, options);
       return this.handleResponse(response);
     } catch (error) {
-      if (error instanceof AppError) {
-        throw error;
-      }
-
       const message = error instanceof Error ? error.message : "Unknown error";
       throw new AppError(500, "Internal Server Error", message);
     }
   }
 
-  public async get(endpoint: string): Promise<unknown> {
-    return this.request(endpoint, {
-      method: "GET",
-    });
-  }
+  // public async get(endpoint: string): Promise<unknown> {
+  //   return this.request(endpoint, {
+  //     method: "GET",
+  //   });
+  // }
 
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
     return this.request(endpoint, {
