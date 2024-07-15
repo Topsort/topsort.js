@@ -19,13 +19,14 @@
     "build": "bun build src/index.ts --outdir=dist",
     "test": "bun test",
     "format": "biome check",
-    "format:fix": "biome check --write"
+    "format:fix": "biome check --write",
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "lefthook": "^1.6.18",
     "@supabase/doctest-js": "^0.1.0",
     "@types/bun": "^1.1.6",
-    "husky": "^9.0.11",
     "msw": "^2.3.1"
   },
   "peerDependencies": {
