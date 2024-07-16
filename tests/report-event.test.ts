@@ -12,7 +12,7 @@ describe("reportEvent", () => {
     returnStatus(401, `${baseURL}/${apis.events}`);
     expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 401,
-      statusText: "",
+      statusText: "Unauthorized",
       body: {},
     });
   });
@@ -21,7 +21,7 @@ describe("reportEvent", () => {
     returnStatus(429, `${baseURL}/${apis.events}`);
     expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 429,
-      statusText: "",
+      statusText: "Too Many Requests",
       body: {},
     });
   });
@@ -30,7 +30,7 @@ describe("reportEvent", () => {
     returnStatus(500, `${baseURL}/${apis.events}`);
     expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 500,
-      statusText: "",
+      statusText: "Internal Server Error",
       body: {},
     });
   });

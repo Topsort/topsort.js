@@ -18,7 +18,7 @@ describe("createAuction", () => {
     returnStatus(401, `${baseURL}/${apis.auctions}`);
     expect(createAuction({ apiKey: "apiKey" }, {} as TopsortAuction)).rejects.toEqual({
       status: 401,
-      statusText: "",
+      statusText: "Unauthorized",
       body: {},
     });
   });
@@ -27,7 +27,7 @@ describe("createAuction", () => {
     returnStatus(429, `${baseURL}/${apis.auctions}`);
     expect(createAuction({ apiKey: "apiKey" }, {} as TopsortAuction)).rejects.toEqual({
       status: 429,
-      statusText: "",
+      statusText: "Too Many Requests",
       body: {},
     });
   });
@@ -36,7 +36,7 @@ describe("createAuction", () => {
     returnStatus(500, `${baseURL}/${apis.auctions}`);
     expect(createAuction({ apiKey: "apiKey" }, {} as TopsortAuction)).rejects.toEqual({
       status: 500,
-      statusText: "",
+      statusText: "Internal Server Error",
       body: {},
     });
   });
