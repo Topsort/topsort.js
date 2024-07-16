@@ -1,9 +1,9 @@
 import { apis, baseURL } from "../constants/apis.constant";
-import type { TopsortEvent } from "../interfaces/events.interface";
-import type { Config } from "../interfaces/shared.interface";
 import APIClient from "../lib/api-client";
 import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
+import type { TopsortEvent } from "../types/events";
+import type { Config } from "../types/shared";
 
 /**
  * Reports an event to the Topsort API.

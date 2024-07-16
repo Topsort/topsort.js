@@ -1,6 +1,6 @@
 import { version } from "../../package.json";
 import { baseURL } from "../constants/apis.constant";
-import type { Config } from "../interfaces/shared.interface";
+import type { Config } from "../types/shared";
 import AppError from "./app-error";
 
 class APIClient {
@@ -35,12 +35,6 @@ class APIClient {
       throw new AppError(500, "Internal Server Error", message);
     }
   }
-
-  // public async get(endpoint: string): Promise<unknown> {
-  //   return this.request(endpoint, {
-  //     method: "GET",
-  //   });
-  // }
 
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
     return this.request(endpoint, {

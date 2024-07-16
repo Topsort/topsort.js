@@ -1,4 +1,4 @@
-import type { Config } from "../interfaces/shared.interface";
+import type { Config } from "../types/shared";
 import AppError from "./app-error";
 
 export function validateConfig(config: Config): void {

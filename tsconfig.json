@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
     "allowJs": true,
-    "types": ["node"] //As part of making the `new URL()` to work
+    "types": ["node"]
   },
   "include": ["src/*.ts", "src/**/*.ts"],
   "exclude": ["node_modules"]

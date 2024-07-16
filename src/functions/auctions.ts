@@ -1,9 +1,9 @@
 import { apis, baseURL } from "../constants/apis.constant";
-import type { AuctionResult, TopsortAuction } from "../interfaces/auctions.interface";
-import type { Config } from "../interfaces/shared.interface";
 import APIClient from "../lib/api-client";
 import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
+import type { AuctionResult, TopsortAuction } from "../types/auctions";
+import type { Config } from "../types/shared";
 
 async function handler(config: Config, body: TopsortAuction): Promise<AuctionResult> {
   let url: URL;

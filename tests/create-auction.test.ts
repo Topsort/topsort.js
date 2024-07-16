@@ -7,8 +7,8 @@ import {
   returnError,
   returnStatus,
 } from "../src/constants/handlers.constant";
-import type { TopsortAuction } from "../src/interfaces/auctions.interface";
 import AppError from "../src/lib/app-error";
+import type { TopsortAuction } from "../src/types/auctions";
 
 describe("createAuction", () => {
   beforeAll(() => mswServer.listen());
