@@ -16,7 +16,7 @@
   },
   "files": ["dist/*"],
   "scripts": {
-    "build": "bun build src/index.ts --outdir=dist",
+    "build": "rm -rf dist && bun run tsup",
     "test": "bun test",
     "format": "biome check",
     "format:fix": "biome check --write",
@@ -24,13 +24,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
-    "lefthook": "^1.6.18",
     "@supabase/doctest-js": "^0.1.0",
     "@types/bun": "^1.1.6",
-    "msw": "^2.3.1"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {}
+    "lefthook": "^1.6.18",
+    "msw": "^2.3.1",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.3"
+  }
 }
