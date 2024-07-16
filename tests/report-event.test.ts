@@ -1,9 +1,8 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, jest } from "bun:test";
-import { apis, baseURL } from "../constants/apis.constant";
-import { mswServer, returnError, returnStatus } from "../constants/handlers.constant";
-import { reportEvent } from "../functions/report-event";
-import type { TopsortEvent } from "../interfaces/events.interface";
-import AppError from "../lib/app-error";
+import { afterEach, beforeAll, describe, expect, it } from "bun:test";
+import { type TopsortEvent, reportEvent } from "../src";
+import { apis, baseURL } from "../src/constants/apis.constant";
+import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
+import AppError from "../src/lib/app-error";
 
 describe("reportEvent", () => {
   beforeAll(() => mswServer.listen());

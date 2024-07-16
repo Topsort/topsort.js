@@ -1,7 +1,6 @@
-import type { Config } from "../interfaces/shared.interface";
-import { validateConfig } from "../lib/validate-config";
-
-import AppError from "../lib/app-error";
+import type { Config } from "../src/interfaces/shared.interface";
+import AppError from "../src/lib/app-error";
+import { validateConfig } from "../src/lib/validate-config";
 
 describe("validateConfig", () => {
   it("should throw an error if apiKey is missing", () => {

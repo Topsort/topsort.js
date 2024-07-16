@@ -1,14 +1,14 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, jest } from "bun:test";
-import { apis, baseURL } from "../constants/apis.constant";
+import { afterEach, beforeAll, describe, expect, it } from "bun:test";
+import { createAuction } from "../src";
+import { apis, baseURL } from "../src/constants/apis.constant";
 import {
   mswServer,
   returnAuctionSuccess,
   returnError,
   returnStatus,
-} from "../constants/handlers.constant";
-import { createAuction } from "../functions/create-auction";
-import type { TopsortAuction } from "../interfaces/auctions.interface";
-import AppError from "../lib/app-error";
+} from "../src/constants/handlers.constant";
+import type { TopsortAuction } from "../src/interfaces/auctions.interface";
+import AppError from "../src/lib/app-error";
 
 describe("createAuction", () => {
   beforeAll(() => mswServer.listen());
