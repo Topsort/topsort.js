@@ -4,7 +4,8 @@
   "description": "",
   "private": true,
   "packageManager": "bun@1.1.17",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "author": "Márcio Barbosa <marcio@topsort.com>",
   "license": "UNLICENSED",
   "exports": {
