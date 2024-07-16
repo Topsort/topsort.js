@@ -10,14 +10,14 @@ import type { Config } from "../types/shared";
  *
  * @example
  * ```js
- * const event = { eventType: "test", eventData: {} };
  * const config = { apiKey: "api-key" };
- * const result = await reportEvent(event, config);
+ * const event = { eventType: "test", eventData: {} };
+ * const result = await reportEvent(config, event);
  * console.log(result); // { "ok": true }
  * ```
  *
- * @param event - The event to report.
  * @param config - The configuration object containing the API Key and optionally, the Host.
+ * @param event - The event to report.
  * @returns {Promise<{ok: boolean}>} The result of the report, indicating success.
  */
 async function handler(config: Config, event: TopsortEvent): Promise<{ ok: boolean }> {
