@@ -39,11 +39,11 @@ are more sensitive, emailed to <marcio@topsort.com>.
 
 To install Topsort.js as a contributor, you need to have Bun installed on your machine. Follow the instructions on the [Bun website](https://bun.sh/) to install it.
 
-You will also need [typos][https://github.com/crate-ci/typos] for validating documentation. Install it through your package manager (on MacOS: `brew install typos-cli`)
+You will also need [typos](https://github.com/crate-ci/typos) for validating documentation and [actionlint](https://github.com/rhysd/actionlint) for validating actions. Install it through your package manager of choice (on MacOS: `brew install typos-cli actionlint`).
 
 Clone the repository and install the dependencies:
 
-```sh
+```bash
 git clone git@github.com:Topsort/topsort.js.git
 cd topsort.js
 bun install
@@ -54,6 +54,7 @@ bun install
 In order to run a local application and test it against the local Topsort.js you need to do the following (after having the SDK all set up on local machine):
 
 On Topsort.js:
+
 ```bash
 bun run build
 bun link
@@ -62,11 +63,14 @@ bun link
 This will register a local `topsort.js` to be used on the secondary project.
 
 On the secondary project, if using bun, run:
+
 ```bash
 bun link topsort.js
 ```
+
 Or add it in dependencies in the package.json file:
-```sh
+
+```bash
 "topsort.js": "link:topsort.js"
 ```
 
@@ -74,7 +78,7 @@ Or add it in dependencies in the package.json file:
 
 To build the SDK, run the following command:
 
-```sh
+```bash
 bun run build
 ```
 
@@ -86,19 +90,21 @@ This command cleans the `dist` directory and compiles the Typescript files into 
 
 To run the unit tests, use the following command:
 
-```sh
+```bash
 bun run test
 ```
 
 ## Code Standards
 
 We follow the coding standards set by Biome. Ensure your code follows these guidelines before submitting a pull request. You can run the formatter with the following command:
-```sh
+
+```bash
 bun run format
 ```
 
 To automatically fix issues:
-```sh
+
+```bash
 bun run format:fix
 ```
 
@@ -116,10 +122,8 @@ We do conventional commits, so it will fail on checker with capital case after c
 ## Configuration
 
 The SDK uses following configuration files:
-
-`tsconfig.json`: TypeScript configuration.
-
-`tsup.config.ts`: Configuration for the TSUP bundler.
+- `tsconfig.json`: TypeScript configuration.
+- `tsup.config.ts`: Configuration for the TSUP bundler.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

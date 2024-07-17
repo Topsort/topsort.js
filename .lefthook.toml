@@ -14,3 +14,7 @@ run = "bun test"
 [pre-commit.commands.typos]
 glob = "*.{md,mdoc,mdx}"
 run = "typos {staged_files}"
+
+[pre-commit.commands.actionlint]
+glob = ".github/workflows/*.yml"
+run = "actionlint {staged_files}"
