@@ -16,7 +16,7 @@ We'd love to accept your patches and contributions to this project. Bellow, you 
 - [Running Locally](#running-locally)
 - [Building the SDK](#building-the-sdk)
 - [Tests](#tests)
-  - [Integration Tests](#integration-tests)
+  - [Unit Tests](#unit-tests)
 - [Code Standards](#code-standards)
 - [Submitting contributions](#submitting-contributions)
   - [Commit Messages](#commit-messages)
@@ -80,9 +80,9 @@ This command cleans the `dist` directory and compiles the Typescript files into 
 
 ## Tests
 
-### Integration Tests
+### Unit Tests
 
-To run the integration tests, use the following command:
+To run the unit tests, use the following command:
 
 ```sh
 bun run test

@@ -32,7 +32,7 @@ yarn add @topsort/topsort.js --save
 To create an auction, use the createAuction function. Here is an example:
 
 ```js
-import { createAuction, TopsortAuction } from '@topsort/topsort.js';
+import { createAuction, type TopsortAuction } from '@topsort/topsort.js';
 
 const auctionDetails: TopsortAuction = {
   auctions: [
@@ -54,7 +54,8 @@ const auctionDetails: TopsortAuction = {
 };
 
 const config = {
-  apiKey: "your-api-key",
+  // generate your api key in the auction manager - it should look some thing like this
+  apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
 };
 
 createAuction(config, auctionDetails)
@@ -64,7 +65,7 @@ createAuction(config, auctionDetails)
 
 #### Parameters
 
-`config`: An object containing configuration details including the API key.
+`config`: An object containing configuration details including the API key. Please refer to [Auction Manager](https://app.topsort.com/new/en-US/marketplace/account-settings/api-integration)
 
 `auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
 
@@ -95,12 +96,12 @@ createAuction(config, auctionDetails)
 400:
 ```json
 {
-  status: 400,
-  statusText: "No Content",
-  body: {
-    errCode: "bad_request",
-    docUrl: "https://docs.topsort.com/reference/errors",
-    message: "The request could not be parsed.",
+  "status": 400,
+  "statusText": "No Content",
+  "body": {
+    "errCode": "bad_request",
+    "docUrl": "https://docs.topsort.com/reference/errors",
+    "message": "The request could not be parsed.",
   },
 }
 ```
@@ -110,7 +111,7 @@ createAuction(config, auctionDetails)
 To report an event, use the reportEvent function. Here is an example:
 
 ```js
-import { reportEvent, TopsortEvent } from 'topsort.js';
+import { reportEvent, type TopsortEvent } from 'topsort.js';
 
 const event: TopsortEvent = {
     impressions: [
@@ -128,7 +129,8 @@ const event: TopsortEvent = {
   };
   
 const config = {
-  apiKey: "your-api-key",
+  // generate your api key in the auction manager - it should look some thing like this
+  apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
 };
 
 reportEvent(config, event)
@@ -138,7 +140,7 @@ reportEvent(config, event)
 
 #### Parameters
 
-`config`: An object containing configuration details including the API key.
+`config`: An object containing configuration details including the API key. Please refer to [Auction Manager](https://app.topsort.com/new/en-US/marketplace/account-settings/api-integration)
 
 `event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
 
@@ -147,18 +149,18 @@ reportEvent(config, event)
 200:
 ```json
 {
-    ok: true
+    "ok": true
 }
 ```
 400:
 ```json
 {
-  status: 204,
-  statusText: "No Content",
-  body: {
-    errCode: "bad_request",
-    docUrl: "https://docs.topsort.com/reference/errors",
-    message: "The request could not be parsed.",
+  "status": 204,
+  "statusText": "No Content",
+  "body": {
+    "errCode": "bad_request",
+    "docUrl": "https://docs.topsort.com/reference/errors",
+    "message": "The request could not be parsed.",
   },
 }
 ```
