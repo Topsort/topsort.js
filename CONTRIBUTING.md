@@ -1,6 +1,6 @@
-# Topsort.js
+# @topsort/sdk
 
-This repository holds the official Topsort.js client library. This project is built with [TypeScript][typescript] and uses [Bun][bun] for package management and testing.
+This repository holds the official Topsort javascript client library. This project is built with [TypeScript][typescript] and uses [Bun][bun] for package management and testing.
 
 [typescript]: https://www.typescriptlang.org
 [bun]: https://bun.sh/
@@ -37,9 +37,9 @@ are more sensitive, emailed to <marcio@topsort.com>.
 
 ## Local Installation
 
-To install Topsort.js as a contributor, you need to have Bun installed on your machine. Follow the instructions on the [Bun website](https://bun.sh/) to install it.
+To modify or interact with the source code, you need to install Bun (the runtime). Follow the instructions on the [Bun website](https://bun.sh/) to install it.
 
-You will also need [typos](https://github.com/crate-ci/typos) for validating documentation and [actionlint](https://github.com/rhysd/actionlint) for validating actions. Install it through your package manager of choice (on MacOS: `brew install typos-cli actionlint`).
+You will additionally need [typos](https://github.com/crate-ci/typos) for validating documentation and [actionlint](https://github.com/rhysd/actionlint) for validating actions. Install it through your package manager of choice (on MacOS: `brew install typos-cli actionlint`).
 
 Clone the repository and install the dependencies:
 
@@ -60,18 +60,18 @@ bun run build
 bun link
 ```
 
-This will register a local `topsort.js` to be used on the secondary project.
+This will set up a local `@topsort/sdk` library to be used on another local project.
 
 On the secondary project, if using bun, run:
 
 ```bash
-bun link topsort.js
+bun link @topsort/sdk
 ```
 
 Or add it in dependencies in the package.json file:
 
 ```bash
-"topsort.js": "link:topsort.js"
+"@topsort/sdk": "link:@topsort/sdk"
 ```
 
 ## Building the SDK
@@ -82,7 +82,7 @@ To build the SDK, run the following command:
 bun run build
 ```
 
-This command cleans the `dist` directory and compiles the Typescript files into Javascript back to it
+This command compiles Typescript into Javascript, suitable for use in more runtimes and browsers.
 
 ## Tests
 
@@ -109,6 +109,7 @@ bun run format:fix
 ```
 
 ## Submitting Contributions
+
 ### Commit Messages
 
 We do conventional commits, so it will fail on checker with capital case after commit prefix. Refer to [Conventional Commits spec](https://www.conventionalcommits.org/en/v1.0.0/) or to [Amannn's Github Action for Semantic Pull Request](https://github.com/amannn/action-semantic-pull-request) for details.
