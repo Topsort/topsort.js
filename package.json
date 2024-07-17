@@ -24,7 +24,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && bun run tsup",
+    "build": "tsup",
     "format": "biome check",
     "format:fix": "biome check --write",
     "prepare": "lefthook install"
