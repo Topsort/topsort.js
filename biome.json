@@ -12,12 +12,18 @@
     }
   },
   "formatter": {
+    "enabled": true,
     "formatWithErrors": true,
     "indentStyle": "space",
-    "enabled": true,
     "lineWidth": 100
   },
   "linter": {
     "enabled": true
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "defaultBranch": "main",
+    "useIgnoreFile": true
   }
 }

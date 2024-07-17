@@ -1,0 +1,19 @@
+name: Renovate
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/validate-renovate.yml"
+      - ".github/renovate.json"
+
+jobs:
+  validate-renovate-config:
+    name: Validate config
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install -g renovate
+
+      - name: Validate config
+        run: renovate-config-validator .github/renovate.json
