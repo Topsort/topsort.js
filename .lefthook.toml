@@ -1,0 +1,16 @@
+skip_output = ['meta', 'execution', 'empty_summary']
+
+[pre-commit]
+parallel = true
+
+[pre-commit.commands.biome]
+glob = "*.{json,ts}"
+run = "node_modules/.bin/biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}"
+
+[pre-commit.commands.test]
+glob = "*.ts"
+run = "bun test"
+
+[pre-commit.commands.typos]
+glob = "*.{md,mdoc,mdx}"
+run = "typos {staged_files}"
