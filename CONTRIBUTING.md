@@ -1,4 +1,4 @@
-# @topsort/sdk
+# Topsort SDK
 
 This repository holds the official Topsort javascript client library. This project is built with [TypeScript][typescript] and uses [Bun][bun] for package management and testing.
 
