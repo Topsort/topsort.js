@@ -39,6 +39,8 @@ are more sensitive, emailed to <marcio@topsort.com>.
 
 To install Topsort.js as a contributor, you need to have Bun installed on your machine. Follow the instructions on the [Bun website](https://bun.sh/) to install it.
 
+You will also need [typos][https://github.com/crate-ci/typos] for validating documentation. Install it through your package manager (on MacOS: `brew install typos-cli`)
+
 Clone the repository and install the dependencies:
 
 ```sh
