@@ -2,8 +2,8 @@ name: Renovate
 on:
   pull_request:
     paths:
-      - .github/workflows/validate-renovate.yml
-      - .github/renovate.json
+      - ".github/workflows/validate-renovate.yml"
+      - ".github/renovate.json"
 
 jobs:
   validate-renovate-config:

@@ -2,7 +2,7 @@ name: Github Actions
 on:
   pull_request:
     paths:
-      - .github/workflows/*.yml
+      - ".github/workflows/*.yml"
 
 jobs:
   actionlint:
