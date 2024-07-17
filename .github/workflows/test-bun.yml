@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - "**/*.ts"
+  push:
+    branches:
+      - main
 
 jobs:
   bun-test:
@@ -15,4 +18,11 @@ jobs:
       - run: bun install
 
       - name: Run tests
-        run: bun test
+        run: bun test --coverage-reporter lcov
+
+      - uses: codecov/codecov-action@v4.5.0
+        with:
+          slug: Topsort/topsort.js
+          files: coverage.lcov
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittest
