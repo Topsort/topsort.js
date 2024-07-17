@@ -1,0 +1,39 @@
+{
+  "name": "topsort.js",
+  "version": "0.1.0",
+  "description": "",
+  "packageManager": "bun@1.1.20",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "author": "Márcio Barbosa <marcio@topsort.com>",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/index.js",
+    "dist/index.mjs",
+    "dist/*.d.ts",
+    "package.json",
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && bun run tsup",
+    "test": "bun test",
+    "format": "biome check",
+    "format:fix": "biome check --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@types/bun": "1.1.6",
+    "msw": "2.3.1",
+    "tsup": "8.1.0",
+    "typescript": "5.5.3"
+  }
+}

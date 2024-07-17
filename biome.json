@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "ignore": ["dist/**"]
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "formatter": {
+    "formatWithErrors": true,
+    "indentStyle": "space",
+    "enabled": true,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true
+  }
+}
