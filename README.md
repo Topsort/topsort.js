@@ -8,46 +8,21 @@ This repository holds the official Topsort.js client library. This project is bu
 ## Table of Contents
 
 - [Installation](#installation)
-- [Running Locally](#running-locally)
 - [Usage](#usage)
   - [Creating an Auction](#auctions)
   - [Reporting an Event](#events)
-- [Development](#development)
-  - [Building the SDK](#building-the-sdk)
-  - [Running Integration Tests](#running-integration-tests)
-- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
-To install Topsort.js, you need to have Bun installed on your machine. Follow the instructions on the [Bun website](https://bun.sh/) to install it.
-
-Clone the repository and install the dependencies:
-
+With npm:
 ```sh
-git clone git@github.com:Topsort/topsort.js.git
-cd topsort.js
-bun install
+npm install @topsort/topsort.js --save
 ```
-
-## Running Locally
-
-In order to run a local application and test it against the local Topsort.js you need to do the following (after having the SDK all set up on local machine):
-
-On Topsort.js:
-```bash
-bun run build
-bun link
-```
-
-This will register a local `topsort.js` to be used on the secondary project.
-
-On the secondary project, if using bun, run:
-```bash
-bun link topsort.js
-```
-Or add it in dependencies in the package.json file:
+With yarn:
 ```sh
-"topsort.js": "link:topsort.js"
+yarn add @topsort/topsort.js --save
 ```
 
 ## Usage
@@ -57,9 +32,9 @@ Or add it in dependencies in the package.json file:
 To create an auction, use the createAuction function. Here is an example:
 
 ```js
-import { createAuction } from 'topsort.js';
+import { createAuction, TopsortAuction } from '@topsort/topsort.js';
 
-const auctionDetails = {
+const auctionDetails: TopsortAuction = {
   auctions: [
     {
       type: "listings",
@@ -87,27 +62,67 @@ createAuction(config, auctionDetails)
   .catch(error => console.error(error));
 ```
 
-Parameters:
+#### Parameters
 
 `config`: An object containing configuration details including the API key.
 
-`auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions).
+`auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
+
+#### Sample response
+
+200:
+```json
+{
+  "results": [
+    {
+      "winners": [
+        {
+          "rank": 1,
+          "type": "product",
+          "id": "p_Mfk11",
+          "resolvedBidId": "WyJiX01mazExIiwiMTJhNTU4MjgtOGVhZC00Mjk5LTMyNjYtY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=="
+        }
+      ],
+      "error": false
+    },
+    {
+      "winners": [],
+      "error": false
+    }
+  ]
+}
+```
+400:
+```json
+{
+  status: 400,
+  statusText: "No Content",
+  body: {
+    errCode: "bad_request",
+    docUrl: "https://docs.topsort.com/reference/errors",
+    message: "The request could not be parsed.",
+  },
+}
+```
 
 ### Events
 
 To report an event, use the reportEvent function. Here is an example:
 
 ```js
-import { reportEvent } from 'topsort.js';
+import { reportEvent, TopsortEvent } from 'topsort.js';
 
-const event = {
+const event: TopsortEvent = {
     impressions: [
       {
         resolvedBidId:
-          "ChAGaP5D2ex-UKEEBCOHwvDjEhABkF4FDAx0S5mMD2cO",
-        id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46150",
+          "ChAGaP5D2ex-UKEEBCOHwvDjEhABkF4FDAx0S5mMD2cOG0w9GhABkEnL2CB6qKIoqeItVgA_InsKd2h0dHBzOi8vd3d3LndlYmEuYmUvZnIvcHJvbW8uaHRtbD91dG1fc291cmNlPW15c2hvcGkmdXRtX21lZGl1bT1iYW5uZXJfMTI4MHg0MDAmdXRtX2NvbnRlbnQ9ZGlzcGxheSZ1dG1fY2FtcGFpZ249c29sZGVuEAU",
+        id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46149",
         occurredAt: "2024-07-11T13:55:09Z",
-        opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e9",
+        opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
+        placement: {
+          path: "/categories/sports",
+        }
       },
     ],
   };
@@ -121,36 +136,38 @@ reportEvent(config, event)
   .catch(error => console.error(error));
 ```
 
-Parameters:
+#### Parameters
 
 `config`: An object containing configuration details including the API key.
 
-`event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents).
+`event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
 
-## Development
+#### Sample response
 
-### Building the SDK
-
-To build the SDK, run the following command:
-
-```sh
-bun run build
+200:
+```json
+{
+    ok: true
+}
+```
+400:
+```json
+{
+  status: 204,
+  statusText: "No Content",
+  body: {
+    errCode: "bad_request",
+    docUrl: "https://docs.topsort.com/reference/errors",
+    message: "The request could not be parsed.",
+  },
+}
 ```
 
-This command cleans the `dist` directory and compiles the Typescript files into Javascript back to it
+## Contributing
 
-### Running Integration Tests
+We aim to cover the entire Topsort API, and contributions are always welcome. The calling pattern is well established, making the addition of new methods relatively straightforward. For more detailed guidelines on how to contribute, please refer to our [CONTRIBUTING.md](CONTRIBUTING.md).
 
-To run the integration tests, use the following command:
+Your help in enhancing the project is highly appreciated. Whether it’s reporting a bug, suggesting a new feature, or submitting a pull request, every bit of input helps us improve. Thank you for your support and happy coding!
 
-```sh
-bun run test
-```
-
-## Configuration
-
-The SDK uses following configuration files:
-
-`tsconfig.json`: TypeScript configuration.
-
-`tsup.config.ts`: Configuration for the TSUP bundler.
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

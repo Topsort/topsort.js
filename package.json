@@ -7,7 +7,7 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "author": "Márcio Barbosa <marcio@topsort.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
