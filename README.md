@@ -1,6 +1,6 @@
-# Topsort.js
+# Topsort SDK
 
-This repository holds the official Topsort.js client library. This project is built with [TypeScript][typescript] and uses [Bun][bun] for package management and testing.
+This repository holds the official Topsort javascript client library. This project is built with [TypeScript][typescript] and uses [Bun][bun] for package management and testing.
 
 [typescript]: https://www.typescriptlang.org
 [bun]: https://bun.sh/
@@ -16,23 +16,24 @@ This repository holds the official Topsort.js client library. This project is bu
 
 ## Installation
 
-With npm:
+Using npm:
 ```sh
-npm install @topsort/topsort.js --save
+npm install @topsort/sdk --save
 ```
-With yarn:
+
+Using yarn:
 ```sh
-yarn add @topsort/topsort.js --save
+yarn add @topsort/sdk --save
 ```
 
 ## Usage
 
 ### Auctions
 
-To create an auction, use the createAuction function. Here is an example:
+To create an auction, use the `createAuction` function. Example:
 
 ```js
-import { createAuction, type TopsortAuction } from '@topsort/topsort.js';
+import { type TopsortAuction, createAuction } from "@topsort/sdk";
 
 const auctionDetails: TopsortAuction = {
   auctions: [
@@ -55,12 +56,13 @@ const auctionDetails: TopsortAuction = {
 
 const config = {
   // generate your api key in the auction manager - it should look some thing like this
+  // note: this is an invalid key and won't work, you need to replace it with your own
   apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
 };
 
 createAuction(config, auctionDetails)
-  .then(result => console.log(result))
-  .catch(error => console.error(error));
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
 ```
 
 #### Parameters
@@ -111,31 +113,31 @@ createAuction(config, auctionDetails)
 To report an event, use the reportEvent function. Here is an example:
 
 ```js
-import { reportEvent, type TopsortEvent } from 'topsort.js';
+import { type TopsortEvent, reportEvent } from "@topsort/sdk";
 
 const event: TopsortEvent = {
-    impressions: [
-      {
-        resolvedBidId:
-          "ChAGaP5D2ex-UKEEBCOHwvDjEhABkF4FDAx0S5mMD2cOG0w9GhABkEnL2CB6qKIoqeItVgA_InsKd2h0dHBzOi8vd3d3LndlYmEuYmUvZnIvcHJvbW8uaHRtbD91dG1fc291cmNlPW15c2hvcGkmdXRtX21lZGl1bT1iYW5uZXJfMTI4MHg0MDAmdXRtX2NvbnRlbnQ9ZGlzcGxheSZ1dG1fY2FtcGFpZ249c29sZGVuEAU",
-        id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46149",
-        occurredAt: "2024-07-11T13:55:09Z",
-        opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
-        placement: {
-          path: "/categories/sports",
-        }
+  impressions: [
+    {
+      resolvedBidId:
+        "ChAGaP5D2ex-UKEEBCOHwvDjEhABkF4FDAx0S5mMD2cOG0w9GhABkEnL2CB6qKIoqeItVgA_InsKd2h0dHBzOi8vd3d3LndlYmEuYmUvZnIvcHJvbW8uaHRtbD91dG1fc291cmNlPW15c2hvcGkmdXRtX21lZGl1bT1iYW5uZXJfMTI4MHg0MDAmdXRtX2NvbnRlbnQ9ZGlzcGxheSZ1dG1fY2FtcGFpZ249c29sZGVuEAU",
+      id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46149",
+      occurredAt: "2024-07-11T13:55:09Z",
+      opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
+      placement: {
+        path: "/categories/sports",
       },
-    ],
-  };
-  
+    },
+  ],
+};
+
 const config = {
   // generate your api key in the auction manager - it should look some thing like this
   apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
 };
 
 reportEvent(config, event)
-  .then(result => console.log(result))
-  .catch(error => console.error(error));
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
 ```
 
 #### Parameters
@@ -172,4 +174,5 @@ We aim to cover the entire Topsort API, and contributions are always welcome. Th
 Your help in enhancing the project is highly appreciated. Whether it’s reporting a bug, suggesting a new feature, or submitting a pull request, every bit of input helps us improve. Thank you for your support and happy coding!
 
 ## License
+
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

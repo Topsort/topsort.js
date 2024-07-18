@@ -1,5 +1,5 @@
 {
-  "name": "topsort.js",
+  "name": "@topsort/sdk",
   "version": "0.1.0",
   "description": "",
   "packageManager": "bun@1.1.20",
