@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topsort SDK Test Application</title>
+    <script src="../dist/index.global.js"></script>
+  </head>
+  <body>
+    <h1>Test Topsort.js Integration</h1>
+    <form id="auction-form">
+      <input type="text" name="apiKey" placeholder="API Key" required />
+      <input
+        type="text"
+        name="auctionDetails"
+        placeholder="Auction Details"
+        required
+      />
+      <button type="submit">Create Auction</button>
+    </form>
+    <pre id="response"></pre>
+    <script>
+      document
+        .getElementById("auction-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const apiKey = event.target.apiKey.value;
+          const auctionDetails = JSON.parse(event.target.auctionDetails.value);
+          const config = { apiKey };
+          try {
+            const result = await Topsort.createAuction(
+              config,
+              auctionDetails
+            );
+            document.getElementById("response").textContent = JSON.stringify(
+              result,
+              null,
+              2
+            );
+          } catch (error) {
+            document.getElementById("response").textContent = error.toString();
+          }
+        });
+    </script>
+  </body>
+</html>

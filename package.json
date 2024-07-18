@@ -32,13 +32,16 @@
   ],
   "scripts": {
     "build": "tsup",
+    "test:e2e": "playwright test",
     "format": "biome check",
     "format:fix": "biome check --write",
     "prepare": "lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@playwright/test": "^1.45.2",
     "@types/bun": "1.1.6",
+    "http-server": "^14.1.1",
     "lefthook": "1.7.2",
     "msw": "2.3.1",
     "tsup": "8.1.0",
