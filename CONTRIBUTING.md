@@ -17,6 +17,7 @@ We'd love to accept your patches and contributions to this project. Bellow, you 
 - [Building the SDK](#building-the-sdk)
 - [Tests](#tests)
   - [Unit Tests](#unit-tests)
+  - [E2E Tests](#e2e-tests)
 - [Code Standards](#code-standards)
 - [Submitting contributions](#submitting-contributions)
   - [Commit Messages](#commit-messages)
@@ -94,6 +95,14 @@ To run the unit tests, use the following command:
 bun run test
 ```
 
+### E2E Tests
+
+To run the end-to-end tests, use the following command:
+
+```bash
+bun run test:e2e
+```
+
 ## Code Standards
 
 We follow the coding standards set by Biome. Ensure your code follows these guidelines before submitting a pull request. You can run the formatter with the following command:
@@ -125,6 +134,7 @@ We do conventional commits, so it will fail on checker with capital case after c
 The SDK uses following configuration files:
 - `tsconfig.json`: TypeScript configuration.
 - `tsup.config.ts`: Configuration for the TSUP bundler.
+- `playwright.config.ts`: Configuration for E2E tests runner
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
