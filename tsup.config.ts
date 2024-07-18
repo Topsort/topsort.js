@@ -8,6 +8,6 @@ export default defineConfig({
   minify: true,
   esbuildOptions(options) {
     options.keepNames = true;
-    options.globalName = "Topsort"
+    options.globalName = "Topsort";
   },
 });
