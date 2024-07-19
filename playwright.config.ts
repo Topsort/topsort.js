@@ -23,7 +23,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "http-server ./ -p 8080",
+    command: `http-server ./ -p ${process.env.PLAYWRIGHT_PORT || 8080}`,
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",
     stderr: "pipe",

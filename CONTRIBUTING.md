@@ -97,6 +97,7 @@ bun run test
 
 ### E2E Tests
 
+By default, the application is set to serve a web browser in the port `8080` for Playwright. If this port is already being used on your local machine, make sure you change the port in your `.env`.`PLAYWRIGHT_PORT`.
 To run the end-to-end tests, make sure you have latest bundled file before running it. Use the following commands:
 
 ```bash
@@ -136,6 +137,9 @@ The SDK uses following configuration files:
 - `tsconfig.json`: TypeScript configuration.
 - `tsup.config.ts`: Configuration for the TSUP bundler.
 - `playwright.config.ts`: Configuration for E2E tests runner
+
+We also have the following variables as part of the `.env` file:
+- `PLAYWRIGHT_PORT`: Port used to run the local web browser to run Playwright E2E tests.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
