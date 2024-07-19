@@ -1,6 +1,6 @@
 interface Window {
   sdk: {
-    createAuction: (a, b) => unknown,
-    reportEvent: (a, b) => unknown,
+    createAuction: (a, b) => unknown;
+    reportEvent: (a, b) => unknown;
   };
 }

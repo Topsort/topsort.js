@@ -4,8 +4,8 @@ import { apis, baseURL } from "../src/constants/apis.constant";
 test.describe("Report Events via Topsort SDK", () => {
   test("should report an successfully", async ({ page }) => {
     const mockAPIResponse = {
-      ok: true
-    }
+      ok: true,
+    };
 
     await page.route(`${baseURL}/${apis.events}`, async (route) => {
       await route.fulfill({ json: mockAPIResponse });
@@ -43,11 +43,11 @@ test.describe("Report Events via Topsort SDK", () => {
   });
 
   test("should fail to call with missing apiKey", async ({ page }) => {
-    const expectedError = { status: 401, statusText: 'API Key is required.', body: {} }
+    const expectedError = { status: 401, statusText: "API Key is required.", body: {} };
     await page.goto("http://localhost:8080/e2e");
     const result = await page.evaluate(() => {
       const config = {
-        apiKey: null
+        apiKey: null,
       };
 
       const event = {

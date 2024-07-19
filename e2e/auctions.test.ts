@@ -57,11 +57,11 @@ test.describe("Create Auction via Topsort SDK", () => {
   });
 
   test("should fail to call with missing apiKey", async ({ page }) => {
-    const expectedError = { status: 401, statusText: 'API Key is required.', body: {} }
+    const expectedError = { status: 401, statusText: "API Key is required.", body: {} };
     await page.goto("http://localhost:8080/e2e");
     const result = await page.evaluate(() => {
       const config = {
-        apiKey: null
+        apiKey: null,
       };
 
       const auctionDetails = {
