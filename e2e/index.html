@@ -17,6 +17,13 @@
           ).catch((error) => error);
           return result;
         },
+        reportEvent: async (config, eventDetails) => {
+          const result = await Topsort.reportEvent(
+            config,
+            eventDetails
+          ).catch((error) => error);
+          return result;
+        },
       };
     </script>
   </body>

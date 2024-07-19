@@ -97,9 +97,10 @@ bun run test
 
 ### E2E Tests
 
-To run the end-to-end tests, use the following command:
+To run the end-to-end tests, make sure you have latest bundled file before running it. Use the following commands:
 
 ```bash
+bun run build
 bun run test:e2e
 ```
 
