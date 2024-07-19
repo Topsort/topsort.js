@@ -24,6 +24,7 @@
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
+    "dist/index.global.js",
     "dist/index.d.mts",
     "dist/index.d.ts",
     "dist/index.js",

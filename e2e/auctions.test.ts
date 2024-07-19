@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { apis, baseURL } from "../src/constants/apis.constant";
 
-test.describe("Create Auction via Topsort.js", () => {
-  test("should create auction successfully", async ({ page }) => {
+test.describe("Create Auction via Topsort SDK", () => {
+  test("should create an auction successfully", async ({ page }) => {
     const mockAPIResponse = {
       results: [
         {
@@ -22,12 +22,13 @@ test.describe("Create Auction via Topsort.js", () => {
       await route.fulfill({ json: mockAPIResponse });
     });
 
-    await page.goto("http://localhost:8080/e2e/index.html");
+    await page.goto("http://localhost:8080/e2e");
+    const result = await page.evaluate(() => {
+      const config = {
+        apiKey: "rando-api-key",
+      };
 
-    await page.fill('input[name="apiKey"]', "your-api-key");
-    await page.fill(
-      'input[name="auctionDetails"]',
-      JSON.stringify({
+      const auctionDetails = {
         auctions: [
           {
             type: "listings",
@@ -44,14 +45,14 @@ test.describe("Create Auction via Topsort.js", () => {
             geoTargeting: { location: "UK" },
           },
         ],
-      }),
-    );
+      };
+      if (typeof window.sdk.createAuction === "undefined") {
+        throw new Error("Global function `createAuctions` is not available.");
+      }
 
-    await page.click('button[type="submit"]');
+      return window.sdk.createAuction(config, auctionDetails);
+    });
 
-    const response = await page.locator("#response").textContent();
-    const jsonResponse = JSON.parse(response || "{}");
-    expect(jsonResponse).toEqual(mockAPIResponse);
-    expect(jsonResponse).toEqual(mockAPIResponse);
+    expect(result).toEqual(mockAPIResponse);
   });
 });

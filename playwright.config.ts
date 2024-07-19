@@ -4,7 +4,6 @@ export default defineConfig({
   testDir: "./e2e",
   timeout: 30000,
   retries: 1,
-  testMatch: "**/*.spec.ts",
   reporter: [["list"], ["json", { outputFile: "test-results.json" }]],
   use: {
     trace: "on-first-retry",
