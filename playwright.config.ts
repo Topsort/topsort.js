@@ -3,7 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   timeout: 30000,
-  retries: 1,
+  retries: 0,
   reporter: [["list"], ["json", { outputFile: "test-results.json" }]],
   use: {
     trace: "on-first-retry",
@@ -23,7 +23,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `http-server ./ -p ${process.env.PLAYWRIGHT_PORT || 8080}`,
+    command: "bun run serve",
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",
     stderr: "pipe",

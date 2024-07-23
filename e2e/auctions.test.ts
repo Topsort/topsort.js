@@ -3,7 +3,7 @@ import { apis, baseURL } from "../src/constants/apis.constant";
 import { playwrightConstants } from "./constants";
 
 test.describe("Create Auction via Topsort SDK", () => {
-  test("should create an auction successfully", async ({ page }) => {
+  test.only("should create an auction successfully", async ({ page }) => {
     const mockAPIResponse = {
       results: [
         {
