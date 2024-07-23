@@ -9,6 +9,10 @@ Bun.serve({
     const filePath = `./dist${pathname}`;
 
     try {
+      if (filePath.endsWith(".ico")) {
+        return new Response("", { status: 204 });
+      }
+
       return new Response(file(filePath));
     } catch (e) {
       return new Response("Not Found", { status: 404 });
