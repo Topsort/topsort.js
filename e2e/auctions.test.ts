@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { apis, baseURL } from "../src/constants/apis.constant";
-import { playwrightConstants } from "./constants";
+import { playwrightConstants } from "./config";
 
 test.describe("Create Auction via Topsort SDK", () => {
-  test.only("should create an auction successfully", async ({ page }) => {
+  test("should create an auction successfully", async ({ page }) => {
     const mockAPIResponse = {
       results: [
         {
@@ -23,7 +23,7 @@ test.describe("Create Auction via Topsort SDK", () => {
       await route.fulfill({ json: mockAPIResponse });
     });
 
-    await page.goto(playwrightConstants.url);
+    await page.goto(playwrightConstants.host);
     const result = await page.evaluate(() => {
       const config = {
         apiKey: "rando-api-key",
@@ -59,7 +59,7 @@ test.describe("Create Auction via Topsort SDK", () => {
 
   test("should fail to call with missing apiKey", async ({ page }) => {
     const expectedError = { status: 401, statusText: "API Key is required.", body: {} };
-    await page.goto(playwrightConstants.url);
+    await page.goto(playwrightConstants.host);
     const result = await page.evaluate(() => {
       const config = {
         apiKey: null,

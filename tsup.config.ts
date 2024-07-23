@@ -10,4 +10,5 @@ export default defineConfig({
     options.keepNames = true;
     options.globalName = "Topsort";
   },
+  onSuccess: "cp -r ./e2e/public/* dist",
 });
