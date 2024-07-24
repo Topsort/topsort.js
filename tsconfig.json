@@ -17,6 +17,6 @@
     "allowJs": true,
     "types": ["node"]
   },
-  "include": ["src/*.ts", "src/**/*.ts"],
+  "include": ["src/*.ts", "src/**/*.ts", "e2e/server.ts"],
   "exclude": ["node_modules"]
 }
