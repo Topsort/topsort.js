@@ -17,6 +17,7 @@ We'd love to accept your patches and contributions to this project. Bellow, you 
 - [Building the SDK](#building-the-sdk)
 - [Tests](#tests)
   - [Unit Tests](#unit-tests)
+  - [E2E Tests](#e2e-tests)
 - [Code Standards](#code-standards)
 - [Submitting contributions](#submitting-contributions)
   - [Commit Messages](#commit-messages)
@@ -94,6 +95,24 @@ To run the unit tests, use the following command:
 bun run test
 ```
 
+### E2E Tests
+
+By default, the application is set to serve a web browser in the port `8080` for Playwright. If this port is already being used on your local machine, make sure you change the port in your `.env`.`SERVER_PORT`.
+To run the end-to-end tests, make sure you have installed the browsers supported by playwright by running this command:
+
+```bash
+npx playwright install
+```
+
+Please refer to [Playwright Documentation](https://playwright.dev/docs/browsers) for details.
+
+Then, also make sure you have the latest bundled files before running it. Use the following commands:
+
+```bash
+bun run build
+bun run test:e2e
+```
+
 ## Code Standards
 
 We follow the coding standards set by Biome. Ensure your code follows these guidelines before submitting a pull request. You can run the formatter with the following command:
@@ -125,6 +144,10 @@ We do conventional commits, so it will fail on checker with capital case after c
 The SDK uses following configuration files:
 - `tsconfig.json`: TypeScript configuration.
 - `tsup.config.ts`: Configuration for the TSUP bundler.
+- `playwright.config.ts`: Configuration for E2E tests runner
+
+We also have the following variables as part of the `.env` file:
+- `PLAYWRIGHT_PORT`: Port used to run the local web browser to run Playwright E2E tests.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

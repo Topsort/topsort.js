@@ -157,7 +157,7 @@ reportEvent(config, event)
 400:
 ```json
 {
-  "status": 204,
+  "status": 400,
   "statusText": "No Content",
   "body": {
     "errCode": "bad_request",
