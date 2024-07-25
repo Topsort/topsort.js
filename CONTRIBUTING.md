@@ -97,8 +97,16 @@ bun run test
 
 ### E2E Tests
 
-By default, the application is set to serve a web browser in the port `8080` for Playwright. If this port is already being used on your local machine, make sure you change the port in your `.env`.`PLAYWRIGHT_PORT`.
-To run the end-to-end tests, make sure you have latest bundled file before running it. Use the following commands:
+By default, the application is set to serve a web browser in the port `8080` for Playwright. If this port is already being used on your local machine, make sure you change the port in your `.env`.`SERVER_PORT`.
+To run the end-to-end tests, make sure you have installed the browsers supported by playwright by running this command:
+
+```bash
+npx playwright install
+```
+
+Please refer to [Playwright Documentation](https://playwright.dev/docs/browsers) for details.
+
+Then, also make sure you have the latest bundled files before running it. Use the following commands:
 
 ```bash
 bun run build
