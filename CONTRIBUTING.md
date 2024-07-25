@@ -113,10 +113,9 @@ bunx playwright install
 
 Please refer to [Playwright Documentation](https://playwright.dev/docs/browsers) for details.
 
-Then, make sure you have the latest bundled files before running it. Use the following commands:
+Then, use the following command to run a build and generate the bundled files and run the tests:
 
 ```bash
-bun run build
 bun run test:e2e
 ```
 
