@@ -6,7 +6,7 @@ test.describe("Report Events via Topsort SDK", () => {
   test("should report an event successfully", async ({ page }) => {
     const mockAPIResponse = {
       ok: true,
-      retry: false, 
+      retry: false,
     };
 
     await page.route(`${baseURL}/${apis.events}`, async (route) => {
@@ -45,7 +45,12 @@ test.describe("Report Events via Topsort SDK", () => {
   });
 
   test("should fail to call with missing apiKey", async ({ page }) => {
-    const expectedError = { status: 401, retry: false, statusText: "API Key is required.", body: {} };
+    const expectedError = {
+      status: 401,
+      retry: false,
+      statusText: "API Key is required.",
+      body: {},
+    };
     await page.goto(playwrightConstants.host);
     const result = await page.evaluate(() => {
       const config = {
