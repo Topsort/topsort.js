@@ -1,5 +1,5 @@
 import { version } from "../../package.json";
-import { baseURL } from "../constants/apis.constant";
+import { baseURL, retryableStatusCodes } from "../constants/apis.constant";
 import type { Config } from "../types/shared";
 import AppError from "./app-error";
 
@@ -20,7 +20,8 @@ class APIClient {
     }
 
     if (!response.ok) {
-      throw new AppError(response.status, response.statusText, data);
+      const retry = retryableStatusCodes.includes(response.status);
+      throw new AppError(response.status, response.statusText, data, retry);
     }
 
     return data;
