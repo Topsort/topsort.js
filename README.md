@@ -11,6 +11,7 @@ This repository holds the official Topsort javascript client library. This proje
 - [Usage](#usage)
   - [Creating an Auction](#auctions)
   - [Reporting an Event](#events)
+    - [Retryable Errors](#retryable-errors)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -151,7 +152,8 @@ reportEvent(config, event)
 200:
 ```json
 {
-    "ok": true
+  "ok": true,
+  "retry": false
 }
 ```
 400:
@@ -162,10 +164,21 @@ reportEvent(config, event)
   "body": {
     "errCode": "bad_request",
     "docUrl": "https://docs.topsort.com/reference/errors",
-    "message": "The request could not be parsed.",
-  },
+    "message": "The request could not be parsed."
+  }
 }
 ```
+429:
+```json
+{
+  "ok": false,
+  "retry": true
+}
+```
+
+#### Retryable Errors
+
+The `reportEvent` function returns `"retry": true` if the response status code is `429` or any `5xx`. This enables you to identify when it’s appropriate to retry the function call.
 
 ## Contributing
 

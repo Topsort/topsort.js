@@ -20,7 +20,8 @@ class APIClient {
     }
 
     if (!response.ok) {
-      throw new AppError(response.status, response.statusText, data);
+      const retry = response.status === 429 || response.status >= 500;
+      throw new AppError(response.status, response.statusText, data, retry);
     }
 
     return data;

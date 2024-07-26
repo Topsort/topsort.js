@@ -45,3 +45,8 @@ export interface TopsortEvent {
   clicks?: Click[];
   purchases?: Purchase[];
 }
+
+export interface EventResult {
+  ok: boolean;
+  retry: boolean;
+}
