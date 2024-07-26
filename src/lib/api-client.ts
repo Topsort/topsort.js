@@ -43,7 +43,7 @@ class APIClient {
         "Content-Type": "application/json",
         Accept: "application/json",
         "X-UA": config.userAgent
-          ? `@topsort/sdk ${version} ${config.userAgent}`
+          ? `${config.userAgent}`
           : `@topsort/sdk ${version}`,
         Authorization: `Bearer ${config.apiKey}`,
       },
