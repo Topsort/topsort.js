@@ -45,6 +45,6 @@
     "lefthook": "1.7.9",
     "msw": "2.3.2",
     "tsup": "8.1.0",
-    "typescript": "5.5.3"
+    "typescript": "5.5.4"
   }
 }
