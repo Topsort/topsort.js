@@ -6,3 +6,7 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 0.2.0 (2024-07-29)
+
+- Adding `userAgent: string` as part of Config for requests
+- Adding `retry: boolean` as part of `reportEvent` response
