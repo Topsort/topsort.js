@@ -1,6 +1,6 @@
 {
-  "name": "topsort.js",
-  "version": "0.1.0",
+  "name": "@topsort/sdk",
+  "version": "0.2.0",
   "description": "",
   "packageManager": "bun@1.1.20",
   "main": "dist/index.js",
@@ -32,16 +32,19 @@
   ],
   "scripts": {
     "build": "tsup",
+    "test:e2e": "bun run build && playwright test",
     "format": "biome check",
     "format:fix": "biome check --write",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "serve:e2e": "bun run ./e2e/server.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@playwright/test": "1.45.3",
     "@types/bun": "1.1.6",
-    "lefthook": "1.7.2",
-    "msw": "2.3.1",
-    "tsup": "8.1.0",
-    "typescript": "5.5.3"
+    "lefthook": "1.7.9",
+    "msw": "2.3.4",
+    "tsup": "8.2.3",
+    "typescript": "5.5.4"
   }
 }

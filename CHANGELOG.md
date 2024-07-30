@@ -6,3 +6,16 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 0.2.0 (2024-07-29)
+
+- Adding `userAgent: string` as part of Config for requests ([#21](https://github.com/Topsort/topsort.js/pull/21))
+- Adding `retry: boolean` as part of `reportEvent` response ([#20](https://github.com/Topsort/topsort.js/pull/20))
+
+## Version 0.1.0 (2024-07-19)
+
+### Added
+
+- Initial release of the SDK ([#1](https://github.com/Topsort/topsort.js/pull/1))
+- Pulling `reportEvent` from [Analytics.js](https://github.com/Topsort/analytics.js)
+- Added function `createAuction`
+

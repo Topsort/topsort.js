@@ -5,4 +5,5 @@ export interface Config {
   host?: string;
   /// An optional timeout for requests in milliseconds.
   timeout?: number;
+  userAgent?: string;
 }

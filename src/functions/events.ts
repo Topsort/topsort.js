@@ -2,7 +2,7 @@ import { apis, baseURL } from "../constants/apis.constant";
 import APIClient from "../lib/api-client";
 import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
-import type { TopsortEvent } from "../types/events";
+import type { EventResult, TopsortEvent } from "../types/events";
 import type { Config } from "../types/shared";
 
 /**
@@ -18,9 +18,9 @@ import type { Config } from "../types/shared";
  *
  * @param config - The configuration object containing the API Key and optionally, the Host.
  * @param event - The event to report.
- * @returns {Promise<{ok: boolean}>} The result of the report, indicating success.
+ * @returns {Promise<EventResult>} The result of the report, indicating success.
  */
-async function handler(config: Config, event: TopsortEvent): Promise<{ ok: boolean }> {
+async function handler(config: Config, event: TopsortEvent): Promise<EventResult> {
   let url: URL;
   try {
     url = new URL(`${config.host || baseURL}/${apis.events}`);
@@ -30,11 +30,15 @@ async function handler(config: Config, event: TopsortEvent): Promise<{ ok: boole
     });
   }
 
-  await APIClient.post(url.toString(), event, config);
-
-  return {
-    ok: true,
-  };
+  try {
+    await APIClient.post(url.toString(), event, config);
+    return { ok: true, retry: false };
+  } catch (error) {
+    if (error instanceof AppError && error.retry) {
+      return { ok: false, retry: true };
+    }
+    throw error;
+  }
 }
 
 export const reportEvent = withValidation(handler);

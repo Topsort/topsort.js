@@ -12,6 +12,7 @@ describe("reportEvent", () => {
     returnStatus(401, `${baseURL}/${apis.events}`);
     expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
       status: 401,
+      retry: false,
       statusText: "Unauthorized",
       body: {},
     });
@@ -19,19 +20,17 @@ describe("reportEvent", () => {
 
   it("should handle retryable error", async () => {
     returnStatus(429, `${baseURL}/${apis.events}`);
-    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
-      status: 429,
-      statusText: "Too Many Requests",
-      body: {},
+    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).resolves.toEqual({
+      ok: false,
+      retry: true,
     });
   });
 
   it("should handle server error", async () => {
     returnStatus(500, `${baseURL}/${apis.events}`);
-    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).rejects.toEqual({
-      status: 500,
-      statusText: "Internal Server Error",
-      body: {},
+    expect(reportEvent({ apiKey: "apiKey" }, {} as TopsortEvent)).resolves.toEqual({
+      ok: false,
+      retry: true,
     });
   });
 
@@ -45,7 +44,7 @@ describe("reportEvent", () => {
         },
         {} as TopsortEvent,
       ),
-    ).resolves.toEqual({ ok: true });
+    ).resolves.toEqual({ ok: true, retry: false });
   });
 
   it("should handle fetch error", async () => {

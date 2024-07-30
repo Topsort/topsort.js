@@ -20,7 +20,8 @@ class APIClient {
     }
 
     if (!response.ok) {
-      throw new AppError(response.status, response.statusText, data);
+      const retry = response.status === 429 || response.status >= 500;
+      throw new AppError(response.status, response.statusText, data, retry);
     }
 
     return data;
@@ -51,7 +52,9 @@ class APIClient {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-UA": `topsort.js ${version}`,
+        "X-UA": config.userAgent
+          ? `@topsort/sdk ${version} ${config.userAgent}`
+          : `@topsort/sdk ${version}`,
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(body),
