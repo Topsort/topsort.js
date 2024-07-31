@@ -1,0 +1,21 @@
+name: 📝 Documentation issue
+description: Report an issue related to the documentation
+title: "[DOCS] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Describe the issue**
+        A clear and concise description of what the documentation issue is.
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe the documentation issue.
+    validations:
+      required: true
+  - type: input
+    id: issue-location
+    attributes:
+      label: Issue Location
+      description: Provide the URL or section of the documentation where the issue is found.
