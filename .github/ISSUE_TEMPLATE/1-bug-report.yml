@@ -1,13 +1,15 @@
 name: 🪲 Bug report
 description: Create a report to help us improve
-title: "[BUG] "
+labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
         Thank you for reporting an issue.
 
-        Please fill in as much of the following form as you're able.
+        Please complete the below form to help us look into the issue.  
+        
+        Note: if you are looking for help, create a [discussion](https://github.com/Topsort/topsort.js/discussions) instead.
   - type: textarea
     id: description
     attributes:
@@ -26,11 +28,6 @@ body:
       description: What is the expected behavior? Why is that the expected behavior?
     validations:
       required: true
-  - type: textarea
-    id: screenshots
-    attributes:
-      label: Screenshots
-      description: Provide screenshots if applicable.
   - type: input
     id: sdk-version
     attributes:
@@ -43,13 +40,12 @@ body:
       value: |
         **Environment (please complete the following information):**
         - OS: [e.g. iOS, Android, Windows]
-        - Browser [e.g. Chrome, Safari]
+        - Browser [e.g. Chrome, Safari] (or runtime) [e.g. Node.js, .NET, Java]
         - Version [e.g. 22]
   - type: input
     id: environment
     attributes:
       label: Environment
-      description: Provide details about the environment (OS, Browser, Version).
   - type: textarea
     id: additional-context
     attributes:
