@@ -97,4 +97,51 @@ test.describe("Create Auction via Topsort SDK", () => {
 
     expect(result).toEqual(expectedError);
   });
+
+  test("should have a delay when being called with timeout parameter", async ({ page }) => {
+    const mockAPIResponse = {
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+      ],
+    };
+
+    await page.route(`${baseURL}/${apis.auctions}`, async (route) => {
+      await delay(2000);
+      await route.fulfill({ json: mockAPIResponse });
+    });
+
+    await page.goto(playwrightConstants.host);
+    const result = await page.evaluate(async () => {
+      const startTime = Date.now();
+      const config = {
+        apiKey: "rando-api-key",
+        timeOut: 2000,
+      };
+
+      const auctionDetails = {
+        auctions: [
+          {
+            type: "listings",
+            slots: 3,
+            category: { id: "cat123" },
+            geoTargeting: { location: "US" },
+          },
+        ],
+      };
+      if (typeof window.sdk.createAuction === "undefined") {
+        throw new Error("Global function `createAuction` is not available.");
+      }
+
+      const createAuctionResult = await window.sdk.createAuction(config, auctionDetails);
+      const endTime = Date.now();
+      return { createAuctionResult, timeTaken: endTime - startTime };
+    });
+
+    expect(result.createAuctionResult).toEqual(mockAPIResponse);
+    expect(result.timeTaken).toBeGreaterThanOrEqual(2000);
+  });
 });
