@@ -40,7 +40,7 @@ body:
       value: |
         **Environment (please complete the following information):**
         - OS: [e.g. iOS, Android, Windows]
-        - Browser [e.g. Chrome, Safari] (or runtime) [e.g. Node.js, .NET, Java]
+        - Browser [e.g. Chrome, Safari] (or runtime) [e.g. Node.js, Deno, Bun]
         - Version [e.g. 22]
   - type: input
     id: environment
