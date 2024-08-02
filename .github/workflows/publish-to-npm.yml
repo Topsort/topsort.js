@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  npm-publish:
+    name: Publish to NPM
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Run tests
+        run: bun test
+        
+      - name: Build artifacts
+        run: node_modules/.bin/tsup
+
+      - name: Publish to npm
+        id: publish
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          npm publish --access public --no-git-checks
