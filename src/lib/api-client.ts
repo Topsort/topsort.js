@@ -37,7 +37,16 @@ class APIClient {
     }
   }
 
+  private setupTimeoutSignal(config: Config): AbortSignal | undefined {
+    if (config.timeout != null) {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), config.timeout);
+      return controller.signal;
+    }
+  }
+
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
+    const signal = this.setupTimeoutSignal(config);
     return this.request(endpoint, {
       method: "POST",
       headers: {
@@ -49,6 +58,7 @@ class APIClient {
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(body),
+      signal,
     });
   }
 }

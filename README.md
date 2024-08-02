@@ -59,7 +59,8 @@ const config = {
   // generate your api key in the auction manager - it should look some thing like this
   // note: this is an invalid key and won't work, you need to replace it with your own
   apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
-  userAgent?: "Mozilla/5.0" // optional user agent to be added as part of the request
+  userAgent: "Mozilla/5.0"
+  timeout: 50
 };
 
 createAuction(config, auctionDetails)
@@ -70,6 +71,11 @@ createAuction(config, auctionDetails)
 #### Parameters
 
 `config`: An object containing configuration details including the API key. Please refer to [Auction Manager](https://app.topsort.com/new/en-US/marketplace/account-settings/api-integration)
+
+##### Config Parameters
+- `apiKey`: Your Topsort API Key
+- `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
+- `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
 
 `auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
 
