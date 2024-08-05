@@ -34,10 +34,6 @@ test.describe("Report Events via Topsort SDK", () => {
         ],
       };
 
-      if (typeof window.sdk.reportEvent === "undefined") {
-        throw new Error("Global function `reportEvent` is not available.");
-      }
-
       return window.sdk.reportEvent(config, event);
     });
 
@@ -71,9 +67,6 @@ test.describe("Report Events via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.reportEvent === "undefined") {
-        throw new Error("Global function `reportEvent` is not available.");
-      }
 
       return window.sdk.reportEvent(config, event);
     });

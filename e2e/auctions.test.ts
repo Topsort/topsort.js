@@ -48,9 +48,6 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       return window.sdk.createAuction(config, auctionDetails);
     });
@@ -89,9 +86,6 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       return window.sdk.createAuction(config, auctionDetails);
     });
@@ -111,7 +105,7 @@ test.describe("Create Auction via Topsort SDK", () => {
     };
 
     await page.route(`${baseURL}/${apis.auctions}`, async (route) => {
-      await delay(2000);
+      await delay(100);
       await route.fulfill({ json: mockAPIResponse });
     });
 
@@ -120,7 +114,7 @@ test.describe("Create Auction via Topsort SDK", () => {
       const startTime = Date.now();
       const config = {
         apiKey: "rando-api-key",
-        timeOut: 2000,
+        timeOut: 100,
       };
 
       const auctionDetails = {
@@ -133,9 +127,6 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       const createAuctionResult = await window.sdk.createAuction(config, auctionDetails);
       const endTime = Date.now();
@@ -143,6 +134,6 @@ test.describe("Create Auction via Topsort SDK", () => {
     });
 
     expect(result.createAuctionResult).toEqual(mockAPIResponse);
-    expect(result.timeTaken).toBeGreaterThanOrEqual(2000);
+    expect(result.timeTaken).toBeGreaterThanOrEqual(100);
   });
 });
