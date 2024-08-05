@@ -1,6 +1,6 @@
 import { version } from "../../package.json";
 import { baseURL } from "../constants/apis.constant";
-import type { Config } from "../types/shared";
+import { Config } from "../types/shared";
 import AppError from "./app-error";
 
 class APIClient {
