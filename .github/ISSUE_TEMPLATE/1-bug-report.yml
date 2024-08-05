@@ -1,0 +1,53 @@
+name: 🪲 Bug report
+description: Create a report to help us improve
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue.
+
+        Please complete the below form to help us look into the issue.  
+        
+        Note: if you are looking for help, create a [discussion](https://github.com/Topsort/topsort.js/discussions) instead.
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior, preferably a sample code snippet.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: What is the expected behavior? Why is that the expected behavior?
+    validations:
+      required: true
+  - type: input
+    id: sdk-version
+    attributes:
+      label: SDK Version
+      description: Provide the SDK version (e.g., 0.2.0).
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        **Environment (please complete the following information):**
+        - OS: [e.g. iOS, Android, Windows]
+        - Browser [e.g. Chrome, Safari] (or runtime) [e.g. Node.js, Deno, Bun]
+        - Version [e.g. 22]
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
