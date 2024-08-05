@@ -8,7 +8,7 @@ import {
   returnStatus,
 } from "../src/constants/handlers.constant";
 import AppError from "../src/lib/app-error";
-import type { TopsortAuction } from "../src/types/auctions";
+import { TopsortAuction } from "../src/types/auctions";
 
 describe("createAuction", () => {
   beforeAll(() => mswServer.listen());

@@ -34,7 +34,7 @@ yarn add @topsort/sdk --save
 To create an auction, use the `createAuction` function. Example:
 
 ```js
-import { type TopsortAuction, createAuction } from "@topsort/sdk";
+import { TopsortAuction, createAuction } from "@topsort/sdk";
 
 const auctionDetails: TopsortAuction = {
   auctions: [
@@ -121,7 +121,7 @@ createAuction(config, auctionDetails)
 To report an event, use the reportEvent function. Here is an example:
 
 ```js
-import { type TopsortEvent, reportEvent } from "@topsort/sdk";
+import { TopsortEvent, reportEvent } from "@topsort/sdk";
 
 const event: TopsortEvent = {
   impressions: [

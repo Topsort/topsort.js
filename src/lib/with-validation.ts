@@ -1,4 +1,4 @@
-import type { Config } from "../types/shared";
+import { Config } from "../types/shared";
 import { validateConfig } from "./validate-config";
 
 export function withValidation<T extends Config, U, Args extends unknown[]>(
