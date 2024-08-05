@@ -19,7 +19,7 @@ interface AuctionDisjunctiveCategories {
 
 interface AuctionProduct {
   ids: string[];
-  qualityScores: number[];
+  qualityScores?: number[];
 }
 
 interface AuctionBase {
