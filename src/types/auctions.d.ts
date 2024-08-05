@@ -37,8 +37,8 @@ interface SponsoredListingAuction extends AuctionBase {
 
 interface BannerAuction extends AuctionBase {
   type: "banners";
-  device: DeviceType;
   slotId: string;
+  device?: DeviceType;
 }
 
 export interface TopsortAuction {

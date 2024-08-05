@@ -1,27 +1,33 @@
 interface Placement {
   path: string;
+  position?: number;
+  page?: number;
+  pageSize?: number;
+  productId?: string;
+  categoryIds?: string[];
+  searchQuery?: string;
 }
 
 export interface Entity {
-  type: "product";
+  type: "product" | "vendor";
   id: string;
 }
 
 interface Impression {
-  resolvedBidId?: string;
-  entity?: Entity;
-  additionalAttribution?: Entity;
-  placement: Placement;
   occurredAt: string;
   opaqueUserId: string;
   id: string;
+  resolvedBidId?: string;
+  entity?: Entity;
+  additionalAttribution?: Entity;
+  placement?: Placement;
 }
 
 interface Click {
   resolvedBidId?: string;
   entity?: Entity;
   additionalAttribution?: Entity;
-  placement: Placement;
+  placement?: Placement;
   occurredAt: string;
   opaqueUserId: string;
   id: string;
@@ -31,6 +37,7 @@ interface Item {
   productId: string;
   quantity: number;
   unitPrice: number;
+  vendorId?: string;
 }
 
 interface Purchase {
