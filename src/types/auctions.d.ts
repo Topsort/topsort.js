@@ -23,12 +23,12 @@ interface AuctionProduct {
 }
 
 interface AuctionBase {
-  type: AuctionType;
-  slots: number;
   category?: AuctionSingleCategory | AuctionMultipleCategories | AuctionDisjunctiveCategories;
-  searchQuery?: string;
-  products?: AuctionProduct;
   geoTargeting?: GeoTargeting;
+  products?: AuctionProduct;
+  searchQuery?: string;
+  slots: number;
+  type: AuctionType;
 }
 
 interface SponsoredListingAuction extends AuctionBase {
@@ -36,9 +36,9 @@ interface SponsoredListingAuction extends AuctionBase {
 }
 
 interface BannerAuction extends AuctionBase {
-  type: "banners";
-  slotId: string;
   device?: DeviceType;
+  slotId: string;
+  type: "banners";
 }
 
 export interface TopsortAuction {
@@ -50,17 +50,17 @@ interface Asset {
 }
 
 interface Winner {
-  rank: number;
   asset: Asset[];
-  type: string;
   id: string;
+  rank: number;
   resolvedBidId: string;
+  type: string;
 }
 
 interface Result {
+  error: boolean;
   resultType: AuctionType;
   winners: Winner[];
-  error: boolean;
 }
 
 export interface AuctionResult {

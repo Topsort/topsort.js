@@ -1,36 +1,36 @@
 interface Placement {
-  path: string;
-  position?: number;
+  categoryIds?: string[];
   page?: number;
   pageSize?: number;
+  path: string;
+  position?: number;
   productId?: string;
-  categoryIds?: string[];
   searchQuery?: string;
 }
 
 export interface Entity {
-  type: "product" | "vendor";
   id: string;
+  type: "product" | "vendor";
 }
 
 interface Impression {
+  additionalAttribution?: Entity;
+  entity?: Entity;
+  id: string;
   occurredAt: string;
   opaqueUserId: string;
-  id: string;
-  resolvedBidId?: string;
-  entity?: Entity;
-  additionalAttribution?: Entity;
   placement?: Placement;
+  resolvedBidId?: string;
 }
 
 interface Click {
-  resolvedBidId?: string;
-  entity?: Entity;
   additionalAttribution?: Entity;
-  placement?: Placement;
+  entity?: Entity;
+  id: string;
   occurredAt: string;
   opaqueUserId: string;
-  id: string;
+  placement?: Placement;
+  resolvedBidId?: string;
 }
 
 interface Item {
@@ -41,15 +41,15 @@ interface Item {
 }
 
 interface Purchase {
-  occurredAt: string;
-  opaqueUserId: string;
   id: string;
   items: Item[];
+  occurredAt: string;
+  opaqueUserId: string;
 }
 
 export interface TopsortEvent {
-  impressions?: Impression[];
   clicks?: Click[];
+  impressions?: Impression[];
   purchases?: Purchase[];
 }
 
