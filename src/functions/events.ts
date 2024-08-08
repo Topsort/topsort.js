@@ -23,10 +23,10 @@ import { Config } from "../types/shared";
 async function handler(config: Config, event: TopsortEvent): Promise<EventResult> {
   let url: URL;
   try {
-    url = new URL(`${config.host || baseURL}/${apis.events}`);
+    url = new URL(apis.events, config.host || baseURL);
   } catch (error) {
     throw new AppError(400, "Invalid URL", {
-      error: `Invalid URL: ${config.host || baseURL}/${apis.events}`,
+      error: `Invalid URL: ${error}`,
     });
   }
 
