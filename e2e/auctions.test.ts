@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { delay } from "msw";
 import { apis, baseURL } from "../src/constants/apis.constant";
 import { playwrightConstants } from "./config";
 
@@ -47,9 +48,6 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       return window.sdk.createAuction(config, auctionDetails);
     });
@@ -88,13 +86,54 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       return window.sdk.createAuction(config, auctionDetails);
     });
 
     expect(result).toEqual(expectedError);
+  });
+
+  test("should have a delay when being called with timeout parameter", async ({ page }) => {
+    const mockAPIResponse = {
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+      ],
+    };
+
+    await page.route(`${baseURL}/${apis.auctions}`, async (route) => {
+      await delay(100);
+      await route.fulfill({ json: mockAPIResponse });
+    });
+
+    await page.goto(playwrightConstants.host);
+    const result = await page.evaluate(async () => {
+      const startTime = Date.now();
+      const config = {
+        apiKey: "rando-api-key",
+        timeOut: 100,
+      };
+
+      const auctionDetails = {
+        auctions: [
+          {
+            type: "listings",
+            slots: 3,
+            category: { id: "cat123" },
+            geoTargeting: { location: "US" },
+          },
+        ],
+      };
+
+      const createAuctionResult = await window.sdk.createAuction(config, auctionDetails);
+      const endTime = Date.now();
+      return { createAuctionResult, timeTaken: endTime - startTime };
+    });
+
+    expect(result.createAuctionResult).toEqual(mockAPIResponse);
+    expect(result.timeTaken).toBeGreaterThanOrEqual(100);
   });
 });
