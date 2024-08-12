@@ -8,10 +8,10 @@ import { Config } from "../types/shared";
 async function handler(config: Config, body: TopsortAuction): Promise<AuctionResult> {
   let url: URL;
   try {
-    url = new URL(`${config.host || baseURL}/${apis.auctions}`);
+    url = new URL(apis.auctions, config.host || baseURL);
   } catch (error) {
     throw new AppError(400, "Invalid URL", {
-      error: `Invalid URL: ${config.host || baseURL}/${apis.auctions}`,
+      error: `Invalid URL: ${error}`,
     });
   }
 
