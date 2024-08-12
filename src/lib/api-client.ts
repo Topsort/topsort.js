@@ -1,15 +1,8 @@
 import { version } from "../../package.json";
-import { baseURL } from "../constants/apis.constant";
 import { Config } from "../types/shared";
 import AppError from "./app-error";
 
 class APIClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async handleResponse(response: Response): Promise<unknown> {
     const contentType = response.headers.get("Content-Type") || "";
     let data: unknown;
@@ -27,9 +20,12 @@ class APIClient {
     return data;
   }
 
-  private async request(endpoint: string, options: RequestInit): Promise<unknown> {
+  private async request(
+    endpoint: string,
+    options: RequestInit
+  ): Promise<unknown> {
     try {
-      const response = await fetch(`${endpoint ?? this.baseUrl}`, options);
+      const response = await fetch(endpoint, options);
       return this.handleResponse(response);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -45,7 +41,11 @@ class APIClient {
     }
   }
 
-  public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
+  public async post(
+    endpoint: string,
+    body: unknown,
+    config: Config
+  ): Promise<unknown> {
     const signal = this.setupTimeoutSignal(config);
     return this.request(endpoint, {
       method: "POST",
@@ -63,4 +63,4 @@ class APIClient {
   }
 }
 
-export default new APIClient(`${baseURL}`);
+export default new APIClient();

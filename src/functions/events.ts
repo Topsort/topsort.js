@@ -5,33 +5,11 @@ import { withValidation } from "../lib/with-validation";
 import { EventResult, TopsortEvent } from "../types/events";
 import { Config } from "../types/shared";
 
-/**
- * Reports an event to the Topsort API.
- *
- * @example
- * ```js
- * const config = { apiKey: "api-key" };
- * const event = { eventType: "test", eventData: {} };
- * const result = await reportEvent(config, event);
- * console.log(result); // { "ok": true }
- * ```
- *
- * @param config - The configuration object containing the API Key and optionally, the Host.
- * @param event - The event to report.
- * @returns {Promise<EventResult>} The result of the report, indicating success.
- */
-async function handler(config: Config, event: TopsortEvent): Promise<EventResult> {
-  let url: URL;
+async function handler(event: TopsortEvent, config: Config): Promise<EventResult> {
   try {
-    url = new URL(apis.events, config.host || baseURL);
-  } catch (error) {
-    throw new AppError(400, "Invalid URL", {
-      error: `Invalid URL: ${error}`,
-    });
-  }
+    const url = `${config.host}${apis.events}`;
+    await APIClient.post(url, event, config);
 
-  try {
-    await APIClient.post(url.toString(), event, config);
     return { ok: true, retry: false };
   } catch (error) {
     if (error instanceof AppError && error.retry) {
