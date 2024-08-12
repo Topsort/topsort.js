@@ -9,7 +9,7 @@ test.describe("Report Events via Topsort SDK", () => {
       retry: false,
     };
 
-    await page.route(`${baseURL}/${apis.events}`, async (route) => {
+    await page.route(`${baseURL}${apis.events}`, async (route) => {
       await route.fulfill({ json: mockAPIResponse });
     });
 

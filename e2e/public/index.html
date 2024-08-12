@@ -11,15 +11,15 @@
     <script>
       window.sdk = {
         createAuction: async (config, auctionDetails) => {
-          const result = await Topsort.createAuction(
-            config,
+          const topsortClient = new Topsort.TopsortClient(config)
+          const result = await topsortClient.createAuction(
             auctionDetails
           ).catch((error) => error);
           return result;
         },
         reportEvent: async (config, eventDetails) => {
-          const result = await Topsort.reportEvent(
-            config,
+          const topsortClient = new Topsort.TopsortClient(config)
+          const result = await topsortClient.reportEvent(
             eventDetails
           ).catch((error) => error);
           return result;
