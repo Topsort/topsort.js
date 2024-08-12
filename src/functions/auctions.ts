@@ -8,7 +8,7 @@ async function handler(
   body: TopsortAuction,
   config: Config
 ): Promise<AuctionResult> {
-  const url = `${config.host}${apis.auctions}`;
+  const url = `${config.host}/${apis.auctions}`;
   const result = await APIClient.post(url.toString(), body, config);
 
   return result as AuctionResult;

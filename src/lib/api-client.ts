@@ -25,7 +25,8 @@ class APIClient {
     options: RequestInit
   ): Promise<unknown> {
     try {
-      const response = await fetch(endpoint, options);
+      const sanitizedUrl = this.sanitizeUrl(endpoint);
+      const response = await fetch(sanitizedUrl, options);
       return this.handleResponse(response);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -60,6 +61,17 @@ class APIClient {
       body: JSON.stringify(body),
       signal,
     });
+  }
+
+  private sanitizeUrl(url: string): string {
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.href.replace(/\/+$/, "");
+    } catch (error) {
+      throw new AppError(400, "Invalid URL", {
+        error: `Invalid URL: ${error}`,
+      });
+    }
   }
 }
 

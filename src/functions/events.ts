@@ -7,7 +7,7 @@ import { Config } from "../types/shared";
 
 async function handler(event: TopsortEvent, config: Config): Promise<EventResult> {
   try {
-    const url = `${config.host}${apis.events}`;
+    const url = `${config.host}/${apis.events}`;
     await APIClient.post(url, event, config);
 
     return { ok: true, retry: false };

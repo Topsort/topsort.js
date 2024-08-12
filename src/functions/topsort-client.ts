@@ -16,18 +16,7 @@ class TopsortClient {
 
   constructor(config: Config) {
     this.config = config;
-    this.config.host = this.sanitizeUrl(this.config.host ?? baseURL);
-  }
-
-  private sanitizeUrl(url: string): string {
-    try {
-      const parsedUrl = new URL(url);
-      return parsedUrl.href.replace(/\/+$/, "");
-    } catch (error) {
-      throw new AppError(400, "Invalid URL", {
-        error: `Invalid URL: ${error}`,
-      });
-    }
+    this.config.host = this.config.host ?? baseURL;
   }
 
   public async reportEvent(event: TopsortEvent): Promise<EventResult> {
