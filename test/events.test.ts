@@ -24,7 +24,7 @@ describe("reportEvent", () => {
   });
 
   it("should handle authentication error", async () => {
-    returnStatus(401, `${baseURL}${apis.events}`);
+    returnStatus(401, `${baseURL}/${apis.events}`);
     expect(topsortClient.reportEvent({} as TopsortEvent)).rejects.toEqual({
       status: 401,
       retry: false,
@@ -34,7 +34,7 @@ describe("reportEvent", () => {
   });
 
   it("should handle retryable error", async () => {
-    returnStatus(429, `${baseURL}${apis.events}`);
+    returnStatus(429, `${baseURL}/${apis.events}`);
     expect(topsortClient.reportEvent({} as TopsortEvent)).resolves.toEqual({
       ok: false,
       retry: true,
@@ -42,7 +42,7 @@ describe("reportEvent", () => {
   });
 
   it("should handle server error", async () => {
-    returnStatus(500, `${baseURL}${apis.events}`);
+    returnStatus(500, `${baseURL}/${apis.events}`);
     expect(topsortClient.reportEvent({} as TopsortEvent)).resolves.toEqual({
       ok: false,
       retry: true,
@@ -50,7 +50,7 @@ describe("reportEvent", () => {
   });
 
   it("should handle custom url", async () => {
-    returnStatus(200, `https://demo.api.topsort.com${apis.events}`);
+    returnStatus(200, `https://demo.api.topsort.com/${apis.events}`);
     topsortClient = new TopsortClient({
       apiKey: "apiKey",
       host: "https://demo.api.topsort.com/",
@@ -62,7 +62,7 @@ describe("reportEvent", () => {
   });
 
   it("should handle fetch error", async () => {
-    returnError(`${baseURL}${apis.events}`);
+    returnError(`${baseURL}/${apis.events}`);
     expect(
       async () => await topsortClient.reportEvent({} as TopsortEvent)
     ).toThrow(AppError);

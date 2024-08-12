@@ -26,7 +26,7 @@ describe("createAuction", () => {
   });
 
   it("should handle authentication error", async () => {
-    returnStatus(401, `${baseURL}${apis.auctions}`);
+    returnStatus(401, `${baseURL}/${apis.auctions}`);
     expect(topsortClient.createAuction({} as TopsortAuction)).rejects.toEqual({
       status: 401,
       retry: false,

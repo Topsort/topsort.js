@@ -19,7 +19,7 @@ test.describe("Create Auction via Topsort SDK", () => {
       ],
     };
 
-    await page.route(`${baseURL}${apis.auctions}`, async (route) => {
+    await page.route(`${baseURL}/${apis.auctions}`, async (route) => {
       await route.fulfill({ json: mockAPIResponse });
     });
 
