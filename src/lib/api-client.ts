@@ -1,23 +1,10 @@
 import { version } from "../../package.json";
-import { baseURL } from "../constants/apis.constant";
 import { Config } from "../types/shared";
 import AppError from "./app-error";
 
 class APIClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async handleResponse(response: Response): Promise<unknown> {
-    const contentType = response.headers.get("Content-Type") || "";
-    let data: unknown;
-    if (contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
+    const data: unknown = await response.json();
 
     if (!response.ok) {
       const retry = response.status === 429 || response.status >= 500;
@@ -29,7 +16,8 @@ class APIClient {
 
   private async request(endpoint: string, options: RequestInit): Promise<unknown> {
     try {
-      const response = await fetch(`${endpoint ?? this.baseUrl}`, options);
+      const sanitizedUrl = this.sanitizeUrl(endpoint);
+      const response = await fetch(sanitizedUrl, options);
       return this.handleResponse(response);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -61,6 +49,17 @@ class APIClient {
       signal,
     });
   }
+
+  private sanitizeUrl(url: string): string {
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.href.replace(/\/+$/, "");
+    } catch (error) {
+      throw new AppError(400, "Invalid URL", {
+        error: `Invalid URL: ${error}`,
+      });
+    }
+  }
 }
 
-export default new APIClient(`${baseURL}`);
+export default new APIClient();

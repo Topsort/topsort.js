@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { apis, baseURL } from "../src/constants/apis.constant";
+import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import { playwrightConstants } from "./config";
 
 test.describe("Report Events via Topsort SDK", () => {
@@ -9,7 +9,7 @@ test.describe("Report Events via Topsort SDK", () => {
       retry: false,
     };
 
-    await page.route(`${baseURL}/${apis.events}`, async (route) => {
+    await page.route(`${baseURL}/${endpoints.events}`, async (route) => {
       await route.fulfill({ json: mockAPIResponse });
     });
 

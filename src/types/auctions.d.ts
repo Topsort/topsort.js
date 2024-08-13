@@ -41,7 +41,7 @@ interface BannerAuction extends AuctionBase {
   type: "banners";
 }
 
-export interface TopsortAuction {
+export interface Auction {
   auctions: (SponsoredListingAuction | BannerAuction)[];
 }
 

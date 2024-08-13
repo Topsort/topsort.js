@@ -47,7 +47,7 @@ interface Purchase {
   opaqueUserId: string;
 }
 
-export interface TopsortEvent {
+export interface Event {
   clicks?: Click[];
   impressions?: Impression[];
   purchases?: Purchase[];

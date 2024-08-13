@@ -2,10 +2,12 @@ import { Config } from "../types/shared";
 import { validateConfig } from "./validate-config";
 
 export function withValidation<T extends Config, U, Args extends unknown[]>(
-  fn: (config: T, ...args: Args) => Promise<U>,
-): (config: T, ...args: Args) => Promise<U> {
-  return async (config: T, ...args: Args): Promise<U> => {
+  fn: (...args: [...Args, T]) => Promise<U>,
+): (...args: [...Args, T]) => Promise<U> {
+  return async (...args: [...Args, T]): Promise<U> => {
+    const config = args[args.length - 1] as T;
     validateConfig(config);
-    return fn(config, ...args);
+
+    return fn(...args);
   };
 }
