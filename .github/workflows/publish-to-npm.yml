@@ -18,6 +18,10 @@ jobs:
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
+        with:
+          registry-url: https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
 
       - name: Run tests
         run: bun test
@@ -27,8 +31,4 @@ jobs:
 
       - name: Publish to npm
         id: publish
-        env:
-          NPM_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-          npm publish --access public --no-git-checks
+        run: npm publish --provenance --access public --no-git-checks
