@@ -10,7 +10,7 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 - Introduce a new way to initialize a client ([#43](https://github.com/Topsort/topsort.js/pull/43))
 
-As part of the new implementation, a Topsort Client that embeds all functions is now initialized by receiving a config. Additionally, some type names have been renamed:
+As part of the new implementation, a Topsort Client that embeds all functions is now initialized by receiving a config. Also, some types have been simplified:
 - _TopsortAuction_ > **Auction**
 - _TopsortEvents_ > **Event**
 
