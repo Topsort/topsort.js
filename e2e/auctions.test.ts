@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { delay } from "msw";
 import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import { playwrightConstants } from "./config";
 
@@ -47,9 +48,6 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       return window.sdk.createAuction(config, auctionDetails);
     });
@@ -88,13 +86,52 @@ test.describe("Create Auction via Topsort SDK", () => {
           },
         ],
       };
-      if (typeof window.sdk.createAuction === "undefined") {
-        throw new Error("Global function `createAuction` is not available.");
-      }
 
       return window.sdk.createAuction(config, auctionDetails);
     });
 
     expect(result).toEqual(expectedError);
+  });
+
+  test("should have a delay when being called with timeout parameter", async ({ page }) => {
+    const errorsList = [
+      "signal is aborted without reason",
+      "The operation was aborted. ",
+      "Fetch is aborted",
+    ];
+
+    const hasMatchingError = (actualError: any): boolean => {
+      return errorsList.some((error) => error === actualError.body);
+    };
+
+    await page.route(`${baseURL}/${endpoints.auctions}`, async (route) => {
+      await delay(100);
+      await route.abort();
+    });
+
+    await page.goto(playwrightConstants.host);
+
+    const result = await page.evaluate(async () => {
+      const config = {
+        apiKey: "rando-api-key",
+        timeout: 50,
+      };
+
+      const auctionDetails = {
+        auctions: [
+          {
+            type: "listings",
+            slots: 3,
+            category: { id: "cat123" },
+            geoTargeting: { location: "US" },
+          },
+        ],
+      };
+
+      return window.sdk.createAuction(config, auctionDetails);
+    });
+
+    const isErrorFound = hasMatchingError(result);
+    expect(isErrorFound).toBeTruthy();
   });
 });
