@@ -1,4 +1,4 @@
-import { apis, baseURL } from "../constants/apis.constant";
+import { apis } from "../constants/apis.constant";
 import APIClient from "../lib/api-client";
 import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
