@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { TopsortClient } from "../src";
-import { apis, baseURL } from "../src/constants/apis.constant";
+import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import {
   mswServer,
   returnAuctionSuccess,
@@ -8,7 +8,7 @@ import {
   returnStatus,
 } from "../src/constants/handlers.constant";
 import AppError from "../src/lib/app-error";
-import { TopsortAuction } from "../src/types/auctions";
+import { Auction } from "../src/types/auctions";
 
 describe("createAuction", () => {
   let topsortClient: TopsortClient;
@@ -19,8 +19,8 @@ describe("createAuction", () => {
   });
 
   it("should handle authentication error", async () => {
-    returnStatus(401, `${baseURL}/${apis.auctions}`);
-    expect(topsortClient.createAuction({} as TopsortAuction)).rejects.toEqual({
+    returnStatus(401, `${baseURL}/${endpoints.auctions}`);
+    expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
       status: 401,
       retry: false,
       statusText: "Unauthorized",
@@ -29,8 +29,8 @@ describe("createAuction", () => {
   });
 
   it("should handle retryable error", async () => {
-    returnStatus(429, `${baseURL}/${apis.auctions}`);
-    expect(topsortClient.createAuction({} as TopsortAuction)).rejects.toEqual({
+    returnStatus(429, `${baseURL}/${endpoints.auctions}`);
+    expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
       status: 429,
       retry: true,
       statusText: "Too Many Requests",
@@ -39,8 +39,8 @@ describe("createAuction", () => {
   });
 
   it("should handle server error", async () => {
-    returnStatus(500, `${baseURL}/${apis.auctions}`);
-    expect(topsortClient.createAuction({} as TopsortAuction)).rejects.toEqual({
+    returnStatus(500, `${baseURL}/${endpoints.auctions}`);
+    expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
       status: 500,
       retry: true,
       statusText: "Internal Server Error",
@@ -49,13 +49,13 @@ describe("createAuction", () => {
   });
 
   it("should handle custom url", async () => {
-    returnAuctionSuccess(`https://demo.api.topsort.com/${apis.auctions}`);
+    returnAuctionSuccess(`https://demo.api.topsort.com/${endpoints.auctions}`);
     topsortClient = new TopsortClient({
       apiKey: "apiKey",
       host: "https://demo.api.topsort.com",
     });
 
-    expect(topsortClient.createAuction({} as TopsortAuction)).resolves.toEqual({
+    expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
       results: [
         {
           resultType: "listings",
@@ -72,25 +72,25 @@ describe("createAuction", () => {
   });
 
   it("should handle fetch error", async () => {
-    returnError(`${baseURL}/${apis.auctions}`);
-    expect(async () => topsortClient.createAuction({} as TopsortAuction)).toThrow(AppError);
+    returnError(`${baseURL}/${endpoints.auctions}`);
+    expect(async () => topsortClient.createAuction({} as Auction)).toThrow(AppError);
   });
 
   it("should handle invalid URL error", async () => {
     const invalidHost = "invalid-url";
     topsortClient = new TopsortClient({ apiKey: "apiKey", host: invalidHost });
-    expect(async () => topsortClient.createAuction({} as TopsortAuction)).toThrow(AppError);
+    expect(async () => topsortClient.createAuction({} as Auction)).toThrow(AppError);
   });
 
   it("should handle success auction with timeout", async () => {
-    returnAuctionSuccess(`${baseURL}/${apis.auctions}`);
+    returnAuctionSuccess(`${baseURL}/${endpoints.auctions}`);
     topsortClient = new TopsortClient({
       apiKey: "apiKey",
       host: baseURL,
       timeout: 50,
     });
 
-    expect(topsortClient.createAuction({} as TopsortAuction)).resolves.toEqual({
+    expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
       results: [
         {
           resultType: "listings",

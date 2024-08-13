@@ -1,5 +1,5 @@
-import { baseURL } from "../constants/apis.constant";
-import { AuctionResult, EventResult, TopsortAuction, TopsortEvent } from "../types";
+import { baseURL } from "../constants/endpoints.constant";
+import { Auction, AuctionResult, Event, EventResult } from "../types";
 import { Config } from "../types/shared";
 
 import { createAuction } from "./auctions";
@@ -13,11 +13,11 @@ class TopsortClient {
     this.config.host = this.config.host ?? baseURL;
   }
 
-  public async reportEvent(event: TopsortEvent): Promise<EventResult> {
+  public async reportEvent(event: Event): Promise<EventResult> {
     return reportEvent(event, this.config);
   }
 
-  public async createAuction(auction: TopsortAuction): Promise<AuctionResult> {
+  public async createAuction(auction: Auction): Promise<AuctionResult> {
     return createAuction(auction, this.config);
   }
 }

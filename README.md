@@ -31,12 +31,12 @@ yarn add @topsort/sdk --save
 
 ### Auctions
 
-To create an auction, first initialize Topsort Client, then use the `createAuction` function. Example:
+To create an auction, first initialize a Topsort Client, then call the `createAuction` function:
 
 ```js
-import { TopsortClient, TopsortAuction } from "@topsort/sdk";
+import { TopsortClient, Auction } from "@topsort/sdk";
 
-const auctionDetails: TopsortAuction = {
+const auctionDetails: Auction = {
   auctions: [
     {
       type: "listings",
@@ -60,7 +60,7 @@ const config = {
   // note: this is an invalid key and won't work, you need to replace it with your own
   apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
   userAgent: "Mozilla/5.0", // optional user agent to be added as part of the request
-  timeout: 50 // optional timeout signal to be added asp art of the request
+  timeout: 50 // optional timeout for the request
 };
 
 const topsortClient = new TopsortClient(config)
@@ -120,12 +120,12 @@ topsortClient.createAuction(config, auctionDetails)
 
 ### Events
 
-To report an event, first initialize Topsort Client, then use the `reportEvent` function. Here is an example:
+To report an event, first initialize a Topsort Client, then call the `reportEvent` function:
 
 ```js
-import { TopsortClient, TopsortEvent } from "@topsort/sdk";
+import { TopsortClient, Event } from "@topsort/sdk";
 
-const event: TopsortEvent = {
+const event: Event = {
   impressions: [
     {
       resolvedBidId:
