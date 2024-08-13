@@ -1,10 +1,5 @@
 import { baseURL } from "../constants/apis.constant";
-import {
-  AuctionResult,
-  EventResult,
-  TopsortAuction,
-  TopsortEvent,
-} from "../types";
+import { AuctionResult, EventResult, TopsortAuction, TopsortEvent } from "../types";
 import { Config } from "../types/shared";
 
 import { createAuction } from "./auctions";

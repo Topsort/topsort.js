@@ -11,23 +11,23 @@ describe("apiClient", () => {
   it("should handle custom url with trailing slash", async () => {
     const customURL = `${baseURL}/${apis.auctions}/`;
     const config: Config = {
-        apiKey: "apiKey",
-    }
+      apiKey: "apiKey",
+    };
     returnAuctionSuccess(`${baseURL}/${apis.auctions}`);
 
     expect(APIClient.post(customURL, {} as TopsortEvent, config)).resolves.toEqual({
-        results: [
-          {
-            resultType: "listings",
-            winners: [],
-            error: false,
-          },
-          {
-            resultType: "banners",
-            winners: [],
-            error: false,
-          },
-        ],
-      });
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+        {
+          resultType: "banners",
+          winners: [],
+          error: false,
+        },
+      ],
+    });
   });
 });
