@@ -31,10 +31,10 @@ yarn add @topsort/sdk --save
 
 ### Auctions
 
-To create an auction, use the `createAuction` function. Example:
+To create an auction, first initialize Topsort Client, then use the `createAuction` function. Example:
 
 ```js
-import { TopsortAuction, createAuction } from "@topsort/sdk";
+import { TopsortClient, TopsortAuction } from "@topsort/sdk";
 
 const auctionDetails: TopsortAuction = {
   auctions: [
@@ -59,11 +59,13 @@ const config = {
   // generate your api key in the auction manager - it should look some thing like this
   // note: this is an invalid key and won't work, you need to replace it with your own
   apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
-  userAgent: "Mozilla/5.0"
-  timeout: 50
+  userAgent: "Mozilla/5.0", // optional user agent to be added as part of the request
+  timeout: 50 // optional timeout signal to be added asp art of the request
 };
 
-createAuction(config, auctionDetails)
+const topsortClient = new TopsortClient(config)
+
+topsortClient.createAuction(config, auctionDetails)
   .then((result) => console.log(result))
   .catch((error) => console.error(error));
 ```
@@ -118,10 +120,10 @@ createAuction(config, auctionDetails)
 
 ### Events
 
-To report an event, use the reportEvent function. Here is an example:
+To report an event, first initialize Topsort Client, then use the `reportEvent` function. Here is an example:
 
 ```js
-import { TopsortEvent, reportEvent } from "@topsort/sdk";
+import { TopsortClient, TopsortEvent } from "@topsort/sdk";
 
 const event: TopsortEvent = {
   impressions: [
@@ -141,10 +143,12 @@ const event: TopsortEvent = {
 const config = {
   // generate your api key in the auction manager - it should look some thing like this
   apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
-  userAgent?: "Mozilla/5.0" // optional user agent to be added as part of the request
+  userAgent: "Mozilla/5.0" // optional user agent to be added as part of the request
 };
 
-reportEvent(config, event)
+const topsortClient = new TopsortClient(config)
+
+topsortClient.reportEvent(config, event)
   .then((result) => console.log(result))
   .catch((error) => console.error(error));
 ```
