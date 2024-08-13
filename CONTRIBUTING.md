@@ -48,6 +48,8 @@ Clone the repository and install the dependencies:
 git clone git@github.com:Topsort/topsort.js.git
 cd topsort.js
 bun install
+# Install browsers for end to end tests
+bun run install:e2e
 ```
 
 ## Running Locally

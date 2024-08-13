@@ -23,7 +23,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "bun run serve:e2e",
+    command: "bun run --bun ./e2e/server.ts",
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",
     stderr: "pipe",
