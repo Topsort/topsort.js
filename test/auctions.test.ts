@@ -1,11 +1,4 @@
-import {
-  afterEach,
-  beforeEach,
-  beforeAll,
-  describe,
-  expect,
-  it,
-} from "bun:test";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { TopsortClient } from "../src";
 import { apis, baseURL } from "../src/constants/apis.constant";
 import {
@@ -80,17 +73,13 @@ describe("createAuction", () => {
 
   it("should handle fetch error", async () => {
     returnError(`${baseURL}/${apis.auctions}`);
-    expect(async () =>
-      topsortClient.createAuction({} as TopsortAuction)
-    ).toThrow(AppError);
+    expect(async () => topsortClient.createAuction({} as TopsortAuction)).toThrow(AppError);
   });
 
   it("should handle invalid URL error", async () => {
     const invalidHost = "invalid-url";
     topsortClient = new TopsortClient({ apiKey: "apiKey", host: invalidHost });
-    expect(async () =>
-      topsortClient.createAuction({} as TopsortAuction)
-    ).toThrow(AppError);
+    expect(async () => topsortClient.createAuction({} as TopsortAuction)).toThrow(AppError);
   });
 
   it("should handle success auction with timeout", async () => {
@@ -98,7 +87,7 @@ describe("createAuction", () => {
     topsortClient = new TopsortClient({
       apiKey: "apiKey",
       host: baseURL,
-      timeout: 50
+      timeout: 50,
     });
 
     expect(topsortClient.createAuction({} as TopsortAuction)).resolves.toEqual({

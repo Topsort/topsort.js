@@ -1,18 +1,7 @@
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "bun:test";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { TopsortClient, TopsortEvent } from "../src";
 import { apis, baseURL } from "../src/constants/apis.constant";
-import {
-  mswServer,
-  returnError,
-  returnStatus,
-} from "../src/constants/handlers.constant";
+import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
 import AppError from "../src/lib/app-error";
 
 describe("reportEvent", () => {
@@ -64,16 +53,12 @@ describe("reportEvent", () => {
 
   it("should handle fetch error", async () => {
     returnError(`${baseURL}/${apis.events}`);
-    expect(
-      async () => await topsortClient.reportEvent({} as TopsortEvent)
-    ).toThrow(AppError);
+    expect(async () => await topsortClient.reportEvent({} as TopsortEvent)).toThrow(AppError);
   });
 
   it("should handle invalid URL error", async () => {
     const invalidHost = "invalid-url";
     topsortClient = new TopsortClient({ apiKey: "apiKey", host: invalidHost });
-    expect(async () => topsortClient.reportEvent({} as TopsortEvent)).toThrow(
-      AppError
-    );
+    expect(async () => topsortClient.reportEvent({} as TopsortEvent)).toThrow(AppError);
   });
 });

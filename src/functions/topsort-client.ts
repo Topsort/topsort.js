@@ -1,11 +1,6 @@
 import { baseURL } from "../constants/apis.constant";
 import AppError from "../lib/app-error";
-import {
-  AuctionResult,
-  EventResult,
-  TopsortAuction,
-  TopsortEvent,
-} from "../types";
+import { AuctionResult, EventResult, TopsortAuction, TopsortEvent } from "../types";
 import { Config } from "../types/shared";
 
 import { createAuction } from "./auctions";
@@ -24,7 +19,7 @@ class TopsortClient {
   }
 
   public async createAuction(auction: TopsortAuction): Promise<AuctionResult> {
-    return await createAuction(auction, this.config);
+    return createAuction(auction, this.config);
   }
 }
 

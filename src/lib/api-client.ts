@@ -14,10 +14,7 @@ class APIClient {
     return data;
   }
 
-  private async request(
-    endpoint: string,
-    options: RequestInit
-  ): Promise<unknown> {
+  private async request(endpoint: string, options: RequestInit): Promise<unknown> {
     try {
       const sanitizedUrl = this.sanitizeUrl(endpoint);
       const response = await fetch(sanitizedUrl, options);
@@ -36,11 +33,7 @@ class APIClient {
     }
   }
 
-  public async post(
-    endpoint: string,
-    body: unknown,
-    config: Config
-  ): Promise<unknown> {
+  public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
     const signal = this.setupTimeoutSignal(config);
     return this.request(endpoint, {
       method: "POST",
