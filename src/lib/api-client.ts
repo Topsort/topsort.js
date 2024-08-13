@@ -4,13 +4,7 @@ import AppError from "./app-error";
 
 class APIClient {
   private async handleResponse(response: Response): Promise<unknown> {
-    const contentType = response.headers.get("Content-Type") || "";
-    let data: unknown;
-    if (contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
+    const data: unknown = await response.json();
 
     if (!response.ok) {
       const retry = response.status === 429 || response.status >= 500;

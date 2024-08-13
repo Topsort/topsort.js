@@ -36,7 +36,7 @@ describe("createAuction", () => {
   });
 
   it("should handle retryable error", async () => {
-    returnStatus(429, `${baseURL}${apis.auctions}`);
+    returnStatus(429, `${baseURL}/${apis.auctions}`);
     expect(topsortClient.createAuction({} as TopsortAuction)).rejects.toEqual({
       status: 429,
       retry: true,
@@ -46,7 +46,7 @@ describe("createAuction", () => {
   });
 
   it("should handle server error", async () => {
-    returnStatus(500, `${baseURL}${apis.auctions}`);
+    returnStatus(500, `${baseURL}/${apis.auctions}`);
     expect(topsortClient.createAuction({} as TopsortAuction)).rejects.toEqual({
       status: 500,
       retry: true,
@@ -56,7 +56,7 @@ describe("createAuction", () => {
   });
 
   it("should handle custom url", async () => {
-    returnAuctionSuccess(`https://demo.api.topsort.com${apis.auctions}`);
+    returnAuctionSuccess(`https://demo.api.topsort.com/${apis.auctions}`);
     topsortClient = new TopsortClient({
       apiKey: "apiKey",
       host: "https://demo.api.topsort.com",
@@ -79,7 +79,7 @@ describe("createAuction", () => {
   });
 
   it("should handle fetch error", async () => {
-    returnError(`${baseURL}${apis.auctions}`);
+    returnError(`${baseURL}/${apis.auctions}`);
     expect(async () =>
       topsortClient.createAuction({} as TopsortAuction)
     ).toThrow(AppError);
@@ -91,5 +91,29 @@ describe("createAuction", () => {
     expect(async () =>
       topsortClient.createAuction({} as TopsortAuction)
     ).toThrow(AppError);
+  });
+
+  it("should handle success auction with timeout", async () => {
+    returnAuctionSuccess(`${baseURL}/${apis.auctions}`);
+    topsortClient = new TopsortClient({
+      apiKey: "apiKey",
+      host: baseURL,
+      timeout: 50
+    });
+
+    expect(topsortClient.createAuction({} as TopsortAuction)).resolves.toEqual({
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+        {
+          resultType: "banners",
+          winners: [],
+          error: false,
+        },
+      ],
+    });
   });
 });

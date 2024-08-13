@@ -50,11 +50,12 @@ describe("reportEvent", () => {
   });
 
   it("should handle custom url", async () => {
-    returnStatus(200, `https://demo.api.topsort.com/${apis.events}`);
+    returnStatus(204, `https://demo.api.topsort.com/${apis.events}`);
     topsortClient = new TopsortClient({
       apiKey: "apiKey",
-      host: "https://demo.api.topsort.com/",
+      host: "https://demo.api.topsort.com",
     });
+
     expect(topsortClient.reportEvent({} as TopsortEvent)).resolves.toEqual({
       ok: true,
       retry: false,
