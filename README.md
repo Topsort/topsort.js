@@ -65,7 +65,7 @@ const config = {
 
 const topsortClient = new TopsortClient(config)
 
-topsortClient.createAuction(config, auctionDetails)
+topsortClient.createAuction(auctionDetails)
   .then((result) => console.log(result))
   .catch((error) => console.error(error));
 ```
@@ -148,7 +148,7 @@ const config = {
 
 const topsortClient = new TopsortClient(config)
 
-topsortClient.reportEvent(config, event)
+topsortClient.reportEvent(event)
   .then((result) => console.log(result))
   .catch((error) => console.error(error));
 ```
