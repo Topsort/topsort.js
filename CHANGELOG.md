@@ -10,8 +10,84 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 - Add implementation for TopsortClient ([#43](https://github.com/Topsort/topsort.js/pull/43))
 
-As part of new implementation, now a client is initialized receiving a config as `const topsortClient = new TopsortClient(config)`
-And all the functions will be found within the client, as `topsortClient.createAuction(auction)` or `topsortClient.reportEvent(event)`
+As part of the new implementation, a Topsort Client that embeds all functions is now initialized by receiving a config. Additionally, some type names have been renamed:
+- _TopsortAuction_ > **Auction**
+- _TopsortEvents_ > **Event**
+
+Migration steps:
+
+#### Auctions - Before
+```js
+import { TopsortAuction, Config, reportAuction } from "@topsort/sdk";
+
+const auction: TopsortAuction = {
+    //...
+};
+
+const config: Config = {
+  apiKey: "API_KEY",
+};
+
+createAuction(config, auction)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+#### Auctions - After
+```js
+import { Auction, Config, TopsortClient } from "@topsort/sdk";
+
+const auction: Auction = {
+    //...
+};
+
+const config: Config = {
+  apiKey: "API_KEY",
+};
+
+const topsortClient = new TopsortClient(config);
+
+topsortClient.createAuction(auction)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+
+#### Events - Before
+```js
+import { TopsortEvent, Config, reportEvent } from "@topsort/sdk";
+
+const event: TopsortEvent = {
+    //...
+};
+
+const config: Config = {
+  apiKey: "API_KEY",
+};
+
+reportEvent(config, event)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+#### Events - After
+```js
+import { Event, Config, TopsortClient } from "@topsort/sdk";
+
+const event: Event = {
+    //...
+};
+
+const config: Config = {
+  apiKey: "API_KEY",
+};
+
+const topsortClient = new TopsortClient(config);
+
+topsortClient.reportEvent(event)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
 
 - Fix CI/CD for release process ([#38](https://github.com/Topsort/topsort.js/pull/38))
 - Convert some parameters to optional ([#36](https://github.com/Topsort/topsort.js/pull/36))
