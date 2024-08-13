@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { delay } from "msw";
 import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import { playwrightConstants } from "./config";
 
@@ -93,27 +94,27 @@ test.describe("Create Auction via Topsort SDK", () => {
   });
 
   test("should have a delay when being called with timeout parameter", async ({ page }) => {
-    const mockAPIResponse = {
-      results: [
-        {
-          resultType: "listings",
-          winners: [],
-          error: false,
-        },
-      ],
+    const errorsList = [
+      "signal is aborted without reason",
+      "The operation was aborted. ",
+      "Fetch is aborted",
+    ];
+
+    const hasMatchingError = (actualError: any): boolean => {
+      return errorsList.some((error) => error === actualError.body);
     };
 
-    await page.route(`${baseURL}/${apis.auctions}`, async (route) => {
+    await page.route(`${baseURL}/${endpoints.auctions}`, async (route) => {
       await delay(100);
-      await route.fulfill({ json: mockAPIResponse });
+      await route.abort();
     });
 
     await page.goto(playwrightConstants.host);
+
     const result = await page.evaluate(async () => {
-      const startTime = Date.now();
       const config = {
         apiKey: "rando-api-key",
-        timeOut: 100,
+        timeout: 50,
       };
 
       const auctionDetails = {
@@ -127,12 +128,10 @@ test.describe("Create Auction via Topsort SDK", () => {
         ],
       };
 
-      const createAuctionResult = await window.sdk.createAuction(config, auctionDetails);
-      const endTime = Date.now();
-      return { createAuctionResult, timeTaken: endTime - startTime };
+      return window.sdk.createAuction(config, auctionDetails);
     });
 
-    expect(result.createAuctionResult).toEqual(mockAPIResponse);
-    expect(result.timeTaken).toBeGreaterThanOrEqual(100);
+    const isErrorFound = hasMatchingError(result);
+    expect(isErrorFound).toBeTruthy();
   });
 });
