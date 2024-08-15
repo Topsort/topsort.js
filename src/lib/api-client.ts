@@ -4,7 +4,11 @@ import AppError from "./app-error";
 
 class APIClient {
   private async handleResponse(response: Response): Promise<unknown> {
-    const data: unknown = await response.json();
+    let data: unknown;
+
+    if (response.status !== 204) {
+      data = await response.json();
+    }
 
     if (!response.ok) {
       const retry = response.status === 429 || response.status >= 500;
