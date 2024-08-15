@@ -6,6 +6,10 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 0.3.1 (2024-08-15)
+
+- Add validation to the response handler to prevent parsing of a No Content body ([#44](https://github.com/Topsort/topsort.js/pull/49))
+
 ## Version 0.3.0 (2024-08-13)
 
 - Introduce a new way to initialize a client ([#43](https://github.com/Topsort/topsort.js/pull/43))
