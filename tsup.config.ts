@@ -1,14 +1,14 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
-  format: ["cjs", "esm", "iife"],
-  dts: true,
   clean: true,
-  minify: true,
+  dts: true,
+  entry: ["src/index.ts"],
   esbuildOptions(options) {
-    options.keepNames = true;
     options.globalName = "Topsort";
+    options.keepNames = true;
   },
-  onSuccess: "cp -r ./e2e/public/* dist",
+  format: ["cjs", "esm", "iife"],
+  minify: true,
+  publicDir: "e2e/public",
 });
