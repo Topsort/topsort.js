@@ -38,7 +38,7 @@
     "package.json"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "bun -b tsup",
     "test:e2e": "bun run build && playwright test",
     "format": "biome check",
     "format:fix": "biome check --write",
@@ -54,10 +54,5 @@
     "tsup": "8.2.4",
     "typescript": "5.5.4"
   },
-  "keywords": [
-    "topsort",
-    "sdk",
-    "javascript",
-    "typescript"
-  ]
+  "keywords": ["topsort", "sdk", "javascript", "typescript"]
 }
