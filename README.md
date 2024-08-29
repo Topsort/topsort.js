@@ -58,9 +58,7 @@ const auctionDetails: Auction = {
 const config = {
   // generate your api key in the auction manager - it should look some thing like this
   // note: this is an invalid key and won't work, you need to replace it with your own
-  apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
-  userAgent: "Mozilla/5.0", // optional user agent to be added as part of the request
-  timeout: 50 // optional timeout for the request
+  apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR"
 };
 
 const topsortClient = new TopsortClient(config)
@@ -142,8 +140,7 @@ const event: Event = {
 
 const config = {
   // generate your api key in the auction manager - it should look some thing like this
-  apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR",
-  userAgent: "Mozilla/5.0" // optional user agent to be added as part of the request
+  apiKey: "TSE_4S6o1g1CB5tyRENfhDMAn6viR7A5cy3j1JAR"
 };
 
 const topsortClient = new TopsortClient(config)
