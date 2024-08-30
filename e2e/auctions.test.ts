@@ -3,6 +3,13 @@ import { delay } from "msw";
 import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import { playwrightConstants } from "./config";
 
+type CustomError = {
+  body: string;
+  retry: boolean;
+  status: number;
+  statusText: string;
+};
+
 test.describe("Create Auction via Topsort SDK", () => {
   test("should create an auction successfully", async ({ page }) => {
     const mockAPIResponse = {
@@ -100,7 +107,7 @@ test.describe("Create Auction via Topsort SDK", () => {
       "Fetch is aborted",
     ];
 
-    const hasMatchingError = (actualError: any): boolean => {
+    const hasMatchingError = (actualError: CustomError): boolean => {
       return errorsList.some((error) => error === actualError.body);
     };
 
