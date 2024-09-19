@@ -1,5 +1,5 @@
 import { version } from "../../package.json";
-import { Config } from "../types/shared";
+import type { Config } from "../types/shared";
 import AppError from "./app-error";
 
 class APIClient {

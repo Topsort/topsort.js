@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it } from "bun:test";
-import { Config, Event } from "../src";
+import type { Config, Event } from "../src";
 import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import { mswServer, returnAuctionSuccess } from "../src/constants/handlers.constant";
 import APIClient from "../src/lib/api-client";

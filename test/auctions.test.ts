@@ -8,7 +8,7 @@ import {
   returnStatus,
 } from "../src/constants/handlers.constant";
 import AppError from "../src/lib/app-error";
-import { Auction } from "../src/types/auctions";
+import type { Auction } from "../src/types/auctions";
 
 describe("createAuction", () => {
   let topsortClient: TopsortClient;
