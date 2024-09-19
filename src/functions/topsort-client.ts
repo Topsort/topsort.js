@@ -1,6 +1,6 @@
 import { baseURL } from "../constants/endpoints.constant";
-import { Auction, AuctionResult, Event, EventResult } from "../types";
-import { Config } from "../types/shared";
+import type { Auction, AuctionResult, Event, EventResult } from "../types";
+import type { Config } from "../types/shared";
 
 import { createAuction } from "./auctions";
 import { reportEvent } from "./events";

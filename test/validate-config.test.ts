@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import AppError from "../src/lib/app-error";
 import { validateConfig } from "../src/lib/validate-config";
-import { Config } from "../src/types/shared";
+import type { Config } from "../src/types/shared";
 
 describe("validateConfig", () => {
   it("should throw an error if apiKey is missing", () => {

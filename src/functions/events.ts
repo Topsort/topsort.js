@@ -2,8 +2,8 @@ import { endpoints } from "../constants/endpoints.constant";
 import APIClient from "../lib/api-client";
 import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
-import { Event, EventResult } from "../types/events";
-import { Config } from "../types/shared";
+import type { Event, EventResult } from "../types/events";
+import type { Config } from "../types/shared";
 
 async function handler(event: Event, config: Config): Promise<EventResult> {
   try {
