@@ -6,6 +6,13 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 0.3.2 (2024-09-19)
+
+- Simplifies tsup bundling ([#57](https://github.com/Topsort/topsort.js/pull/57))
+- Adds custom error type to remove `any` ([#58](https://github.com/Topsort/topsort.js/pull/58))
+- Improves the events types usage by exporting interfaces from `events.d.ts` ([#72](https://github.com/Topsort/topsort.js/pull/72/commits/3819cf7effee078833096139c6a2145829d610bf))
+- Reverts changes from ([#37](https://github.com/Topsort/topsort.js/pull/37)) ([#72](https://github.com/Topsort/topsort.js/pull/72/commits/1c14393c61413dc5d7298b83942a185a4ac6a884))
+
 ## Version 0.3.1 (2024-08-15)
 
 - Add validation to the response handler to prevent parsing of a No Content body ([#44](https://github.com/Topsort/topsort.js/pull/49))
