@@ -1,4 +1,4 @@
-interface Placement {
+export interface Placement {
   categoryIds?: string[];
   page?: number;
   pageSize?: number;
@@ -13,7 +13,7 @@ export interface Entity {
   type: "product" | "vendor";
 }
 
-interface Impression {
+export interface Impression {
   additionalAttribution?: Entity;
   entity?: Entity;
   id: string;
@@ -23,7 +23,7 @@ interface Impression {
   resolvedBidId?: string;
 }
 
-interface Click {
+export interface Click {
   additionalAttribution?: Entity;
   entity?: Entity;
   id: string;
@@ -33,14 +33,14 @@ interface Click {
   resolvedBidId?: string;
 }
 
-interface Item {
+export interface Item {
   productId: string;
   quantity: number;
   unitPrice: number;
   vendorId?: string;
 }
 
-interface Purchase {
+export interface Purchase {
   id: string;
   items: Item[];
   occurredAt: string;
