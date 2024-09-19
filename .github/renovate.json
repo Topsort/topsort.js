@@ -25,6 +25,10 @@
     {
       "matchPackagePatterns": ["bun"],
       "rangeStrategy": "in-range-only"
+    },
+    {
+      "matchPackageNames": ["msw"],
+      "allowedVersions": "<=2.4.3"
     }
   ],
   "regexManagers": [
