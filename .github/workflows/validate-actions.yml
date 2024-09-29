@@ -13,7 +13,7 @@ jobs:
 
       - name: Install Actionlint
         env:
-          version: "1.7.1"
+          version: "1.7.2"
         run: curl -Ls "https://github.com/rhysd/actionlint/releases/download/v${{ env.version }}/actionlint_${{ env.version }}_linux_amd64.tar.gz" | sudo tar -x -z -C /usr/local/bin actionlint
 
       - name: Run Actionlint
