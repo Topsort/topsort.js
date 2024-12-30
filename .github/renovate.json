@@ -69,7 +69,7 @@
   ],
   "rebaseWhen": "never",
   "labels": [
-    "type: dependencies"
+    "dependencies"
   ],
   "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   "prHeader": "",
