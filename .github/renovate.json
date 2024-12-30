@@ -1,39 +1,64 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranches": ["main"],
+  "baseBranches": [
+    "main"
+  ],
   "timezone": "Europe/Lisbon",
-  "schedule": ["before 9pm on sunday"],
-  "extends": [":dependencyDashboard", ":disableRateLimiting", ":semanticCommits"],
+  "schedule": [
+    "before 9pm on sunday"
+  ],
+  "extends": [
+    ":dependencyDashboard",
+    ":disableRateLimiting",
+    ":semanticCommits"
+  ],
   "rangeStrategy": "pin",
-  "enabledManagers": ["github-actions", "regex", "npm"],
+  "enabledManagers": [
+    "github-actions",
+    "custom.regex",
+    "npm"
+  ],
   "commitMessageAction": "",
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "{{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}{{prettyNewMajor}}{{else}}{{#if isSingleVersion}}{{prettyNewVersion}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
   "packageRules": [
     {
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "commitMessageTopic": "{{depName}}"
     },
     {
-      "matchPackagePatterns": ["actionlint"],
-      "commitMessageTopic": "actionlint"
+      "commitMessageTopic": "actionlint",
+      "matchPackageNames": [
+        "/actionlint/"
+      ]
     },
     {
-      "matchPackagePatterns": ["typos"],
-      "commitMessageTopic": "typos"
+      "commitMessageTopic": "typos",
+      "matchPackageNames": [
+        "/typos/"
+      ]
     },
     {
-      "matchPackagePatterns": ["bun"],
-      "rangeStrategy": "in-range-only"
+      "rangeStrategy": "in-range-only",
+      "matchPackageNames": [
+        "/bun/"
+      ]
     },
     {
-      "matchPackageNames": ["msw"],
+      "matchPackageNames": [
+        "msw"
+      ],
       "allowedVersions": "<=2.4.3"
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["^\\.github/workflows/[^/]+\\.yml$"],
+      "customType": "regex",
+      "fileMatch": [
+        "^\\.github/workflows/[^/]+\\.yml$"
+      ],
       "matchStrings": [
         "version: \"(?<currentValue>.*?)\"\\s+run: curl -Ls( -o \\w+)? \"https://github.com/(?<depName>.*?)/releases/download.*",
         "https://github\\.com/(?<depName>.*?)/archive/refs/tags/v(?<currentValue>.*?)\\.tar\\.gz"
@@ -43,7 +68,9 @@
     }
   ],
   "rebaseWhen": "never",
-  "labels": ["type: dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   "prHeader": "",
   "prFooter": ""
