@@ -27,6 +27,11 @@ describe("apiClient", () => {
           winners: [],
           error: false,
         },
+        {
+          resultType: "videos",
+          winners: [],
+          error: false,
+        },
       ],
     });
   });

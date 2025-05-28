@@ -1,4 +1,4 @@
-type AuctionType = "banners" | "listings";
+type AuctionType = "banners" | "listings" | "videos";
 type DeviceType = "desktop" | "mobile";
 
 interface GeoTargeting {
@@ -41,8 +41,14 @@ interface BannerAuction extends AuctionBase {
   type: "banners";
 }
 
+interface VideoAuction extends AuctionBase {
+  device?: DeviceType;
+  slotId: string;
+  type: "videos";
+}
+
 export interface Auction {
-  auctions: (SponsoredListingAuction | BannerAuction)[];
+  auctions: (SponsoredListingAuction | BannerAuction | VideoAuction)[];
 }
 
 interface Asset {

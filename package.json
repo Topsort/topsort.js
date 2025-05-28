@@ -49,10 +49,19 @@
     "@biomejs/biome": "1.9.4",
     "@playwright/test": "1.52.0",
     "@types/bun": "1.1.14",
+    "biome": "^0.3.3",
     "lefthook": "1.11.12",
     "msw": "2.4.3",
     "tsup": "8.4.0",
     "typescript": "5.7.3"
   },
-  "keywords": ["topsort", "sdk", "javascript", "typescript"]
+  "keywords": [
+    "topsort",
+    "sdk",
+    "javascript",
+    "typescript"
+  ],
+  "dependencies": {
+    "@topsort/sdk": "^0.3.2"
+  }
 }

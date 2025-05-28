@@ -24,6 +24,11 @@ test.describe("Create Auction via Topsort SDK", () => {
           winners: [],
           error: false,
         },
+        {
+          resultType: "videos",
+          winners: [],
+          error: false,
+        },
       ],
     };
 
@@ -50,6 +55,14 @@ test.describe("Create Auction via Topsort SDK", () => {
             slots: 1,
             device: "desktop",
             slotId: "slot123",
+            category: { ids: ["cat1", "cat2"] },
+            geoTargeting: { location: "UK" },
+          },
+          {
+            type: "videos",
+            slots: 1,
+            device: "desktop",
+            slotId: "slot1234",
             category: { ids: ["cat1", "cat2"] },
             geoTargeting: { location: "UK" },
           },

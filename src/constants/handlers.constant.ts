@@ -33,6 +33,11 @@ export const returnAuctionSuccess = (url: string) => {
             winners: [],
             error: false,
           },
+          {
+            resultType: "videos",
+            winners: [],
+            error: false,
+          },
         ],
       });
     }),

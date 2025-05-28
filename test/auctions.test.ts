@@ -67,6 +67,11 @@ describe("createAuction", () => {
           winners: [],
           error: false,
         },
+        {
+          resultType: "videos",
+          winners: [],
+          error: false,
+        },
       ],
     });
   });
@@ -99,6 +104,11 @@ describe("createAuction", () => {
         },
         {
           resultType: "banners",
+          winners: [],
+          error: false,
+        },
+        {
+          resultType: "videos",
           winners: [],
           error: false,
         },

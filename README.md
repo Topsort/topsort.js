@@ -52,6 +52,14 @@ const auctionDetails: Auction = {
       category: { ids: ["cat1", "cat2"] },
       geoTargeting: { location: "UK" },
     },
+    {
+      type: "videos",
+      slots: 1,
+      device: "desktop",
+      slotId: "slot1234",
+      category: { ids: ["cat1", "cat2"] },
+      geoTargeting: { location: "UK" },
+    },
   ],
 };
 
