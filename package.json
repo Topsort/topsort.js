@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@playwright/test": "1.52.0",
+    "@playwright/test": "1.53.0",
     "@types/bun": "1.1.14",
     "lefthook": "1.11.12",
     "msw": "2.4.3",
