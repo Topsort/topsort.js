@@ -9,7 +9,7 @@ jobs:
     name: Check for language typos
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         # No major tag unfortunately
         # https://github.com/crate-ci/typos/issues/857
       - uses: crate-ci/typos@v1.30.1
