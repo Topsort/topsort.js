@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranches": [
+  "baseBranchPatterns": [
     "main"
   ],
   "timezone": "Europe/Lisbon",
@@ -56,8 +56,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^\\.github/workflows/[^/]+\\.yml$"
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/"
       ],
       "matchStrings": [
         "version: \"(?<currentValue>.*?)\"\\s+run: curl -Ls( -o \\w+)? \"https://github.com/(?<depName>.*?)/releases/download.*",
