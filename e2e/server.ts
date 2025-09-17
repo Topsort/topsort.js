@@ -7,14 +7,13 @@ Bun.serve({
     const url = new URL(req.url);
     const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
     const filePath = `./dist${pathname}`;
-
     try {
       if (filePath.endsWith(".ico")) {
         return new Response("", { status: 204 });
       }
 
       return new Response(file(filePath));
-    } catch (e) {
+    } catch (_e) {
       return new Response("Not Found", { status: 404 });
     }
   },

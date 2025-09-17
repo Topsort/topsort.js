@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
     "allowJs": true,
-    "types": ["node"]
+    "types": ["bun"]
   },
   "include": ["src/*.ts", "src/**/*.ts", "e2e/server.ts"],
   "exclude": ["node_modules"]

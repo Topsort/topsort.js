@@ -8,6 +8,7 @@ jobs:
   npm-publish:
     name: Publish to NPM
     runs-on: ubuntu-22.04
+
     permissions:
       contents: read
       id-token: write
@@ -28,6 +29,9 @@ jobs:
 
       - name: Run tests
         run: bun test
+
+      - name: Run e2e tests
+        run: bun test:e2e
         
       - name: Build artifacts
         run: node_modules/.bin/tsup
