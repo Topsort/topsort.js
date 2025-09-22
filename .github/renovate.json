@@ -1,64 +1,40 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranchPatterns": [
-    "main"
-  ],
+  "baseBranchPatterns": ["main"],
   "timezone": "Europe/Lisbon",
-  "schedule": [
-    "before 9pm on sunday"
-  ],
-  "extends": [
-    ":dependencyDashboard",
-    ":disableRateLimiting",
-    ":semanticCommits"
-  ],
+  "schedule": ["before 9pm on sunday"],
+  "extends": [":dependencyDashboard", ":disableRateLimiting", ":semanticCommits"],
   "rangeStrategy": "pin",
-  "enabledManagers": [
-    "github-actions",
-    "custom.regex",
-    "npm"
-  ],
+  "enabledManagers": ["github-actions", "custom.regex", "npm"],
   "commitMessageAction": "",
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "{{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}{{prettyNewMajor}}{{else}}{{#if isSingleVersion}}{{prettyNewVersion}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
   "packageRules": [
     {
-      "matchManagers": [
-        "github-actions"
-      ],
+      "matchManagers": ["github-actions"],
       "commitMessageTopic": "{{depName}}"
     },
     {
       "commitMessageTopic": "actionlint",
-      "matchPackageNames": [
-        "/actionlint/"
-      ]
+      "matchPackageNames": ["/actionlint/"]
     },
     {
       "commitMessageTopic": "typos",
-      "matchPackageNames": [
-        "/typos/"
-      ]
+      "matchPackageNames": ["/typos/"]
     },
     {
       "rangeStrategy": "in-range-only",
-      "matchPackageNames": [
-        "/bun/"
-      ]
+      "matchPackageNames": ["/bun/"]
     },
     {
-      "matchPackageNames": [
-        "msw"
-      ],
+      "matchPackageNames": ["msw"],
       "allowedVersions": "<=2.4.3"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/^\\.github/workflows/[^/]+\\.yml$/"
-      ],
+      "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.yml$/"],
       "matchStrings": [
         "version: \"(?<currentValue>.*?)\"\\s+run: curl -Ls( -o \\w+)? \"https://github.com/(?<depName>.*?)/releases/download.*",
         "https://github\\.com/(?<depName>.*?)/archive/refs/tags/v(?<currentValue>.*?)\\.tar\\.gz"
@@ -68,9 +44,7 @@
     }
   ],
   "rebaseWhen": "never",
-  "labels": [
-    "dependencies"
-  ],
+  "labels": ["dependencies"],
   "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   "prHeader": "",
   "prFooter": ""
