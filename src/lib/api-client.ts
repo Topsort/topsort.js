@@ -51,6 +51,7 @@ class APIClient {
       },
       body: JSON.stringify(body),
       signal,
+      keepalive: config.keepalive ?? true,
     });
   }
 
