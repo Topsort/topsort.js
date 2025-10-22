@@ -6,7 +6,7 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
-## Version 0.3.4 (2025-10-22)
+## Version 0.3.3 (2025-10-22)
 
 - Add optional keepalive support for analytics events ([#164](https://github.com/Topsort/topsort.js/pull/164))
 
