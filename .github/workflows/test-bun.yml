@@ -27,3 +27,14 @@ jobs:
           files: coverage.lcov
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittest
+
+  bun-test-e2e:
+    name: E2E Test
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+
+      - run: bun test:e2e
