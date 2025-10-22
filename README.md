@@ -7,13 +7,21 @@ This repository holds the official Topsort javascript client library. This proje
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Creating an Auction](#auctions)
-  - [Reporting an Event](#events)
-    - [Retryable Errors](#retryable-errors)
-- [Contributing](#contributing)
-- [License](#license)
+- [Topsort SDK](#topsort-sdk)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Auctions](#auctions)
+      - [Parameters](#parameters)
+        - [Config Parameters](#config-parameters)
+      - [Sample response](#sample-response)
+    - [Events](#events)
+      - [Parameters](#parameters-1)
+        - [Config Parameters](#config-parameters-1)
+      - [Sample response](#sample-response-1)
+      - [Retryable Errors](#retryable-errors)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Installation
 
@@ -76,6 +84,7 @@ topsortClient.createAuction(auctionDetails)
 - `apiKey`: Your Topsort API Key
 - `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
 - `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
+- `keepalive`: Optional boolean to enable keepalive for requests. Defaults to `true`. When enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
 
 `auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
 
@@ -153,6 +162,12 @@ topsortClient.reportEvent(event)
 #### Parameters
 
 `config`: An object containing configuration details including the API key. Please refer to [Auction Manager](https://app.topsort.com/new/en-US/marketplace/account-settings/api-integration)
+
+##### Config Parameters
+- `apiKey`: Your Topsort API Key
+- `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
+- `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
+- `keepalive`: Optional boolean to enable keepalive for requests. Defaults to `true`. When enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
 
 `event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
 
