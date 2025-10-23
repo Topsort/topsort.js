@@ -11,9 +11,9 @@ on:
 jobs:
   bun-test:
     name: Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: oven-sh/setup-bun@v2
       - run: bun install
@@ -27,3 +27,17 @@ jobs:
           files: coverage.lcov
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittest
+
+  bun-test-e2e:
+    name: E2E Test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+
+      - name: Install Playwright Browsers
+        run: bunx playwright install --with-deps
+
+      - run: bun test:e2e
