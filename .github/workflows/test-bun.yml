@@ -19,14 +19,23 @@ jobs:
       - run: bun install
 
       - name: Run tests
-        run: bun test --coverage-reporter lcov
+        run: bun test --reporter=junit --reporter-outfile=tests.xml --coverage --coverage-reporter=lcov --coverage-dir=coverage
 
       - uses: codecov/codecov-action@v5.5.1
         with:
           slug: Topsort/topsort.js
-          files: coverage.lcov
+          files: coverage/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittest
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: Topsort/topsort.js
+          files: tests.xml
+
 
   bun-test-e2e:
     name: E2E Test
