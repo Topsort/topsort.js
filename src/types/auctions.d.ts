@@ -58,6 +58,12 @@ type AuctionWithSearchOnly = {
   searchQuery: string;
 } & AuctionBaseFields;
 
+type AuctionWithNoConstraints = {
+  category?: never;
+  products?: never;
+  searchQuery?: never;
+} & AuctionBaseFields;
+
 type AuctionBaseFields = {
   geoTargeting?: GeoTargeting;
   slots: number;
@@ -76,7 +82,7 @@ type ValidSponsoredListingAuction = ValidAuctionBase & {
   type: "listings";
 };
 
-type ValidBannerAuction = (ValidAuctionBase | AuctionBaseFields) & {
+type ValidBannerAuction = (ValidAuctionBase | AuctionWithNoConstraints) & {
   device?: DeviceType;
   slotId: string;
   type: "banners";
