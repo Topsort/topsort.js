@@ -50,7 +50,7 @@
     "@biomejs/biome": "2.2.7",
     "@playwright/test": "1.56.1",
     "@types/bun": "1.2.22",
-    "lefthook": "1.13.0",
+    "lefthook": "2.0.0",
     "msw": "2.11.2",
     "tsup": "8.5.0",
     "typescript": "5.9.3"
