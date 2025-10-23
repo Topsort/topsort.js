@@ -1,12 +1,17 @@
 import { endpoints } from "../constants/endpoints.constant";
 import APIClient from "../lib/api-client";
+import AppError from "../lib/app-error";
 import { withValidation } from "../lib/with-validation";
 import type { Auction, AuctionResult } from "../types/auctions";
 import type { Config } from "../types/shared";
 
 function validateAuctionConstraints(auction: Auction): void {
   if (!auction.auctions || !Array.isArray(auction.auctions)) {
-    throw new Error("Invalid auction: 'auctions' must be an array");
+    throw new AppError(
+      400,
+      "Invalid auction request: body and auctions array are required.",
+      undefined,
+    );
   }
 
   for (const item of auction.auctions) {
@@ -18,15 +23,19 @@ function validateAuctionConstraints(auction: Auction): void {
 
     // Check: at most 2 triggers
     if (triggers.length > 2) {
-      throw new Error(
-        `Invalid auction: Cannot specify more than 2 triggers (category, products, searchQuery). Found ${triggers.length} triggers.`,
+      throw new AppError(
+        400,
+        `Cannot pass all three parameters: category, products, and searchQuery. Only two at most are allowed. Found ${triggers.length} triggers.`,
+        undefined,
       );
     }
 
     // Check: listings must have at least 1 trigger
     if (item.type === "listings" && triggers.length === 0) {
-      throw new Error(
-        "Invalid auction: Listings auctions must specify at least one trigger (category, products, or searchQuery).",
+      throw new AppError(
+        400,
+        "Listings auctions must specify at least one trigger (category, products, or searchQuery).",
+        undefined,
       );
     }
   }

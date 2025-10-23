@@ -135,6 +135,24 @@ describe("createAuction", () => {
   });
 
   describe("runtime validation (bypassing TypeScript)", () => {
+    it("should reject auction with invalid auctions array", async () => {
+      // Using type assertion to bypass compile-time checks
+      const invalidAuction = {
+        auctions: null,
+      } as unknown as Auction;
+
+      try {
+        await topsortClient.createAuction(invalidAuction);
+        expect.unreachable("Should have thrown AppError");
+      } catch (error) {
+        expect(error).toBeInstanceOf(AppError);
+        expect((error as AppError).status).toBe(400);
+        expect((error as AppError).statusText).toBe(
+          "Invalid auction request: body and auctions array are required.",
+        );
+      }
+    });
+
     it("should reject auction with all 3 triggers", async () => {
       // Using type assertion to bypass compile-time checks
       const invalidAuction = {
@@ -150,9 +168,16 @@ describe("createAuction", () => {
         ],
       } as Auction;
 
-      await expect(topsortClient.createAuction(invalidAuction)).rejects.toThrow(
-        "Invalid auction: Cannot specify more than 2 triggers (category, products, searchQuery). Found 3 triggers.",
-      );
+      try {
+        await topsortClient.createAuction(invalidAuction);
+        expect.unreachable("Should have thrown AppError");
+      } catch (error) {
+        expect(error).toBeInstanceOf(AppError);
+        expect((error as AppError).status).toBe(400);
+        expect((error as AppError).statusText).toBe(
+          "Cannot pass all three parameters: category, products, and searchQuery. Only two at most are allowed. Found 3 triggers.",
+        );
+      }
     });
 
     it("should reject listing auction with no triggers", async () => {
@@ -166,9 +191,16 @@ describe("createAuction", () => {
         ],
       } as Auction;
 
-      await expect(topsortClient.createAuction(invalidAuction)).rejects.toThrow(
-        "Invalid auction: Listings auctions must specify at least one trigger (category, products, or searchQuery).",
-      );
+      try {
+        await topsortClient.createAuction(invalidAuction);
+        expect.unreachable("Should have thrown AppError");
+      } catch (error) {
+        expect(error).toBeInstanceOf(AppError);
+        expect((error as AppError).status).toBe(400);
+        expect((error as AppError).statusText).toBe(
+          "Listings auctions must specify at least one trigger (category, products, or searchQuery).",
+        );
+      }
     });
   });
 });
