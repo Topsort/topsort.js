@@ -5,6 +5,10 @@ import type { Auction, AuctionResult } from "../types/auctions";
 import type { Config } from "../types/shared";
 
 function validateAuctionConstraints(auction: Auction): Auction {
+  if (!auction.auctions || !Array.isArray(auction.auctions)) {
+    return auction;
+  }
+
   const validatedAuctions = auction.auctions.map((auctionItem) => {
     const hasCategory = auctionItem.category !== undefined;
     const hasProducts = auctionItem.products !== undefined;
@@ -18,7 +22,6 @@ function validateAuctionConstraints(auction: Auction): Auction {
           'All 3 were provided. Dropping "category" to maintain backwards compatibility.',
       );
 
-      // Remove category to satisfy the constraint
       // biome-ignore lint/correctness/noUnusedVariables: ignoreRestSiblings option to ignore unused variables in object destructuring with spread
       const { category, ...rest } = auctionItem;
       return rest;
