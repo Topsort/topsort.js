@@ -42,3 +42,5 @@ jobs:
       - name: Publish to npm
         id: publish
         run: npm publish --provenance --access public --no-git-checks
+        env:
+          NPM_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
