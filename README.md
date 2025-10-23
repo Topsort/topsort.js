@@ -14,6 +14,7 @@ This repository holds the official Topsort javascript client library. This proje
     - [Auctions](#auctions)
       - [Parameters](#parameters)
         - [Config Parameters](#config-parameters)
+        - [Overriding fetch options](#overriding-fetch-options)
       - [Sample response](#sample-response)
     - [Events](#events)
       - [Parameters](#parameters-1)
@@ -40,6 +41,8 @@ yarn add @topsort/sdk --save
 ### Auctions
 
 To create an auction, first initialize a Topsort Client, then call the `createAuction` function:
+
+**Type Triggers**: Each auction can specify at most 2 of the following triggers: `category`, `products`, or `searchQuery`. Banner auctions targeting landing page slots can have no triggers, while sponsored listing auctions and other banner auction types must have at least 1 trigger.
 
 ```js
 import { TopsortClient, Auction } from "@topsort/sdk";

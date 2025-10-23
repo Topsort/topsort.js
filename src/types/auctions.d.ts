@@ -22,27 +22,74 @@ interface AuctionProduct {
   qualityScores?: number[];
 }
 
-interface AuctionBase {
-  category?: AuctionSingleCategory | AuctionMultipleCategories | AuctionDisjunctiveCategories;
+type AuctionWithCategoryAndProducts = {
+  category: AuctionSingleCategory | AuctionMultipleCategories | AuctionDisjunctiveCategories;
+  products: AuctionProduct;
+  searchQuery?: never;
+} & AuctionBaseFields;
+
+type AuctionWithCategoryAndSearch = {
+  category: AuctionSingleCategory | AuctionMultipleCategories | AuctionDisjunctiveCategories;
+  products?: never;
+  searchQuery: string;
+} & AuctionBaseFields;
+
+type AuctionWithProductsAndSearch = {
+  category?: never;
+  products: AuctionProduct;
+  searchQuery: string;
+} & AuctionBaseFields;
+
+type AuctionWithCategoryOnly = {
+  category: AuctionSingleCategory | AuctionMultipleCategories | AuctionDisjunctiveCategories;
+  products?: never;
+  searchQuery?: never;
+} & AuctionBaseFields;
+
+type AuctionWithProductsOnly = {
+  category?: never;
+  products: AuctionProduct;
+  searchQuery?: never;
+} & AuctionBaseFields;
+
+type AuctionWithSearchOnly = {
+  category?: never;
+  products?: never;
+  searchQuery: string;
+} & AuctionBaseFields;
+
+type AuctionWithNoConstraints = {
+  category?: never;
+  products?: never;
+  searchQuery?: never;
+} & AuctionBaseFields;
+
+type AuctionBaseFields = {
   geoTargeting?: GeoTargeting;
-  products?: AuctionProduct;
-  searchQuery?: string;
   slots: number;
   type: AuctionType;
-}
+};
 
-interface SponsoredListingAuction extends AuctionBase {
+type ValidAuctionBase =
+  | AuctionWithCategoryAndProducts
+  | AuctionWithCategoryAndSearch
+  | AuctionWithProductsAndSearch
+  | AuctionWithCategoryOnly
+  | AuctionWithProductsOnly
+  | AuctionWithSearchOnly;
+
+type ValidSponsoredListingAuction = ValidAuctionBase & {
   type: "listings";
-}
+};
 
-interface BannerAuction extends AuctionBase {
+type ValidBannerAuction = (ValidAuctionBase | AuctionWithNoConstraints) & {
   device?: DeviceType;
   slotId: string;
   type: "banners";
-}
+};
 
 export interface Auction {
-  auctions: (SponsoredListingAuction | BannerAuction)[];
+  auctions: (ValidSponsoredListingAuction | ValidBannerAuction)[];
 }
 
 interface Asset {

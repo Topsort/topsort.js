@@ -40,6 +40,8 @@
   ],
   "scripts": {
     "build": "bun -b tsup",
+    "test": "bun test && bun run test:compile",
+    "test:compile": "tsc --noEmit test/compile-time-validation.ts",
     "test:e2e": "bun run build && playwright test",
     "format": "biome check",
     "format:fix": "biome check --write",
