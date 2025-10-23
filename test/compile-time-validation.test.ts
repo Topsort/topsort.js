@@ -46,7 +46,7 @@ const validAuction7: Auction = {
 };
 
 // Invalid combinations (should fail compilation)
-const invalidAuction1: Auction = {
+const _invalidAuction1: Auction = {
   // @ts-expect-error - All 3 constraints specified for listings (should fail)
   auctions: [
     {
@@ -59,7 +59,7 @@ const invalidAuction1: Auction = {
   ],
 };
 
-const invalidAuction2: Auction = {
+const _invalidAuction2: Auction = {
   // @ts-expect-error - All 3 constraints specified for banners (should fail)
   auctions: [
     {
@@ -73,17 +73,17 @@ const invalidAuction2: Auction = {
   ],
 };
 
-const invalidAuction3: Auction = {
+const _invalidAuction3: Auction = {
   // @ts-expect-error - Listings with no constraints (should fail)
   auctions: [{ type: "listings", slots: 3 }],
 };
 
-const invalidAuction4: Auction = {
+const _invalidAuction4: Auction = {
   // @ts-expect-error - Banner missing required slotId (should fail)
   auctions: [{ type: "banners", slots: 1 }],
 };
 
-const invalidAuction5: Auction = {
+const _invalidAuction5: Auction = {
   // @ts-expect-error - Invalid auction type (should fail)
   auctions: [{ type: "invalid", slots: 3 }],
 };
