@@ -30,6 +30,9 @@ jobs:
       - name: Run tests
         run: bun test
 
+      - name: Install Playwright Browsers
+        run: bunx playwright install --with-deps
+
       - name: Run e2e tests
         run: bun test:e2e
         
