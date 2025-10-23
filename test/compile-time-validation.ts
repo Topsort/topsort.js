@@ -1,7 +1,7 @@
 /**
  * Compile-time validation tests for auction constraints
  * This file should compile without errors if the type system is working correctly
- * Run with: tsc --noEmit test/compile-time-validation.test.ts
+ * Run with: tsc --noEmit test/compile-time-validation.ts
  */
 
 import type { Auction } from "../src/types";
@@ -31,6 +31,25 @@ const validAuction5: Auction = {
 
 const validAuction6: Auction = {
   auctions: [{ type: "banners", slots: 1, slotId: "slot123", category: { id: "cat123" } }],
+};
+
+const _invalid3TriggersAuction: Auction = {
+  // @ts-expect-error - All 3 triggers specified (should fail)
+  auctions: [
+    {
+      type: "banners",
+      slots: 1,
+      slotId: "slot123",
+      category: { id: "cat123" },
+      products: { ids: ["prod1"] },
+      searchQuery: "search term",
+    },
+  ],
+};
+
+const _invalidListingNoTriggersAuction: Auction = {
+  // @ts-expect-error - Listing auction with no triggers (should fail)
+  auctions: [{ type: "listings", slots: 1 }],
 };
 
 const validAuction7: Auction = {
