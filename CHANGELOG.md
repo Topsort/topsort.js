@@ -6,6 +6,22 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 0.3.5 (2025-10-23)
+
+- fix: install browsers in npm publish job by @jbergstroem in https://github.com/Topsort/topsort.js/pull/174
+- feat: run e2e tests in PRs by @jbergstroem in https://github.com/Topsort/topsort.js/pull/167
+- chore(deps): actions/setup-node v6 by @renovate[bot] in https://github.com/Topsort/topsort.js/pull/163
+- chore(deps): actionlint v1.7.8 by @renovate[bot] in https://github.com/Topsort/topsort.js/pull/161
+- fix(ci): use correct checkout version by @jbergstroem in https://github.com/Topsort/topsort.js/pull/169
+- chore(deps): @biomejs/biome v2.2.7 by @renovate[bot] in https://github.com/Topsort/topsort.js/pull/162
+- chore(deps): @playwright/test v1.56.1 by @renovate[bot] in https://github.com/Topsort/topsort.js/pull/151
+- chore(deps): typos v1.38.1 by @renovate[bot] in https://github.com/Topsort/topsort.js/pull/141
+- chore(deps): lefthook v2 by @renovate[bot] in https://github.com/Topsort/topsort.js/pull/171
+- feat(ci): send test metadata to codecov by @jbergstroem in https://github.com/Topsort/topsort.js/pull/173
+- feat: pass `fetchOptions` to fetch client by @jbergstroem in https://github.com/Topsort/topsort.js/pull/170
+- chore: v0.3.5 by @jbergstroem in https://github.com/Topsort/topsort.js/pull/172
+
+
 ## Version 0.3.3 (2025-10-22)
 
 - Add optional keepalive support for analytics events ([#164](https://github.com/Topsort/topsort.js/pull/164))
@@ -124,4 +140,3 @@ topsortClient.reportEvent(event)
 - Initial release of the SDK ([#1](https://github.com/Topsort/topsort.js/pull/1))
 - Pull `reportEvent` from [Analytics.js](https://github.com/Topsort/analytics.js)
 - Add function `createAuction`
-
