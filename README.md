@@ -84,9 +84,14 @@ topsortClient.createAuction(auctionDetails)
 - `apiKey`: Your Topsort API Key
 - `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
 - `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
-- `keepalive`: Optional boolean to enable keepalive for requests. Defaults to `true`. When enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
+- `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`.
 
 `auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
+
+##### Overriding fetch options
+
+By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. If you want to pass other options
+or disable fetch due to the browser/engine version required, you can do so by overriding the `fetchOptions` object.
 
 #### Sample response
 
@@ -167,7 +172,7 @@ topsortClient.reportEvent(event)
 - `apiKey`: Your Topsort API Key
 - `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
 - `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
-- `keepalive`: Optional boolean to enable keepalive for requests. Defaults to `true`. When enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
+- `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`. When keepalive is enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
 
 `event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
 

@@ -39,6 +39,7 @@ class APIClient {
 
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
     const signal = this.setupTimeoutSignal(config);
+    const fetchOptions = config.fetchOptions ?? { keepalive: true };
     return this.request(endpoint, {
       method: "POST",
       headers: {
@@ -51,7 +52,7 @@ class APIClient {
       },
       body: JSON.stringify(body),
       signal,
-      keepalive: config.keepalive ?? true,
+      ...fetchOptions,
     });
   }
 
