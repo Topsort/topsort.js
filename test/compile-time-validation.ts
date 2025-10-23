@@ -34,8 +34,8 @@ const validAuction6: Auction = {
 };
 
 const _invalid3TriggersAuction: Auction = {
-  // @ts-expect-error - All 3 triggers specified (should fail)
   auctions: [
+    // @ts-expect-error TS2322 - All 3 triggers specified (should fail)
     {
       type: "banners",
       slots: 1,
@@ -48,8 +48,10 @@ const _invalid3TriggersAuction: Auction = {
 };
 
 const _invalidListingNoTriggersAuction: Auction = {
-  // @ts-expect-error - Listing auction with no triggers (should fail)
-  auctions: [{ type: "listings", slots: 1 }],
+  auctions: [
+    // @ts-expect-error TS2322 - Listing auction with no triggers (should fail)
+    { type: "listings", slots: 1 },
+  ],
 };
 
 const validAuction7: Auction = {
