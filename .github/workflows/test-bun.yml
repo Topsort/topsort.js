@@ -21,6 +21,9 @@ jobs:
       - name: Run tests
         run: bun test --reporter=junit --reporter-outfile=tests.xml --coverage --coverage-reporter=lcov --coverage-dir=coverage
 
+      - name: Run compile-time validation
+        run: bun run test:compile
+
       - uses: codecov/codecov-action@v5.5.1
         with:
           slug: Topsort/topsort.js
