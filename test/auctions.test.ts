@@ -105,4 +105,28 @@ describe("createAuction", () => {
       ],
     });
   });
+
+  it("should handle custom fetchOptions", async () => {
+    returnAuctionSuccess(`${baseURL}/${endpoints.auctions}`);
+    topsortClient = new TopsortClient({
+      apiKey: "apiKey",
+      host: baseURL,
+      fetchOptions: { keepalive: false, cache: "no-cache" },
+    });
+
+    expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+        {
+          resultType: "banners",
+          winners: [],
+          error: false,
+        },
+      ],
+    });
+  });
 });

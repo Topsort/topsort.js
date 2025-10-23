@@ -6,6 +6,6 @@ export interface Config {
   /// An optional timeout for requests in milliseconds.
   timeout?: number;
   userAgent?: string;
-  /// Whether to use keepalive for requests. Defaults to true.
-  keepalive?: boolean;
+  /// Optional fetch options to pass to the fetch call. Defaults to { keepalive: true }.
+  fetchOptions?: RequestInit;
 }

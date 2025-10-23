@@ -61,4 +61,18 @@ describe("reportEvent", () => {
     topsortClient = new TopsortClient({ apiKey: "apiKey", host: invalidHost });
     expect(async () => topsortClient.reportEvent({} as Event)).toThrow(AppError);
   });
+
+  it("should handle custom fetchOptions", async () => {
+    returnStatus(204, `${baseURL}/${endpoints.events}`);
+    topsortClient = new TopsortClient({
+      apiKey: "apiKey",
+      host: baseURL,
+      fetchOptions: { keepalive: false, cache: "no-cache" },
+    });
+
+    expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+  });
 });
