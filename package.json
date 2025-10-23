@@ -47,7 +47,7 @@
     "serve:e2e": "bun run ./e2e/server.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.5",
+    "@biomejs/biome": "2.2.7",
     "@playwright/test": "1.55.0",
     "@types/bun": "1.2.22",
     "lefthook": "1.13.0",
