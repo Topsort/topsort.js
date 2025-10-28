@@ -36,7 +36,6 @@
     "dist/index.d.ts",
     "dist/index.js",
     "dist/index.cjs",
-    "dist/index.global.js",
     "package.json"
   ],
   "scripts": {
