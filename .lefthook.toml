@@ -1,4 +1,4 @@
-skip_output = ['meta', 'execution', 'empty_summary']
+output = ['summary']
 
 [pre-commit]
 parallel = true
