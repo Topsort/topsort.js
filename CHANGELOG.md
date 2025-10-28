@@ -8,6 +8,7 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+- feat: add `customFetch` option to `Config` to allow using custom fetch implementations by @jbergstroem
 - fix: export esm as module in `package.json` by @jbergstroem in https://github.com/Topsort/topsort.js/pull/180
 
 ## Version 0.3.5 (2025-10-23)
