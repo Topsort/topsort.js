@@ -4,21 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Topsort SDK Test Application</title>
-    <script src="./index.global.js"></script>
+    <script type="module">
+      import { TopsortClient } from './index.js';
+
+      window.TopsortClient = TopsortClient;
+    </script>
   </head>
   <body>
     <h1>Test Topsort.js Integration</h1>
-    <script>
+    <script defer>
       window.sdk = {
         createAuction: async (config, auctionDetails) => {
-          const topsortClient = new Topsort.TopsortClient(config)
+          const topsortClient = new TopsortClient(config)
           const result = await topsortClient.createAuction(
             auctionDetails
           ).catch((error) => error);
           return result;
         },
         reportEvent: async (config, eventDetails) => {
-          const topsortClient = new Topsort.TopsortClient(config)
+          const topsortClient = new TopsortClient(config)
           const result = await topsortClient.reportEvent(
             eventDetails
           ).catch((error) => error);

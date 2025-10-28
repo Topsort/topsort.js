@@ -6,6 +6,10 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Unreleased
+
+- fix: export esm as module in `package.json` by @jbergstroem in https://github.com/Topsort/topsort.js/pull/180
+
 ## Version 0.3.5 (2025-10-23)
 
 - fix: install browsers in npm publish job by @jbergstroem in https://github.com/Topsort/topsort.js/pull/174
