@@ -33,11 +33,12 @@ jobs:
       - name: Install Playwright Browsers
         run: bunx playwright install --with-deps
 
+        # The `test:e2e` command invokes `bun build` but we keep it here in case it changes
+      - name: Run e2e tests
+        run: bun run build
+
       - name: Run e2e tests
         run: bun test:e2e
-        
-      - name: Build artifacts
-        run: node_modules/.bin/tsup
 
       - name: Publish to npm
         id: publish
