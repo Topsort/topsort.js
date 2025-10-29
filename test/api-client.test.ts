@@ -30,4 +30,105 @@ describe("apiClient", () => {
       ],
     });
   });
+
+  it("should use customFetch when provided", async () => {
+    let customFetchCalled = false;
+    let capturedUrl = "";
+    let capturedOptions: RequestInit | undefined;
+
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      json: async () => ({
+        results: [
+          {
+            resultType: "listings",
+            winners: [],
+            error: false,
+          },
+        ],
+      }),
+    } as Response;
+
+    const customFetch = async (url: string, options?: RequestInit): Promise<Response> => {
+      customFetchCalled = true;
+      capturedUrl = url;
+      capturedOptions = options;
+      return mockResponse;
+    };
+
+    const config: Config = {
+      apiKey: "test-api-key",
+      customFetch,
+    };
+
+    const url = `${baseURL}/${endpoints.auctions}`;
+    const body = { test: "data" };
+
+    const result = await APIClient.post(url, body, config);
+
+    expect(customFetchCalled).toBe(true);
+    expect(capturedUrl).toBe(url);
+    expect(capturedOptions?.method).toBe("POST");
+    expect(capturedOptions?.headers).toMatchObject({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "Bearer test-api-key",
+    });
+    expect(capturedOptions?.body).toBe(JSON.stringify(body));
+    expect(result).toEqual({
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+      ],
+    });
+  });
+
+  it("should handle customFetch errors properly", async () => {
+    const customFetch = async (): Promise<Response> => {
+      throw new Error("Custom fetch error");
+    };
+
+    const config: Config = {
+      apiKey: "test-api-key",
+      customFetch,
+    };
+
+    const url = `${baseURL}/${endpoints.auctions}`;
+    const body = { test: "data" };
+
+    expect(APIClient.post(url, body, config)).rejects.toThrow();
+  });
+
+  it("should pass fetchOptions to customFetch", async () => {
+    let capturedOptions: RequestInit | undefined;
+
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      json: async () => ({ results: [] }),
+    } as Response;
+
+    const customFetch = async (url: string, options?: RequestInit): Promise<Response> => {
+      capturedOptions = options;
+      return mockResponse;
+    };
+
+    const config: Config = {
+      apiKey: "test-api-key",
+      fetchOptions: { keepalive: false, mode: "cors" },
+      customFetch,
+    };
+
+    const url = `${baseURL}/${endpoints.auctions}`;
+    await APIClient.post(url, {}, config);
+
+    expect(capturedOptions?.keepalive).toBe(false);
+    expect(capturedOptions?.mode).toBe("cors");
+  });
 });

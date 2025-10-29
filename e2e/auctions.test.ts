@@ -141,4 +141,54 @@ test.describe("Create Auction via Topsort SDK", () => {
     const isErrorFound = hasMatchingError(result);
     expect(isErrorFound).toBeTruthy();
   });
+
+  test("should work with custom fetch implementation", async ({ page }) => {
+    const mockAPIResponse = {
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+      ],
+    };
+
+    await page.route(`${baseURL}/${endpoints.auctions}`, async (route) => {
+      await route.fulfill({ json: mockAPIResponse });
+    });
+
+    await page.goto(playwrightConstants.host);
+    const result = await page.evaluate(() => {
+      let customFetchCalled = false;
+
+      // Create a custom fetch that wraps the original
+      const customFetch = async (url: string, options?: RequestInit) => {
+        customFetchCalled = true;
+        return fetch(url, options);
+      };
+
+      const config = {
+        apiKey: "rando-api-key",
+        customFetch,
+      };
+
+      const auctionDetails = {
+        auctions: [
+          {
+            type: "listings",
+            slots: 3,
+            category: { id: "cat123" },
+            geoTargeting: { location: "US" },
+          },
+        ],
+      };
+
+      return window.sdk.createAuction(config, auctionDetails).then((response) => {
+        return { response, customFetchCalled };
+      });
+    });
+
+    expect(result.response).toEqual(mockAPIResponse);
+    expect(result.customFetchCalled).toBe(true);
+  });
 });

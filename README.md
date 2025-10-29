@@ -20,6 +20,7 @@ This repository holds the official Topsort javascript client library. This proje
         - [Config Parameters](#config-parameters-1)
       - [Sample response](#sample-response-1)
       - [Retryable Errors](#retryable-errors)
+  - [Examples](#examples)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -85,15 +86,24 @@ topsortClient.createAuction(auctionDetails)
 - `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
 - `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
 - `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`.
+- `customFetch`: Optional custom fetch implementation to replace the default fetch. Useful for using libraries like axios or adding custom middleware. See [Using Custom Fetch Implementation](#using-custom-fetch-implementation) for examples.
 
 `auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
+
+##### Using a Custom Fetch Implementation
+
+The SDK allows you to replace the default `fetch` implementation with a custom one. This is useful for:
+- Using HTTP clients like `axios` or `node-fetch`
+- Adding custom middleware or interceptors
+- Working in environments without native fetch support
+- Adding custom headers, logging, or error handling
 
 ##### Overriding fetch options
 
 By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. If you want to pass other options
 or disable fetch due to the browser/engine version required, you can do so by overriding the `fetchOptions` object.
 
-#### Sample response
+#### Sample responses
 
 200:
 ```json
@@ -117,6 +127,7 @@ or disable fetch due to the browser/engine version required, you can do so by ov
   ]
 }
 ```
+
 400:
 ```json
 {
@@ -173,6 +184,7 @@ topsortClient.reportEvent(event)
 - `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
 - `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
 - `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`. When keepalive is enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
+- `customFetch`: Optional custom fetch implementation to replace the default fetch. Useful for using libraries like axios or adding custom middleware. See [Using Custom Fetch Implementation](#using-custom-fetch-implementation) for examples.
 
 `event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
 
@@ -207,7 +219,7 @@ topsortClient.reportEvent(event)
 
 #### Retryable Errors
 
-The `reportEvent` function returns `"retry": true` if the response status code is `429` or any `5xx`. This enables you to identify when it’s appropriate to retry the function call.
+The `reportEvent` function returns `"retry": true` if the response status code is `429` or any `5xx`. This enables you to identify when it's appropriate to retry the function call.
 
 ## Contributing
 
