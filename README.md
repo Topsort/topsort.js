@@ -215,6 +215,19 @@ We aim to cover the entire Topsort API, and contributions are always welcome. Th
 
 Your help in enhancing the project is highly appreciated. Whether it’s reporting a bug, suggesting a new feature, or submitting a pull request, every bit of input helps us improve. Thank you for your support and happy coding!
 
+## Cutting a release
+
+1. Introduce a pull request that updates `package.json`. Don't forget to run `bun install` to update `bun.lock` to reflect said change
+2. After the pull request has been merged, go to the github releases page, create a new tag given the changes in the release; meaning patch, minor or major change
+3. Allow github to generate the release, but the change the contents by:
+  - Introduce a high level, human-readable summary on top of the notes
+  - Split the PRs into the following categories (order matters):
+    - New features
+    - Bug fixes
+    - Dependencies and version changes
+    - Other changes (this should include things like documentation, chores)
+  - Removing the "full changelog" at the bottom of the notes
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
