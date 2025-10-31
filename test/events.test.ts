@@ -75,4 +75,29 @@ describe("reportEvent", () => {
       retry: false,
     });
   });
+
+  it("should successfully report pageview events", async () => {
+    returnStatus(204, `${baseURL}/${endpoints.events}`);
+    const pageviewEvent: Event = {
+      pageviews: [
+        {
+          id: "pageview-123",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-456",
+          page: {
+            pageId: "homepage",
+            type: "home",
+            value: "/",
+          },
+          deviceType: "mobile",
+          channel: "onsite",
+        },
+      ],
+    };
+
+    expect(topsortClient.reportEvent(pageviewEvent)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+  });
 });

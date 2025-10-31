@@ -1,3 +1,19 @@
+import { DeviceType } from "./auctions";
+
+export type ChannelType = "onsite" | "offsite" | "instore";
+export type PageType = "home" | "category" | "PDP" | "search" | "cart" | "other";
+
+interface BaseEvent {
+  id: string;
+  occurredAt: string;
+  opaqueUserId: string;
+}
+
+interface AdditionalEventBase extends BaseEvent {
+  additionalAttribution?: Entity;
+  resolvedBidId?: string;
+}
+
 export interface Placement {
   categoryIds?: string[];
   page?: number;
@@ -13,24 +29,14 @@ export interface Entity {
   type: "product" | "vendor";
 }
 
-export interface Impression {
-  additionalAttribution?: Entity;
+export interface Impression extends AdditionalEventBase {
   entity?: Entity;
-  id: string;
-  occurredAt: string;
-  opaqueUserId: string;
   placement?: Placement;
-  resolvedBidId?: string;
 }
 
-export interface Click {
-  additionalAttribution?: Entity;
+export interface Click extends AdditionalEventBase {
   entity?: Entity;
-  id: string;
-  occurredAt: string;
-  opaqueUserId: string;
   placement?: Placement;
-  resolvedBidId?: string;
 }
 
 export interface Item {
@@ -40,16 +46,26 @@ export interface Item {
   vendorId?: string;
 }
 
-export interface Purchase {
-  id: string;
+export interface Purchase extends BaseEvent {
   items: Item[];
-  occurredAt: string;
-  opaqueUserId: string;
+}
+
+export interface Page {
+  pageId: string;
+  type: PageType;
+  value: string | string[];
+}
+
+export interface PageView extends BaseEvent {
+  channel?: ChannelType;
+  deviceType?: DeviceType;
+  page: Page;
 }
 
 export interface Event {
   clicks?: Click[];
   impressions?: Impression[];
+  pageviews?: PageView[];
   purchases?: Purchase[];
 }
 
