@@ -1,5 +1,5 @@
 type AuctionType = "banners" | "listings";
-type DeviceType = "desktop" | "mobile";
+export type DeviceType = "desktop" | "mobile";
 
 interface GeoTargeting {
   location: string;
