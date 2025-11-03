@@ -1,7 +1,6 @@
-import { DeviceType } from "./auctions";
+import type { DeviceType } from "./auctions";
 
 export type ChannelType = "onsite" | "offsite" | "instore";
-export type PageType = "home" | "category" | "PDP" | "search" | "cart" | "other";
 
 interface BaseEvent {
   id: string;
@@ -50,11 +49,21 @@ export interface Purchase extends BaseEvent {
   items: Item[];
 }
 
-export interface Page {
+interface BasePage {
   pageId: string;
-  type: PageType;
-  value: string | string[];
 }
+
+interface StandardPage extends BasePage {
+  type: "home" | "category" | "PDP" | "search" | "other";
+  value: string;
+}
+
+interface CartPage extends BasePage {
+  type: "cart";
+  value: string[];
+}
+
+export type Page = StandardPage | CartPage;
 
 export interface PageView extends BaseEvent {
   channel?: ChannelType;

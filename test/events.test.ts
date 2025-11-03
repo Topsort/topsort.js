@@ -100,4 +100,29 @@ describe("reportEvent", () => {
       retry: false,
     });
   });
+
+  it("should successfully report pageview event for cart page with product array", async () => {
+    returnStatus(204, `${baseURL}/${endpoints.events}`);
+    const cartPageviewEvent: Event = {
+      pageviews: [
+        {
+          id: "pageview-cart-123",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-456",
+          page: {
+            pageId: "cart",
+            type: "cart",
+            value: ["product-1", "product-2", "product-3"],
+          },
+          deviceType: "desktop",
+          channel: "onsite",
+        },
+      ],
+    };
+
+    expect(topsortClient.reportEvent(cartPageviewEvent)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+  });
 });
