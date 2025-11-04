@@ -1,6 +1,6 @@
 {
   "name": "@topsort/sdk",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "The official Topsort SDK for TypeScript and JavaScript",
   "packageManager": "bun@1.3.1",
   "main": "dist/index.cjs",
