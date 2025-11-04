@@ -1,5 +1,6 @@
+import type { DeviceType } from "./shared";
+
 type AuctionType = "banners" | "listings";
-type DeviceType = "desktop" | "mobile";
 
 interface GeoTargeting {
   location: string;

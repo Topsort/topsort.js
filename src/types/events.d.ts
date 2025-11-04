@@ -1,3 +1,25 @@
+import type { DeviceType } from "./shared";
+
+/**
+ * Channel through which the user interaction occurred.
+ * @typedef {("onsite"|"offsite"|"instore")} ChannelType
+ * @property {string} onsite - User is on the merchant's website
+ * @property {string} offsite - User is on a third-party platform
+ * @property {string} instore - User is in a physical store location
+ */
+export type ChannelType = "onsite" | "offsite" | "instore";
+
+interface BaseEvent {
+  id: string;
+  occurredAt: string;
+  opaqueUserId: string;
+}
+
+interface AdditionalEventBase extends BaseEvent {
+  additionalAttribution?: Entity;
+  resolvedBidId?: string;
+}
+
 export interface Placement {
   categoryIds?: string[];
   page?: number;
@@ -13,24 +35,14 @@ export interface Entity {
   type: "product" | "vendor";
 }
 
-export interface Impression {
-  additionalAttribution?: Entity;
+export interface Impression extends AdditionalEventBase {
   entity?: Entity;
-  id: string;
-  occurredAt: string;
-  opaqueUserId: string;
   placement?: Placement;
-  resolvedBidId?: string;
 }
 
-export interface Click {
-  additionalAttribution?: Entity;
+export interface Click extends AdditionalEventBase {
   entity?: Entity;
-  id: string;
-  occurredAt: string;
-  opaqueUserId: string;
   placement?: Placement;
-  resolvedBidId?: string;
 }
 
 export interface Item {
@@ -40,16 +52,53 @@ export interface Item {
   vendorId?: string;
 }
 
-export interface Purchase {
-  id: string;
+export interface Purchase extends BaseEvent {
   items: Item[];
-  occurredAt: string;
-  opaqueUserId: string;
+}
+
+interface BasePage {
+  pageId: string;
+}
+
+interface StandardPage extends BasePage {
+  type: "home" | "category" | "PDP" | "search" | "other";
+  value: string;
+}
+
+interface CartPage extends BasePage {
+  type: "cart";
+  value: string[];
+}
+
+/**
+ * Page information for a pageview event.
+ * Use StandardPage for single-value pages or CartPage for cart pages with multiple product IDs.
+ * @typedef {(StandardPage|CartPage)} Page
+ */
+export type Page = StandardPage | CartPage;
+
+/**
+ * PageView event - tracks when a user views a page.
+ * @interface PageView
+ * @extends {BaseEvent}
+ * @property {ChannelType} [channel] - Channel through which the page was viewed
+ * @property {DeviceType} [deviceType] - Type of device used
+ * @property {Page} page - Page information
+ */
+export interface PageView extends BaseEvent {
+  channel?: ChannelType;
+  deviceType?: DeviceType;
+  page: Page;
 }
 
 export interface Event {
   clicks?: Click[];
   impressions?: Impression[];
+  /**
+   * PageView events
+   * @type {PageView[]}
+   */
+  pageviews?: PageView[];
   purchases?: Purchase[];
 }
 

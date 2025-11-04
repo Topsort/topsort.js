@@ -73,4 +73,82 @@ test.describe("Report Events via Topsort SDK", () => {
 
     expect(result).toEqual(expectedError);
   });
+
+  test("should report a pageview event successfully", async ({ page }) => {
+    const mockAPIResponse = {
+      ok: true,
+      retry: false,
+    };
+
+    await page.route(`${baseURL}/${endpoints.events}`, async (route) => {
+      await route.fulfill({ json: mockAPIResponse });
+    });
+
+    await page.goto(playwrightConstants.host);
+    const result = await page.evaluate(() => {
+      const config = {
+        apiKey: "rando-api-key",
+      };
+
+      const event = {
+        pageviews: [
+          {
+            id: "pageview-123",
+            occurredAt: "2024-10-31T12:00:00Z",
+            opaqueUserId: "user-456",
+            page: {
+              pageId: "homepage",
+              type: "home",
+              value: "/",
+            },
+            deviceType: "mobile",
+            channel: "onsite",
+          },
+        ],
+      };
+
+      return window.sdk.reportEvent(config, event);
+    });
+
+    expect(result).toEqual(mockAPIResponse);
+  });
+
+  test("should report a cart pageview event with product array successfully", async ({ page }) => {
+    const mockAPIResponse = {
+      ok: true,
+      retry: false,
+    };
+
+    await page.route(`${baseURL}/${endpoints.events}`, async (route) => {
+      await route.fulfill({ json: mockAPIResponse });
+    });
+
+    await page.goto(playwrightConstants.host);
+    const result = await page.evaluate(() => {
+      const config = {
+        apiKey: "rando-api-key",
+      };
+
+      const event = {
+        pageviews: [
+          {
+            id: "pageview-cart-123",
+            occurredAt: "2024-10-31T12:00:00Z",
+            opaqueUserId: "user-456",
+            page: {
+              pageId: "cart",
+              type: "cart",
+              value: ["product-1", "product-2", "product-3"],
+            },
+            deviceType: "desktop",
+            channel: "onsite",
+          },
+        ],
+      };
+
+      return window.sdk.reportEvent(config, event);
+    });
+
+    expect(result).toEqual(mockAPIResponse);
+  });
 });

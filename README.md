@@ -150,6 +150,50 @@ const event: Event = {
       },
     },
   ],
+  clicks: [
+    {
+      resolvedBidId:
+        "ChAGaP5D2ex-UKEEBCOHwvDjEhABkF4FDAx0S5mMD2cOG0w9GhABkEnL2CB6qKIoqeItVgA_",
+      id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46150",
+      occurredAt: "2024-07-11T13:56:09Z",
+      opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
+      entity: {
+        id: "p_Mfk11",
+        type: "product",
+      },
+      placement: {
+        path: "/categories/sports",
+      },
+    },
+  ],
+  purchases: [
+    {
+      id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46151",
+      occurredAt: "2024-07-11T13:57:09Z",
+      opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
+      items: [
+        {
+          productId: "p_Mfk11",
+          quantity: 1,
+          unitPrice: 49.99,
+        },
+      ],
+    },
+  ],
+  pageviews: [
+    {
+      id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46152",
+      occurredAt: "2024-07-11T13:54:09Z",
+      opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
+      page: {
+        pageId: "category-sports",
+        type: "category",
+        value: "/categories/sports",
+      },
+      deviceType: "mobile",
+      channel: "onsite",
+    },
+  ],
 };
 
 const config = {

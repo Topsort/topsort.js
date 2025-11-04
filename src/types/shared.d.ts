@@ -1,3 +1,5 @@
+export type DeviceType = "desktop" | "mobile";
+
 export interface Config {
   /// The API key to use for requests.
   apiKey: string;
