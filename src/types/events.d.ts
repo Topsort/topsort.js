@@ -2,6 +2,10 @@ import type { DeviceType } from "./auctions";
 
 /**
  * Channel through which the user interaction occurred.
+ * @typedef {("onsite"|"offsite"|"instore")} ChannelType
+ * @property {string} onsite - User is on the merchant's website
+ * @property {string} offsite - User is on a third-party platform
+ * @property {string} instore - User is in a physical store location
  */
 export type ChannelType = "onsite" | "offsite" | "instore";
 
@@ -69,25 +73,31 @@ interface CartPage extends BasePage {
 /**
  * Page information for a pageview event.
  * Use StandardPage for single-value pages or CartPage for cart pages with multiple product IDs.
+ * @typedef {(StandardPage|CartPage)} Page
  */
 export type Page = StandardPage | CartPage;
 
 /**
  * PageView event - tracks when a user views a page.
+ * @interface PageView
+ * @extends {BaseEvent}
+ * @property {ChannelType} [channel] - Channel through which the page was viewed
+ * @property {DeviceType} [deviceType] - Type of device used
+ * @property {Page} page - Page information
  */
 export interface PageView extends BaseEvent {
-  /** Channel through which the page was viewed */
   channel?: ChannelType;
-  /** Type of device used */
   deviceType?: DeviceType;
-  /** Page information */
   page: Page;
 }
 
 export interface Event {
   clicks?: Click[];
   impressions?: Impression[];
-  /** PageView events */
+  /**
+   * PageView events
+   * @type {PageView[]}
+   */
   pageviews?: PageView[];
   purchases?: Purchase[];
 }
