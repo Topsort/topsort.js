@@ -1,4 +1,4 @@
-import type { DeviceType } from "./auctions";
+import type { DeviceType } from "./shared";
 
 /**
  * Channel through which the user interaction occurred.
