@@ -5,7 +5,7 @@ export default defineConfig({
   entry: "src/index.ts",
   name: "main",
   dts: {
-    minify: true,
+    minify: false,
   },
   minify: true,
   format: ["esm", "cjs"],
