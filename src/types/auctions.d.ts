@@ -233,22 +233,23 @@ interface Asset {
    * @example "https://cdn.topsort.com/assets/example-banner.jpg"
    */
   url: string;
+
+  /**
+   * Additional content metadata for the asset.
+   * This is an open object that can contain any additional properties.
+   * @type {Record<string, any>}
+   * @optional
+   * @example { "headingText": "Summer Sale", "bannerText": "50% off", "bannerTextColour": "#FFFFFF", "heroImage": "hero.jpg", "heroImageAltText": "Hero" }
+   */
+  // biome-ignore lint: this comes from the specification
+  content?: Record<string, any>;
 }
 
 /**
- * Represents an auction winner.
- * @interface Winner
+ * Base interface for auction winners.
+ * @interface BaseWinner
  */
-interface Winner {
-  /**
-   * The list of available sources for a banner.
-   * Only present for banner auction winners.
-   * @type {Asset[]}
-   * @required
-   * @minItems 1
-   */
-  asset: Asset[];
-
+interface BaseWinner {
   /**
    * The marketplace's ID of the winning entity, depending on the target of the campaign.
    * @type {string}
@@ -285,7 +286,44 @@ interface Winner {
    * @example "product"
    */
   type: string;
+
+  /**
+   * The ID of the campaign that won the auction.
+   * @type {string}
+   * @required
+   * @example "82588593-85c5-47c0-b125-07e315b7f2b3"
+   */
+  campaignId: string;
 }
+
+/**
+ * Represents a sponsored listing auction winner.
+ * @interface SponsoredListingWinner
+ * @extends {BaseWinner}
+ */
+interface SponsoredListingWinner extends BaseWinner {}
+
+/**
+ * Represents a banner auction winner with asset information.
+ * @interface BannerWinner
+ * @extends {BaseWinner}
+ */
+interface BannerWinner extends BaseWinner {
+  /**
+   * The list of available sources for a banner.
+   * Only present for banner auction winners.
+   * @type {Asset[]}
+   * @required
+   * @minItems 1
+   */
+  asset: Asset[];
+}
+
+/**
+ * Union type for all winner types.
+ * @typedef {(SponsoredListingWinner|BannerWinner)} Winner
+ */
+type Winner = SponsoredListingWinner | BannerWinner;
 
 /**
  * Result for a single auction.
@@ -302,6 +340,7 @@ interface Result {
 
   /**
    * The type of auction result.
+   * Discriminator for the result type.
    * @type {AuctionType}
    * @required
    */
@@ -312,6 +351,8 @@ interface Result {
    * It will be empty if there were no qualifying bids or if there was an error.
    * The list of winners will contain at most `slots` entries per auction.
    * It may contain fewer or no entries at all if there aren't enough products with usable bids.
+   * Winners for listings auctions will be SponsoredListingWinner objects.
+   * Winners for banner auctions will be BannerWinner objects with asset information.
    * @type {Winner[]}
    * @required
    */

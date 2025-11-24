@@ -78,6 +78,13 @@ interface AdditionalEventBase extends BaseEvent {
    * @example "WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0="
    */
   resolvedBidId?: string;
+
+  /**
+   * Page information describing which page the event occurred on.
+   * @type {Page}
+   * @optional
+   */
+  page?: Page;
 }
 
 /**
@@ -86,6 +93,13 @@ interface AdditionalEventBase extends BaseEvent {
  * @interface Placement
  */
 export interface Placement {
+  /**
+   * Index signature to allow additional properties.
+   * Placement supports additional custom properties beyond the standard fields.
+   */
+  // biome-ignore lint: this comes from the specification
+  [key: string]: any;
+
   /**
    * An array of IDs of the categories associated to the page in which this event occurred, if applicable.
    * These IDs must match the IDs provided through the catalog service.
@@ -176,6 +190,36 @@ export interface Entity {
 }
 
 /**
+ * Information regarding an organic or non-sponsored event.
+ * Describes the type of object that was interacted with.
+ * @interface InteractionObject
+ */
+export interface InteractionObject {
+  /**
+   * The type of object that is being reported on the interaction.
+   * @type {"listing" | "banner"}
+   * @required
+   * @example "listing"
+   */
+  type: "listing" | "banner";
+
+  /**
+   * When type is `banner`, signals the ID of the asset of the banner.
+   * @type {string}
+   * @optional
+   * @example "asset-123"
+   */
+  assetId?: string;
+
+  /**
+   * When type is `listing`, signals the specific interaction flavor with the listing.
+   * @type {"image" | "add_to_cart" | "purchase_now"}
+   * @optional
+   */
+  clickType?: "image" | "add_to_cart" | "purchase_now";
+}
+
+/**
  * An impression means a promotable has become visible to the consumer.
  * For promoted entities, include the `resolvedBidId` field from the `/v2/auctions` response.
  * For unpromoted entities, include the `entity` field to describe what was seen.
@@ -213,6 +257,27 @@ export interface Impression extends AdditionalEventBase {
    * @optional
    */
   placement?: Placement;
+
+  /**
+   * Information regarding an organic or non-sponsored event.
+   * @type {InteractionObject}
+   * @optional
+   */
+  object?: InteractionObject;
+
+  /**
+   * Marketplace provided ID for a campaign.
+   * @type {string}
+   * @optional
+   */
+  externalCampaignId?: string;
+
+  /**
+   * Marketplace provided ID for a vendor.
+   * @type {string}
+   * @optional
+   */
+  externalVendorId?: string;
 }
 
 /**
@@ -252,6 +317,34 @@ export interface Click extends AdditionalEventBase {
    * @optional
    */
   placement?: Placement;
+
+  /**
+   * Information regarding an organic or non-sponsored event.
+   * @type {InteractionObject}
+   * @optional
+   */
+  object?: InteractionObject;
+
+  /**
+   * For sponsored events only, signals the specific interaction flavor with the listing.
+   * @type {"image" | "add_to_cart" | "purchase_now"}
+   * @optional
+   */
+  clickType?: "image" | "add_to_cart" | "purchase_now";
+
+  /**
+   * Marketplace provided ID for a campaign.
+   * @type {string}
+   * @optional
+   */
+  externalCampaignId?: string;
+
+  /**
+   * Marketplace provided ID for a vendor.
+   * @type {string}
+   * @optional
+   */
+  externalVendorId?: string;
 }
 
 /**
