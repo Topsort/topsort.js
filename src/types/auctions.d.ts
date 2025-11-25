@@ -290,7 +290,6 @@ interface BaseWinner {
   /**
    * The ID of the campaign that won the auction.
    * @type {string}
-   * @required
    * @example "82588593-85c5-47c0-b125-07e315b7f2b3"
    */
   campaignId: string;
