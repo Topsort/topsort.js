@@ -21,7 +21,7 @@ jobs:
       - name: Run tests
         run: bun test --reporter=junit --reporter-outfile=tests.xml --coverage --coverage-reporter=lcov --coverage-dir=coverage
 
-      - uses: codecov/codecov-action@v5.5.1
+      - uses: codecov/codecov-action@v5.5.2
         with:
           slug: Topsort/topsort.js
           files: coverage/lcov.info
