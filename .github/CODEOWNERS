@@ -1,10 +1,10 @@
 # Source code
-*.ts @Topsort/integrations
-*.js @Topsort/integrations
+**/*.ts @Topsort/integrations
+**/*.js @Topsort/integrations
 
 # Config
-*.json @Topsort/integrations
-*.toml @Topsort/integrations
+**/*.json @Topsort/integrations
+**/*.toml @Topsort/integrations
 
 # CI
 .github/ @Topsort/integrations
