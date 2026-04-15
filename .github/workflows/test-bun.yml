@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - "**/*.ts"
-      - "./bun.lockb" # dependencies have changed
+      - "bun.lock" # dependencies have changed
   push:
     branches:
       - main
