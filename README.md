@@ -51,6 +51,8 @@ const auctionDetails: Auction = {
       slots: 3,
       category: { id: "cat123" },
       geoTargeting: { location: "US" },
+      opaqueUserId: "71303ce0-de89-496d-8270-6434589615e8",
+      page: { pageId: "category-cat123", type: "category", value: "cat123" },
     },
     {
       type: "banners",
@@ -59,6 +61,8 @@ const auctionDetails: Auction = {
       slotId: "slot123",
       category: { ids: ["cat1", "cat2"] },
       geoTargeting: { location: "UK" },
+      opaqueUserId: "71303ce0-de89-496d-8270-6434589615e8",
+      page: { pageId: "/cart", type: "cart", value: ["p_1", "p_2"] },
     },
   ],
 };

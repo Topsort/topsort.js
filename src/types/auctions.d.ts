@@ -1,3 +1,4 @@
+import type { Page } from "./events";
 import type { DeviceType } from "./shared";
 
 /**
@@ -151,6 +152,28 @@ interface AuctionBase {
    * @required
    */
   type: AuctionType;
+
+  /**
+   * Anonymized unique identifier that maps to the original user ID without revealing the original value.
+   * Allows Topsort to correlate user activity between auctions and user interactions, independent of the
+   * user's logged-in status. For apps or sites where users might interact while logged out, we recommend
+   * generating a random identifier (UUIDv7) on the first load, storing it on local storage (cookie, local
+   * storage, etc), and letting it live for at least a year. Otherwise, if your users are always logged in
+   * for interactions, you may use a hash of your customer ID. Correct purchase attribution requires
+   * long-lived opaque user IDs consistent between auction and event requests.
+   * @type {string}
+   * @optional
+   * @example "71303ce0-de89-496d-8270-6434589615e8"
+   */
+  opaqueUserId?: string;
+
+  /**
+   * Information about the page where the auction occurs.
+   * Use StandardPage for single-value pages or CartPage for cart pages with multiple product IDs.
+   * @type {Page}
+   * @optional
+   */
+  page?: Page;
 }
 
 /**

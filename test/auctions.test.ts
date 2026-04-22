@@ -129,4 +129,41 @@ describe("createAuction", () => {
       ],
     });
   });
+
+  it("should accept opaqueUserId and page on auction requests", async () => {
+    returnAuctionSuccess(`${baseURL}/${endpoints.auctions}`);
+    const auction: Auction = {
+      auctions: [
+        {
+          type: "listings",
+          slots: 2,
+          products: { ids: ["p_1", "p_2"] },
+          opaqueUserId: "71303ce0-de89-496d-8270-6434589615e8",
+          page: { pageId: "/search", type: "search", value: "vanilla yogurt" },
+        },
+        {
+          type: "banners",
+          slots: 1,
+          slotId: "categories-ribbon-banner",
+          opaqueUserId: "71303ce0-de89-496d-8270-6434589615e8",
+          page: { pageId: "/cart", type: "cart", value: ["p_1", "p_2"] },
+        },
+      ],
+    };
+
+    expect(topsortClient.createAuction(auction)).resolves.toEqual({
+      results: [
+        {
+          resultType: "listings",
+          winners: [],
+          error: false,
+        },
+        {
+          resultType: "banners",
+          winners: [],
+          error: false,
+        },
+      ],
+    });
+  });
 });
