@@ -29,7 +29,6 @@ topsort.js is the official `@topsort/sdk` -- a fully typed TypeScript client for
 | Linting/Formatting | [Biome](https://biomejs.dev/) (v2)                      |
 | Git hooks        | [Lefthook](https://github.com/evilmartians/lefthook)      |
 | CI               | GitHub Actions                                             |
-| Code coverage    | [Codecov](https://codecov.io/)                             |
 
 ## Key Commands
 
@@ -102,7 +101,7 @@ dist/                             # Build output (gitignored)
 - Location: `test/` directory.
 - HTTP mocking: [MSW](https://mswjs.io/) (Mock Service Worker) with handlers in `src/constants/handlers.constant.ts`.
 - Run: `bun test`.
-- Coverage: Built-in Bun coverage (`--coverage`), reported to Codecov in CI.
+- Coverage: Built-in Bun coverage (`--coverage`).
 - Pattern: Each test file mirrors a source module. Use `describe`/`it` blocks. Set up MSW server in `beforeAll`, reset handlers in `afterEach`.
 
 ### E2E Tests
@@ -126,7 +125,7 @@ dist/                             # Build output (gitignored)
 
 | Workflow                  | Trigger (paths)            | What it does                                       |
 | ------------------------- | -------------------------- | -------------------------------------------------- |
-| **Bun** (test-bun.yml)   | `**/*.ts`, `./bun.lockb`  | Runs unit tests + Codecov upload; runs E2E tests   |
+| **Bun** (test-bun.yml)   | `**/*.ts`, `./bun.lockb`  | Runs unit tests; runs E2E tests   |
 | **Biome** (validate-biome.yml) | `**/*.ts`, `**/*.json` | Runs `biome ci` on changed files                   |
 | **Conventional Commits** (validate-convco.yml) | All PRs | Validates PR title matches Conventional Commits    |
 | **Typos** (validate-typos.yml) | `**/*.md`             | Spell-checks Markdown files                        |
