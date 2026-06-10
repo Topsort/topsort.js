@@ -9,7 +9,7 @@ run = "node_modules/.bin/biome check --no-errors-on-unmatched --files-ignore-unk
 
 [pre-commit.commands.test]
 glob = "*.ts"
-run = "bun test"
+run = "bun run test"
 
 [pre-commit.commands.typos]
 glob = "*.{md,mdoc,mdx}"

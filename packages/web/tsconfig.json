@@ -17,6 +17,6 @@
     "allowJs": true,
     "types": ["bun"]
   },
-  "include": ["e2e/**/*.ts", "global.d.ts", "packages/web/src/**/*.ts"],
+  "include": ["src/*.ts", "src/**/*.ts"],
   "exclude": ["node_modules"]
 }

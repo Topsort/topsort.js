@@ -9,5 +9,5 @@ export default defineConfig({
   },
   minify: true,
   format: ["esm", "cjs"],
-  plugins: [copy(["e2e/public/index.html"])],
+  plugins: [copy(["../../e2e/public/index.html"])],
 });
