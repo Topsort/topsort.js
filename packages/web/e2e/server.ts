@@ -6,7 +6,7 @@ Bun.serve({
   fetch(req) {
     const url = new URL(req.url);
     const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
-    const filePath = `./packages/web/dist${pathname}`;
+    const filePath = `./dist${pathname}`;
     try {
       if (filePath.endsWith(".ico")) {
         return new Response("", { status: 204 });

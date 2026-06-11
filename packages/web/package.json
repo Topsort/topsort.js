@@ -40,7 +40,9 @@
   ],
   "scripts": {
     "build": "bunup",
-    "test": "bun test"
+    "test": "bun test",
+    "test:e2e": "bun run build && playwright test",
+    "serve:e2e": "bun run ./e2e/server.ts"
   },
   "keywords": [
     "topsort",

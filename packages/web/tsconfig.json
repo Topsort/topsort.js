@@ -1,22 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
-    "module": "ES2020",
-    "target": "ES2020",
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "strict": true,
-    "downlevelIteration": true,
-    "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "removeComments": true,
-    "allowJs": true,
-    "types": ["bun"]
+    "jsx": "react-jsx"
   },
-  "include": ["src/*.ts", "src/**/*.ts"],
+  "include": ["src/**/*.ts", "e2e/**/*.ts"],
   "exclude": ["node_modules"]
 }

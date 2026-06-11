@@ -8,11 +8,10 @@
   "scripts": {
     "build": "bun run --cwd packages/web build",
     "test": "bun run --cwd packages/web test",
-    "test:e2e": "bun run build && playwright test",
+    "test:e2e": "bun run --cwd packages/web test:e2e",
     "format": "biome check",
     "format:fix": "biome check --write",
-    "prepare": "lefthook install",
-    "serve:e2e": "bun run ./e2e/server.ts"
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.13",

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { delay } from "msw";
-import { baseURL, endpoints } from "../packages/web/src/constants/endpoints.constant";
+import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import { playwrightConstants } from "./config";
 
 type CustomError = {
