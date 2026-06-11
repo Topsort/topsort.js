@@ -1,0 +1,16 @@
+import { endpoints } from "../constants/endpoints.constant";
+import type APIClient from "../lib/api-client";
+import { withValidation } from "../lib/with-validation";
+import type { Auction, AuctionResult } from "../types/auctions";
+import type { Config } from "../types/shared";
+
+export function createAuction(apiClient: APIClient) {
+  async function handler(body: Auction, config: Config): Promise<AuctionResult> {
+    const url = `${config.host}/${endpoints.auctions}`;
+    const result = await apiClient.post(url.toString(), body, config);
+
+    return result as AuctionResult;
+  }
+
+  return withValidation(handler);
+}

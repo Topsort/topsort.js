@@ -1,8 +1,8 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
-import { type Event, TopsortClient } from "../src";
-import { baseURL, endpoints } from "../src/constants/endpoints.constant";
+import { baseURL, type Event, endpoints } from "@topsort/sdk-core";
+import AppError from "../../core/src/lib/app-error";
+import { TopsortClient } from "../src";
 import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
-import AppError from "../src/lib/app-error";
 
 describe("reportEvent", () => {
   let topsortClient: TopsortClient;

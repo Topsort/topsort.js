@@ -1,7 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import AppError from "../src/lib/app-error";
-import { validateConfig } from "../src/lib/validate-config";
-import type { Config } from "../src/types/shared";
+import { AppError, type Config, validateConfig } from "@topsort/sdk-core";
 
 describe("validateConfig", () => {
   it("should throw an error if apiKey is missing", () => {

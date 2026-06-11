@@ -1,10 +1,12 @@
 import { afterEach, beforeAll, describe, expect, it } from "bun:test";
-import type { Config, Event } from "../src";
-import { baseURL, endpoints } from "../src/constants/endpoints.constant";
+import { APIClient, baseURL, type Config, type Event, endpoints } from "@topsort/sdk-core";
+import { version } from "../package.json";
 import { mswServer, returnAuctionSuccess } from "../src/constants/handlers.constant";
-import APIClient from "../src/lib/api-client";
+import { webTransport } from "../src/transport";
 
 describe("apiClient", () => {
+  const apiClient = new APIClient(webTransport, version);
+
   beforeAll(() => mswServer.listen());
   afterEach(() => mswServer.resetHandlers());
 
@@ -15,7 +17,7 @@ describe("apiClient", () => {
     };
     returnAuctionSuccess(`${baseURL}/${endpoints.auctions}`);
 
-    expect(APIClient.post(customURL, {} as Event, config)).resolves.toEqual({
+    expect(apiClient.post(customURL, {} as Event, config)).resolves.toEqual({
       results: [
         {
           resultType: "listings",

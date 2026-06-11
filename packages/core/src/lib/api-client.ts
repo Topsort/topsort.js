@@ -1,9 +1,14 @@
-import { version } from "../../package.json";
 import type { Config } from "../types/shared";
 import AppError from "./app-error";
+import type { Transport, TransportRequest, TransportResponse } from "./transport";
 
 class APIClient {
-  private async handleResponse(response: Response): Promise<unknown> {
+  constructor(
+    private transport: Transport,
+    private sdkVersion: string,
+  ) {}
+
+  private async handleResponse(response: TransportResponse): Promise<unknown> {
     let data: unknown;
 
     if (response.status !== 204) {
@@ -18,10 +23,10 @@ class APIClient {
     return data;
   }
 
-  private async request(endpoint: string, options: RequestInit): Promise<unknown> {
+  private async request(endpoint: string, options: TransportRequest): Promise<unknown> {
     try {
       const sanitizedUrl = this.sanitizeUrl(endpoint);
-      const response = await fetch(sanitizedUrl, options);
+      const response = await this.transport.request(sanitizedUrl, options);
       return this.handleResponse(response);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -39,20 +44,20 @@ class APIClient {
 
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
     const signal = this.setupTimeoutSignal(config);
-    const fetchOptions = config.fetchOptions ?? { keepalive: true };
+    const platformOptions = config.fetchOptions ?? { keepalive: true };
     return this.request(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         "X-UA": config.userAgent
-          ? `@topsort/sdk ${version} ${config.userAgent}`
-          : `@topsort/sdk ${version}`,
+          ? `@topsort/sdk ${this.sdkVersion} ${config.userAgent}`
+          : `@topsort/sdk ${this.sdkVersion}`,
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(body),
       signal,
-      ...fetchOptions,
+      options: platformOptions as Record<string, unknown>,
     });
   }
 
@@ -68,4 +73,4 @@ class APIClient {
   }
 }
 
-export default new APIClient();
+export default APIClient;

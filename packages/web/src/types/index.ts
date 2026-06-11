@@ -1,3 +1,3 @@
-export * from "./auctions.d";
-export * from "./events.d";
-export * from "./shared.d";
+export type * from "../../../core/src/types/auctions.d";
+export type * from "../../../core/src/types/events.d";
+export type * from "../../../core/src/types/shared.d";
