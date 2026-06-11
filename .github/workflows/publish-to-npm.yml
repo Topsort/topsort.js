@@ -26,7 +26,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Run tests
-        run: bun test
+        run: bun run test
 
       - name: Install Playwright Browsers
         run: bunx playwright install --with-deps
@@ -40,6 +40,7 @@ jobs:
 
       - name: Publish to npm
         id: publish
+        working-directory: packages/web
         run: npm publish --provenance --access public --no-git-checks
         env:
           NPM_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
