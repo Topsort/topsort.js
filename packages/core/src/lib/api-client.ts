@@ -6,6 +6,7 @@ class APIClient {
   constructor(
     private transport: Transport,
     private sdkVersion: string,
+    private sdkPackageName = "@topsort/sdk",
   ) {}
 
   private async handleResponse(response: TransportResponse): Promise<unknown> {
@@ -50,8 +51,8 @@ class APIClient {
         "Content-Type": "application/json",
         Accept: "application/json",
         "X-UA": config.userAgent
-          ? `@topsort/sdk ${this.sdkVersion} ${config.userAgent}`
-          : `@topsort/sdk ${this.sdkVersion}`,
+          ? `${this.sdkPackageName} ${this.sdkVersion} ${config.userAgent}`
+          : `${this.sdkPackageName} ${this.sdkVersion}`,
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(body),

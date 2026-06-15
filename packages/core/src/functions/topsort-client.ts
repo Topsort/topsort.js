@@ -9,6 +9,8 @@ import { reportEvent } from "./events";
 export interface ClientOptions {
   transport: Transport;
   sdkVersion: string;
+  /** npm package identifier used in the X-UA header. Defaults to "@topsort/sdk". */
+  sdkPackageName?: string;
 }
 
 class TopsortClient {
@@ -18,7 +20,7 @@ class TopsortClient {
 
   constructor(config: Config, options: ClientOptions) {
     this.config = { ...config, host: config.host ?? baseURL };
-    const apiClient = new APIClient(options.transport, options.sdkVersion);
+    const apiClient = new APIClient(options.transport, options.sdkVersion, options.sdkPackageName);
     this.createAuctionFn = createAuction(apiClient);
     this.reportEventFn = reportEvent(apiClient);
   }
