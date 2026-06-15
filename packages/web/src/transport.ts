@@ -1,4 +1,4 @@
-import type { Transport, TransportRequest, TransportResponse } from "../../core/src/lib/transport";
+import type { Transport, TransportRequest, TransportResponse } from "@topsort/sdk-core";
 
 export const webTransport: Transport = {
   async request(url: string, init: TransportRequest): Promise<TransportResponse> {
@@ -7,6 +7,7 @@ export const webTransport: Transport = {
       headers: init.headers,
       body: init.body,
       signal: init.signal,
+      keepalive: true,
       ...(init.options ?? {}),
     });
 

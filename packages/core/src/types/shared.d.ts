@@ -49,12 +49,10 @@ export interface Config {
   userAgent?: string;
 
   /**
-   * Optional fetch options to pass to the fetch call.
-   * Defaults to { keepalive: true }.
-   * Allows customization of the underlying HTTP request behavior.
-   * @type {RequestInit}
+   * Optional platform-specific request options passed through to the transport.
+   * The web SDK accepts fetch-compatible options (e.g. RequestInit); RN supplies its own shape.
+   * @type {Record<string, unknown>}
    * @optional
-   * @default { keepalive: true }
    */
-  fetchOptions?: RequestInit;
+  fetchOptions?: Record<string, unknown>;
 }

@@ -1,6 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
-import { type Auction, baseURL, endpoints } from "@topsort/sdk-core";
-import AppError from "../../core/src/lib/app-error";
+import { AppError, type Auction, baseURL, endpoints } from "@topsort/sdk-core";
 import { TopsortClient } from "../src";
 import {
   mswServer,

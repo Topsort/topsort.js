@@ -40,11 +40,11 @@
   ],
   "scripts": {
     "build": "bunup",
-    "pretest": "bun run --cwd ../core build",
     "test": "bun test",
     "test:e2e": "bun run build && playwright test",
     "serve:e2e": "bun run ./e2e/server.ts"
   },
+  "dependencies": {},
   "devDependencies": {
     "@topsort/sdk-core": "workspace:*"
   },

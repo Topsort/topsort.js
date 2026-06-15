@@ -32,4 +32,4 @@ class TopsortClient {
   }
 }
 
-export default TopsortClient;
+export { TopsortClient };

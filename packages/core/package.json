@@ -1,48 +1,11 @@
 {
   "name": "@topsort/sdk-core",
-  "version": "0.4.1",
-  "description": "Platform-agnostic core for the Topsort SDK",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "author": "Márcio Barbosa <marcio@topsort.com>",
+  "private": true,
   "type": "module",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Topsort/topsort.js",
-    "directory": "packages/core"
-  },
-  "bugs": {
-    "url": "https://github.com/Topsort/topsort.js/issues"
-  },
   "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
-    }
+    ".": "./src/index.ts"
   },
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist/index.d.cts",
-    "dist/index.d.ts",
-    "dist/index.js",
-    "dist/index.cjs",
-    "package.json"
-  ],
   "scripts": {
-    "build": "bunup",
-    "test": "bun test"
-  },
-  "keywords": [
-    "topsort",
-    "sdk",
-    "javascript",
-    "typescript"
-  ]
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
 }

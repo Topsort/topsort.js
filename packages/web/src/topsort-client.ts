@@ -1,12 +1,10 @@
-import CoreTopsortClient from "../../core/src/functions/topsort-client";
-import type { Config } from "../../core/src/types/shared";
+import { TopsortClient as CoreTopsortClient } from "@topsort/sdk-core";
 import { version } from "../package.json";
 import { webTransport } from "./transport";
+import type { Config } from "./types";
 
-class TopsortClient extends CoreTopsortClient {
+export class TopsortClient extends CoreTopsortClient {
   constructor(config: Config) {
     super(config, { transport: webTransport, sdkVersion: version });
   }
 }
-
-export default TopsortClient;

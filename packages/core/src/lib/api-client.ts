@@ -44,7 +44,6 @@ class APIClient {
 
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
     const signal = this.setupTimeoutSignal(config);
-    const platformOptions = config.fetchOptions ?? { keepalive: true };
     return this.request(endpoint, {
       method: "POST",
       headers: {
@@ -57,7 +56,7 @@ class APIClient {
       },
       body: JSON.stringify(body),
       signal,
-      options: platformOptions as Record<string, unknown>,
+      options: config.fetchOptions,
     });
   }
 

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { baseURL, endpoints } from "@topsort/sdk-core";
 import { delay } from "msw";
-import { baseURL, endpoints } from "../../core/src/constants/endpoints.constant";
 import { playwrightConstants } from "./config";
 
 type CustomError = {

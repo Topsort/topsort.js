@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { baseURL, endpoints } from "../../core/src/constants/endpoints.constant";
+import { baseURL, endpoints } from "@topsort/sdk-core";
 import { playwrightConstants } from "./config";
 
 test.describe("Report Events via Topsort SDK", () => {
