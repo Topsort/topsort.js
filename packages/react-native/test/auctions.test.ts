@@ -18,7 +18,7 @@ describe("createAuction", () => {
 
   it("should handle authentication error", async () => {
     returnStatus(401, `${baseURL}/${endpoints.auctions}`);
-    expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
+    await expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
       status: 401,
       retry: false,
       statusText: "Unauthorized",
@@ -28,7 +28,7 @@ describe("createAuction", () => {
 
   it("should handle retryable error", async () => {
     returnStatus(429, `${baseURL}/${endpoints.auctions}`);
-    expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
+    await expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
       status: 429,
       retry: true,
       statusText: "Too Many Requests",
@@ -38,7 +38,7 @@ describe("createAuction", () => {
 
   it("should handle server error", async () => {
     returnStatus(500, `${baseURL}/${endpoints.auctions}`);
-    expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
+    await expect(topsortClient.createAuction({} as Auction)).rejects.toEqual({
       status: 500,
       retry: true,
       statusText: "Internal Server Error",
@@ -53,7 +53,7 @@ describe("createAuction", () => {
       host: "https://demo.api.topsort.com",
     });
 
-    expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
+    await expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
       results: [
         {
           resultType: "listings",
@@ -88,7 +88,7 @@ describe("createAuction", () => {
       timeout: 50,
     });
 
-    expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
+    await expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
       results: [
         {
           resultType: "listings",
@@ -112,7 +112,7 @@ describe("createAuction", () => {
       fetchOptions: { cache: "no-cache" },
     });
 
-    expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
+    await expect(topsortClient.createAuction({} as Auction)).resolves.toEqual({
       results: [
         {
           resultType: "listings",
