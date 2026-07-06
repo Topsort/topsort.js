@@ -18,7 +18,7 @@ describe("apiClient", () => {
     };
     returnAuctionSuccess(`${baseURL}/${endpoints.auctions}`);
 
-    expect(apiClient.post(customURL, {} as Event, config)).resolves.toEqual({
+    await expect(apiClient.post(customURL, {} as Event, config)).resolves.toEqual({
       results: [
         {
           resultType: "listings",

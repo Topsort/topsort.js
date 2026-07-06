@@ -13,7 +13,7 @@ describe("reportEvent", () => {
 
   it("should handle authentication error", async () => {
     returnStatus(401, `${baseURL}/${endpoints.events}`);
-    expect(topsortClient.reportEvent({} as Event)).rejects.toEqual({
+    await expect(topsortClient.reportEvent({} as Event)).rejects.toEqual({
       status: 401,
       retry: false,
       statusText: "Unauthorized",
@@ -23,7 +23,7 @@ describe("reportEvent", () => {
 
   it("should handle retryable error", async () => {
     returnStatus(429, `${baseURL}/${endpoints.events}`);
-    expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
       ok: false,
       retry: true,
     });
@@ -31,7 +31,7 @@ describe("reportEvent", () => {
 
   it("should handle server error", async () => {
     returnStatus(500, `${baseURL}/${endpoints.events}`);
-    expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
       ok: false,
       retry: true,
     });
@@ -44,7 +44,7 @@ describe("reportEvent", () => {
       host: "https://demo.api.topsort.com",
     });
 
-    expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
       ok: true,
       retry: false,
     });
@@ -69,7 +69,7 @@ describe("reportEvent", () => {
       fetchOptions: { cache: "no-cache" },
     });
 
-    expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
       ok: true,
       retry: false,
     });
@@ -94,7 +94,7 @@ describe("reportEvent", () => {
       ],
     };
 
-    expect(topsortClient.reportEvent(pageviewEvent)).resolves.toEqual({
+    await expect(topsortClient.reportEvent(pageviewEvent)).resolves.toEqual({
       ok: true,
       retry: false,
     });
