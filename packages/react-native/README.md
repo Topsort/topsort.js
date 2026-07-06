@@ -54,7 +54,7 @@ See the [web SDK README](../web/README.md) for full auction and event payload sh
 
 ## Versioning
 
-`@topsort/react-native-sdk` is versioned in lockstep with `@topsort/sdk` (e.g. both at `0.4.1`). Release tags publish both packages from this monorepo.
+Each package has its own `version` in `packages/web/package.json` and `packages/react-native/package.json`. Versions are independent — bump only the package(s) you are releasing. On a GitHub release, the publish workflow publishes each package only when that version is not already on npm, so a web-only bump (e.g. `@topsort/sdk@0.4.2`) does not fail when `@topsort/react-native-sdk` is still at `0.4.1`.
 
 ## License
 

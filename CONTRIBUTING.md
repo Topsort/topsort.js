@@ -157,9 +157,10 @@ We also have the following variables as part of the `.env` file:
 
 # Cutting a release
 
-1. Introduce a pull request that updates `package.json`. Don't forget to run `bun install` to update `bun.lock` to reflect said change
+1. Introduce a pull request that updates the `version` field in the `package.json` of each package you intend to release (`packages/web` and/or `packages/react-native`). Run `bun install` if the lockfile needs updating.
 2. After the pull request has been merged, go to the github releases page, create a new tag given the changes in the release; meaning patch, minor or major change
-3. Allow github to generate the release, but the change the contents by:
+3. Publishing a release runs the publish workflow, which skips any package whose version is already on npm — so web-only and RN-only releases are safe.
+4. Allow github to generate the release, but the change the contents by:
   - Introduce a high level, human-readable summary on top of the notes
   - Split the PRs into the following categories (order matters):
     - New features
