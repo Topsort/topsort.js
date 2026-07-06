@@ -30,6 +30,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "LICENSE",
+    "README.md",
     "dist/index.d.cts",
     "dist/index.d.ts",
     "dist/index.js",

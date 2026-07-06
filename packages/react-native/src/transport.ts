@@ -1,3 +1,5 @@
+// Core sanitizes request URLs with `new URL()` (see sdk-core api-client). RN's built-in
+// URL implementation is incomplete, so this polyfill must load before any SDK request.
 import "react-native-url-polyfill/auto";
 import type { Transport, TransportRequest, TransportResponse } from "@topsort/sdk-core";
 
