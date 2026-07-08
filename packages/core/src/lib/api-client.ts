@@ -27,8 +27,11 @@ class APIClient {
     try {
       const sanitizedUrl = this.sanitizeUrl(endpoint);
       const response = await this.transport.request(sanitizedUrl, options);
-      return this.handleResponse(response);
+      return await this.handleResponse(response);
     } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
       const message = error instanceof Error ? error.message : "Unknown error";
       throw new AppError(500, "Internal Server Error", message);
     }

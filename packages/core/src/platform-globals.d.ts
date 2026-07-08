@@ -1,9 +1,12 @@
+interface AbortSignal {
+  readonly aborted: boolean;
+  addEventListener(type: "abort", listener: () => void): void;
+}
+
 declare class AbortController {
   readonly signal: AbortSignal;
   abort(): void;
 }
-
-type AbortSignal = object;
 
 declare class URL {
   constructor(url: string);
