@@ -20,6 +20,6 @@
     "bunup": "0.16.10",
     "lefthook": "2.1.9",
     "msw": "2.12.3",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   }
 }
