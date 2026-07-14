@@ -1,14 +1,12 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
+import { AppError, type Auction, baseURL, endpoints } from "@topsort/sdk-core";
 import { TopsortClient } from "../src";
-import { baseURL, endpoints } from "../src/constants/endpoints.constant";
 import {
   mswServer,
   returnAuctionSuccess,
   returnError,
   returnStatus,
 } from "../src/constants/handlers.constant";
-import AppError from "../src/lib/app-error";
-import type { Auction } from "../src/types/auctions";
 
 describe("createAuction", () => {
   let topsortClient: TopsortClient;

@@ -13,9 +13,16 @@
         "typescript": "6.0.3",
       },
     },
+    "packages/core": {
+      "name": "@topsort/sdk-core",
+      "version": "0.4.1",
+    },
     "packages/web": {
       "name": "@topsort/sdk",
       "version": "0.4.1",
+      "devDependencies": {
+        "@topsort/sdk-core": "workspace:*",
+      },
     },
   },
   "packages": {
@@ -176,6 +183,8 @@
     "@playwright/test": ["@playwright/test@1.58.1", "", { "dependencies": { "playwright": "1.58.1" }, "bin": { "playwright": "cli.js" } }, "sha512-6LdVIUERWxQMmUSSQi0I53GgCBYgM2RpGngCPY7hSeju+VrKjq3lvs7HpJoPbDiY5QM5EYRtRX5fvrinnMAz3w=="],
 
     "@topsort/sdk": ["@topsort/sdk@workspace:packages/web"],
+
+    "@topsort/sdk-core": ["@topsort/sdk-core@workspace:packages/core"],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 

@@ -151,9 +151,8 @@ Lefthook runs these checks in parallel on `pre-commit`:
 
 ## Gotchas
 
-- **IIFE global name**: The IIFE bundle exposes the SDK as `window.Topsort` (configured in `tsup.config.ts` via `esbuildOptions.globalName`). Changing this will break browser consumers.
-- **`publicDir` in tsup**: `tsup.config.ts` sets `publicDir: "e2e/public"`, which copies `e2e/public/index.html` into `dist/` during build. This is needed for E2E tests but means the HTML file ships to `dist/` -- it is excluded from the npm package via the `files` field in `package.json`.
-- **`keepalive: true` default**: The SDK defaults `fetchOptions` to `{ keepalive: true }`. This is intentional for analytics/event tracking use cases where requests should survive page unloads. Consumers can override this.
+- **Browser E2E global**: There is no IIFE bundle or `window.Topsort` namespace. The E2E page imports the built ESM bundle and assigns `window.TopsortClient = TopsortClient` in `packages/web/e2e/public/index.html`.
+- **`keepalive: true` default**: The web transport defaults `keepalive: true` when calling fetch. This is intentional for analytics/event tracking use cases where requests should survive page unloads. Consumers can override via `fetchOptions`.
 - **`AppError` is not an `Error`**: `AppError` does not extend `Error` -- it is a plain class. `catch` blocks that check `instanceof Error` will not catch it. Always check `instanceof AppError`.
 - **Bun test root**: `bunfig.toml` sets `root = "./test"` for unit tests. Only files in `test/` are picked up by `bun test`; E2E tests in `e2e/` are run separately via Playwright.
 - **MSW handlers in `src/`**: Test mock handlers (`handlers.constant.ts`) live in `src/constants/` rather than in `test/` -- be aware of this if refactoring the source tree.

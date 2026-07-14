@@ -1,0 +1,24 @@
+import { endpoints } from "../constants/endpoints.constant";
+import type APIClient from "../lib/api-client";
+import AppError from "../lib/app-error";
+import { withValidation } from "../lib/with-validation";
+import type { Event, EventResult } from "../types/events";
+import type { Config } from "../types/shared";
+
+export function reportEvent(apiClient: APIClient) {
+  async function handler(event: Event, config: Config): Promise<EventResult> {
+    try {
+      const url = `${config.host}/${endpoints.events}`;
+      await apiClient.post(url, event, config);
+
+      return { ok: true, retry: false };
+    } catch (error) {
+      if (error instanceof AppError && error.retry) {
+        return { ok: false, retry: true };
+      }
+      throw error;
+    }
+  }
+
+  return withValidation(handler);
+}
