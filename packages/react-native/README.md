@@ -4,12 +4,10 @@ Official [Topsort](https://topsort.com) SDK for React Native. Same `createAuctio
 
 ## Installation
 
-Install the SDK and its peer dependencies:
-
 ```sh
-npm install @topsort/react-native-sdk react-native-url-polyfill
+npm install @topsort/react-native-sdk
 # or
-yarn add @topsort/react-native-sdk react-native-url-polyfill
+yarn add @topsort/react-native-sdk
 ```
 
 Peer requirements:
@@ -17,11 +15,10 @@ Peer requirements:
 | Package | Version |
 | --- | --- |
 | `react-native` | `>=0.70.0` |
-| `react-native-url-polyfill` | `>=2.0.0` |
 
 ### Why `react-native-url-polyfill`?
 
-The shared core sanitizes every request URL with `new URL()` before calling `fetch`. React Native's built-in `URL` is incomplete and can misbehave on trailing-slash normalization. The SDK imports the polyfill automatically when you load the transport, but **you must install the peer dependency** so Metro can resolve it.
+The shared core sanitizes every request URL with `new URL()` before calling `fetch`. React Native's built-in `URL` is incomplete and can misbehave on trailing-slash normalization. The SDK depends on `react-native-url-polyfill` and imports it automatically when you load the transport — no separate install step.
 
 ## Usage
 

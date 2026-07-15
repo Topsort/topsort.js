@@ -42,14 +42,14 @@
     "test": "bun test",
     "test:harness": "bun run build && bun test ./harness/smoke.test.ts"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "@topsort/sdk-core": "workspace:*",
+  "dependencies": {
     "react-native-url-polyfill": "^2.0.0"
   },
+  "devDependencies": {
+    "@topsort/sdk-core": "workspace:*"
+  },
   "peerDependencies": {
-    "react-native": ">=0.70.0",
-    "react-native-url-polyfill": ">=2.0.0"
+    "react-native": ">=0.70.0"
   },
   "keywords": [
     "topsort",

@@ -19,13 +19,14 @@
     "packages/react-native": {
       "name": "@topsort/react-native-sdk",
       "version": "0.4.1",
+      "dependencies": {
+        "react-native-url-polyfill": "^2.0.0",
+      },
       "devDependencies": {
         "@topsort/sdk-core": "workspace:*",
-        "react-native-url-polyfill": "^2.0.0",
       },
       "peerDependencies": {
         "react-native": ">=0.70.0",
-        "react-native-url-polyfill": ">=2.0.0",
       },
     },
     "packages/web": {
