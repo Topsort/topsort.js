@@ -38,10 +38,30 @@ jobs:
       - name: Run e2e tests
         run: bun run test:e2e
 
-      - name: Publish to npm
-        id: publish
+      - name: Publish web SDK to npm
+        id: publish-web
         working-directory: packages/web
-        run: npm publish --provenance --access public --no-git-checks
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@topsort/sdk@${VERSION}" version > /dev/null 2>&1; then
+            echo "@topsort/sdk@${VERSION} is already on npm; skipping."
+          else
+            npm publish --provenance --access public --no-git-checks
+          fi
+        env:
+          NPM_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+
+      - name: Publish React Native SDK to npm
+        id: publish-react-native
+        working-directory: packages/react-native
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@topsort/react-native-sdk@${VERSION}" version > /dev/null 2>&1; then
+            echo "@topsort/react-native-sdk@${VERSION} is already on npm; skipping."
+          else
+            npm publish --provenance --access public --no-git-checks
+          fi
         env:
           NPM_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
