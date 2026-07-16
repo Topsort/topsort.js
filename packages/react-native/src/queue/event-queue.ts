@@ -35,6 +35,8 @@ export class EventQueue {
   private readonly now: () => number;
   private readonly createId: () => string;
   private flushPromise: Promise<{ sent: number; remaining: number }> | null = null;
+  /** Serializes mutate paths so concurrent enqueues cannot bypass maxSize. */
+  private writeChain: Promise<unknown> = Promise.resolve();
 
   constructor(options: EventQueueOptions) {
     this.storage = options.storage;
@@ -52,24 +54,40 @@ export class EventQueue {
   }
 
   async enqueue(event: Event): Promise<QueueRecord> {
-    const records = await this.loadRecords();
-    await this.enforceCap(records);
+    return this.withWriteLock(async () => {
+      const records = await this.loadRecords();
+      await this.enforceCap(records);
 
-    if (this.dropPolicy === "newest" && records.length >= this.maxSize) {
-      // Cap full and dropping newest means reject this enqueue.
-      throw new Error("@topsort/react-native-sdk: offline queue is full (dropPolicy: newest)");
+      if (this.dropPolicy === "newest" && records.length >= this.maxSize) {
+        // Cap full and dropping newest means reject this enqueue.
+        throw new Error("@topsort/react-native-sdk: offline queue is full (dropPolicy: newest)");
+      }
+
+      const record: QueueRecord = {
+        id: this.createId(),
+        event,
+        enqueuedAt: new Date(this.now()).toISOString(),
+        attempts: 0,
+        nextAttemptAt: this.now(),
+      };
+
+      await this.persist(record);
+      return record;
+    });
+  }
+
+  private async withWriteLock<T>(fn: () => Promise<T>): Promise<T> {
+    const previous = this.writeChain;
+    let release!: () => void;
+    this.writeChain = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previous;
+    try {
+      return await fn();
+    } finally {
+      release();
     }
-
-    const record: QueueRecord = {
-      id: this.createId(),
-      event,
-      enqueuedAt: new Date(this.now()).toISOString(),
-      attempts: 0,
-      nextAttemptAt: this.now(),
-    };
-
-    await this.persist(record);
-    return record;
   }
 
   /** Flush due records oldest-first. Concurrent callers await the in-flight flush. */
@@ -85,11 +103,14 @@ export class EventQueue {
   }
 
   private async runFlush(): Promise<{ sent: number; remaining: number }> {
-    let sent = 0;
-    const records = (await this.loadRecords()).sort(
-      (a, b) => Date.parse(a.enqueuedAt) - Date.parse(b.enqueuedAt),
+    // Wait out in-flight enqueues, then snapshot under the write lock.
+    const records = await this.withWriteLock(async () =>
+      (await this.loadRecords()).sort(
+        (a, b) => Date.parse(a.enqueuedAt) - Date.parse(b.enqueuedAt),
+      ),
     );
     const now = this.now();
+    let sent = 0;
 
     for (const record of records) {
       if (record.nextAttemptAt > now) {
@@ -110,7 +131,7 @@ export class EventQueue {
       const result = await this.send(record.event);
 
       if (result.ok) {
-        await this.remove(record.id);
+        await this.withWriteLock(() => this.remove(record.id));
         return "sent";
       }
 
@@ -119,11 +140,11 @@ export class EventQueue {
       }
 
       // Non-retryable EventResult (should be rare) — drop like Android PERMANENT_FAILURE.
-      await this.remove(record.id);
+      await this.withWriteLock(() => this.remove(record.id));
       return "dropped";
     } catch (error) {
       if (isPermanentFailure(error)) {
-        await this.remove(record.id);
+        await this.withWriteLock(() => this.remove(record.id));
         return "dropped";
       }
       return await this.scheduleRetry(record);
@@ -133,7 +154,7 @@ export class EventQueue {
   private async scheduleRetry(record: QueueRecord): Promise<"retry" | "dropped"> {
     const attempts = record.attempts + 1;
     if (attempts >= this.maxAttempts) {
-      await this.remove(record.id);
+      await this.withWriteLock(() => this.remove(record.id));
       return "dropped";
     }
 
@@ -142,7 +163,7 @@ export class EventQueue {
       attempts,
       nextAttemptAt: nextAttemptAt(attempts, this.now()),
     };
-    await this.persist(updated);
+    await this.withWriteLock(() => this.persist(updated));
     return "retry";
   }
 

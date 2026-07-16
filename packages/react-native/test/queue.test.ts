@@ -135,4 +135,30 @@ describe("EventQueue", () => {
     expect(keys.some((key) => key.endsWith("rec-2"))).toBe(true);
     expect(keys.some((key) => key.endsWith("rec-3"))).toBe(true);
   });
+
+  it("respects maxSize under concurrent enqueue", async () => {
+    const storage = createMemoryStorageAdapter();
+    let id = 0;
+    let clock = 0;
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 3,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: false, retry: true }),
+      now: () => {
+        clock += 1;
+        return clock;
+      },
+      createId: () => {
+        id += 1;
+        return `rec-${id}`;
+      },
+    });
+
+    await Promise.all(Array.from({ length: 10 }, () => queue.enqueue(sampleEvent)));
+
+    expect(await queue.size()).toBe(3);
+  });
 });
