@@ -1,10 +1,10 @@
 # @topsort/react-native-sdk
 
-Official [Topsort](https://topsort.com) SDK for React Native. Same `createAuction` and `reportEvent` API as [`@topsort/sdk`](../web/README.md), with a React Native fetch transport (no `keepalive`, RN-appropriate defaults).
+Official [Topsort](https://topsort.com) SDK for React Native. Same `createAuction` and `reportEvent` API as [`@topsort/sdk`](../web/README.md), with a React Native fetch transport (no `keepalive`) and an **opt-in durable offline event queue**.
 
 ## Installation
 
-Install the SDK and its peer dependencies:
+Install the SDK and its required peer dependencies:
 
 ```sh
 npm install @topsort/react-native-sdk react-native-url-polyfill
@@ -12,12 +12,13 @@ npm install @topsort/react-native-sdk react-native-url-polyfill
 yarn add @topsort/react-native-sdk react-native-url-polyfill
 ```
 
-Peer requirements:
-
-| Package | Version |
-| --- | --- |
-| `react-native` | `>=0.70.0` |
-| `react-native-url-polyfill` | `>=2.0.0` |
+| Package | Version | Required |
+| --- | --- | --- |
+| `react-native` | `>=0.70.0` | yes |
+| `react-native-url-polyfill` | `>=2.0.0` | yes |
+| `@react-native-async-storage/async-storage` | `>=1.17.0` | only if you enable `offlineQueue` without a custom `storage` |
+| `@react-native-community/netinfo` | `>=9.0.0` | recommended with `offlineQueue` (reconnect flush) |
+| `react-native-mmkv` | `>=2.0.0` | optional encrypted storage adapter |
 
 ### Why `react-native-url-polyfill`?
 
@@ -32,12 +33,11 @@ const client = new TopsortClient({
   apiKey: "TSE_your_api_key",
 });
 
-// Auctions
 const auction = await client.createAuction({
   auctions: [{ type: "listings", slots: 3, products: { ids: ["p_1"] } }],
 });
 
-// Events (429 / 5xx return { ok: false, retry: true } instead of throwing)
+// Without offlineQueue: 429 / 5xx return { ok: false, retry: true } (same as web).
 const result = await client.reportEvent({
   impressions: [
     {
@@ -52,9 +52,67 @@ const result = await client.reportEvent({
 
 See the [web SDK README](../web/README.md) for full auction and event payload shapes.
 
+## Offline event queue
+
+This is the React Native analog of the web SDK's `keepalive` default: events that fail with a **retryable** core signal (`{ ok: false, retry: true }` for HTTP 429/5xx) or a **network/transport** failure are persisted locally and flushed when connectivity returns or the app transitions through `AppState` `active` / `background`.
+
+Design follows [topsort.kt](https://github.com/Topsort/topsort.kt): persist under a record id → deferred connectivity-gated send → delete on success or permanent 4xx; retry with backoff on transient failure.
+
+### Enable (opt-in — non-breaking)
+
+```ts
+import {
+  TopsortClient,
+  createAsyncStorageAdapter,
+  createMMKVStorageAdapter,
+} from "@topsort/react-native-sdk";
+
+// Default AsyncStorage adapter (plaintext)
+const client = new TopsortClient({
+  apiKey: "TSE_your_api_key",
+  offlineQueue: true,
+});
+
+// Preferred encrypted posture (MMKV encryption key) — closest to Android EncryptedSharedPreferences
+const encrypted = new TopsortClient({
+  apiKey: "TSE_your_api_key",
+  offlineQueue: {
+    storage: createMMKVStorageAdapter({ encryptionKey: "your-32-byte-secret-key!!!!" }),
+    maxSize: 1000,
+    dropPolicy: "oldest", // or "newest"
+    maxAttempts: 10,
+  },
+});
+
+await client.whenReady();
+await client.flush(); // optional manual flush
+client.dispose(); // unsubscribe AppState / NetInfo
+```
+
+With the queue enabled:
+
+| Core outcome | RN client behavior |
+| --- | --- |
+| `{ ok: true }` | unchanged |
+| `{ ok: false, retry: true }` | enqueued; resolves `{ ok: true, retry: false }` (SDK owns retry) |
+| Thrown 4xx (`AppError`, e.g. 401) | not enqueued; still throws |
+| Network / transport failure | enqueued; resolves `{ ok: true, retry: false }` |
+
+When `offlineQueue` is omitted, behavior matches `@topsort/sdk` / Phase 2 exactly.
+
+### Storage adapters
+
+| Helper | Notes |
+| --- | --- |
+| `createAsyncStorageAdapter()` | Default when `offlineQueue: true` |
+| `createMMKVStorageAdapter({ encryptionKey })` | Encrypted cache option |
+| `createMemoryStorageAdapter()` | Tests / ephemeral |
+
+You can also pass any object implementing `EventStorageAdapter` (`getItem` / `setItem` / `removeItem` / `getAllKeys`).
+
 ## Versioning
 
-Each package has its own `version` in `packages/web/package.json` and `packages/react-native/package.json`. Versions are independent — bump only the package(s) you are releasing. On a GitHub release, the publish workflow publishes each package only when that version is not already on npm, so a web-only bump (e.g. `@topsort/sdk@0.4.2`) does not fail when `@topsort/react-native-sdk` is still at `0.4.1`.
+Each package has its own `version` in `packages/web/package.json` and `packages/react-native/package.json`. Versions are independent — bump only the package(s) you are releasing. On a GitHub release, the publish workflow publishes each package only when that version is not already on npm.
 
 ## License
 

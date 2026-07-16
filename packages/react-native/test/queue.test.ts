@@ -1,0 +1,138 @@
+import { describe, expect, it } from "bun:test";
+import type { Event, EventResult } from "@topsort/sdk-core";
+import { AppError } from "@topsort/sdk-core";
+import { createMemoryStorageAdapter, EventQueue } from "../src/queue";
+
+const sampleEvent: Event = {
+  impressions: [
+    {
+      id: "imp-1",
+      occurredAt: "2024-10-31T12:00:00Z",
+      opaqueUserId: "user-1",
+      resolvedBidId: "bid-1",
+    },
+  ],
+};
+
+describe("EventQueue", () => {
+  it("persists across a new queue instance (simulated app restart)", async () => {
+    const storage = createMemoryStorageAdapter();
+    let sends = 0;
+
+    const first = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => {
+        sends += 1;
+        return { ok: true, retry: false };
+      },
+      now: () => 1_000,
+      createId: () => "rec-1",
+    });
+
+    await first.enqueue(sampleEvent);
+    expect(await first.size()).toBe(1);
+
+    const restarted = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => {
+        sends += 1;
+        return { ok: true, retry: false };
+      },
+    });
+
+    expect(await restarted.size()).toBe(1);
+    const result = await restarted.flush();
+    expect(result).toEqual({ sent: 1, remaining: 0 });
+    expect(sends).toBe(1);
+  });
+
+  it("retries on { ok: false, retry: true } and drops after maxAttempts", async () => {
+    const storage = createMemoryStorageAdapter();
+    let calls = 0;
+    let clock = 0;
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 3,
+      send: async (): Promise<EventResult> => {
+        calls += 1;
+        return { ok: false, retry: true };
+      },
+      now: () => clock,
+      createId: () => "rec-retry",
+    });
+
+    await queue.enqueue(sampleEvent);
+
+    for (let i = 0; i < 3; i += 1) {
+      clock += 60_000;
+      await queue.flush();
+    }
+
+    expect(calls).toBe(3);
+    expect(await queue.size()).toBe(0);
+  });
+
+  it("drops permanent 4xx failures without retrying forever", async () => {
+    const storage = createMemoryStorageAdapter();
+    let calls = 0;
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 10,
+      send: async () => {
+        calls += 1;
+        throw new AppError(401, "Unauthorized", {}, false);
+      },
+      createId: () => "rec-perm",
+    });
+
+    await queue.enqueue(sampleEvent);
+    await queue.flush();
+
+    expect(calls).toBe(1);
+    expect(await queue.size()).toBe(0);
+  });
+
+  it("drops oldest records when the queue cap is reached", async () => {
+    const storage = createMemoryStorageAdapter();
+    let id = 0;
+    let clock = 0;
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 2,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: false, retry: true }),
+      now: () => {
+        clock += 1;
+        return clock;
+      },
+      createId: () => {
+        id += 1;
+        return `rec-${id}`;
+      },
+    });
+
+    await queue.enqueue(sampleEvent);
+    await queue.enqueue(sampleEvent);
+    await queue.enqueue(sampleEvent);
+
+    expect(await queue.size()).toBe(2);
+    const keys = await storage.getAllKeys();
+    expect(keys.some((key) => key.endsWith("rec-1"))).toBe(false);
+    expect(keys.some((key) => key.endsWith("rec-2"))).toBe(true);
+    expect(keys.some((key) => key.endsWith("rec-3"))).toBe(true);
+  });
+});
