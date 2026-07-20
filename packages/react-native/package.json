@@ -45,11 +45,11 @@
   "dependencies": {},
   "devDependencies": {
     "@topsort/sdk-core": "workspace:*",
-    "react-native-url-polyfill": "^2.0.0"
+    "react-native-url-polyfill": "2.0.0"
   },
   "peerDependencies": {
-    "react-native": ">=0.70.0",
-    "react-native-url-polyfill": ">=2.0.0"
+    "react-native": "0.86.0",
+    "react-native-url-polyfill": "4.0.0"
   },
   "keywords": [
     "topsort",
