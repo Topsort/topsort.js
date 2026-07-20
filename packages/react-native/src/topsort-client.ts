@@ -91,14 +91,30 @@ export class TopsortClient extends CoreTopsortClient {
       }
 
       // Core signal: retryable HTTP (429 / 5xx). Take ownership via durable queue.
-      await this.eventQueue.enqueue(event);
-      return { ok: true, retry: false };
+      return await this.acceptIntoQueue(event);
     } catch (error) {
-      if (isEnqueueableFailure(error)) {
-        await this.eventQueue.enqueue(event);
-        return { ok: true, retry: false };
+      if (!isEnqueueableFailure(error)) {
+        throw error;
       }
-      throw error;
+      return await this.acceptIntoQueue(event);
+    }
+  }
+
+  /**
+   * Persist a failed event. If the queue rejects (e.g. full + dropPolicy newest),
+   * surface the original retry contract instead of throwing a raw Error.
+   */
+  private async acceptIntoQueue(event: Event): Promise<EventResult> {
+    const queue = this.eventQueue;
+    if (!queue) {
+      return { ok: false, retry: true };
+    }
+
+    try {
+      await queue.enqueue(event);
+      return { ok: true, retry: false };
+    } catch {
+      return { ok: false, retry: true };
     }
   }
 }

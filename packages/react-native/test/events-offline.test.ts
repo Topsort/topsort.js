@@ -181,4 +181,35 @@ describe("reportEvent with offlineQueue", () => {
     returnError(`${baseURL}/${endpoints.events}`);
     await expect(plain.reportEvent(sampleEvent)).rejects.toBeInstanceOf(AppError);
   });
+
+  it("returns retryable result when newest dropPolicy rejects a full queue", async () => {
+    client.dispose();
+    const fullStorage = createMemoryStorageAdapter();
+    client = new TopsortClient({
+      apiKey: "apiKey",
+      offlineQueue: {
+        storage: fullStorage,
+        connectivity: createConnectivityMock(true),
+        appState: createAppStateMock(),
+        maxSize: 1,
+        dropPolicy: "newest",
+        maxAttempts: 5,
+      },
+    });
+    await client.whenReady();
+
+    returnStatus(429, `${baseURL}/${endpoints.events}`);
+    await expect(client.reportEvent(sampleEvent)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+    expect(await fullStorage.getAllKeys()).toHaveLength(1);
+
+    // Queue is full; rejecting newest must not throw a raw Error through reportEvent.
+    await expect(client.reportEvent(sampleEvent)).resolves.toEqual({
+      ok: false,
+      retry: true,
+    });
+    expect(await fullStorage.getAllKeys()).toHaveLength(1);
+  });
 });
