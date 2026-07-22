@@ -189,4 +189,50 @@ describe("EventQueue", () => {
     await queue.flush();
     expect(await queue.size()).toBe(0);
   });
+
+  it("keeps the index consistent when size() races with enqueue on first launch", async () => {
+    const base = createMemoryStorageAdapter();
+    let releaseGetAllKeys!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      releaseGetAllKeys = resolve;
+    });
+    let blockedOnce = false;
+
+    const storage = {
+      getItem: (key: string) => base.getItem(key),
+      setItem: (key: string, value: string) => base.setItem(key, value),
+      removeItem: (key: string) => base.removeItem(key),
+      getAllKeys: async () => {
+        if (!blockedOnce) {
+          blockedOnce = true;
+          await gate;
+        }
+        return base.getAllKeys();
+      },
+    };
+
+    let id = 0;
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: false, retry: true }),
+      createId: () => {
+        id += 1;
+        return `rec-${id}`;
+      },
+    });
+
+    // size() starts unlocked-looking migration; write lock must serialize enqueue behind it.
+    const sizePromise = queue.size();
+    await Bun.sleep(5);
+    const enqueuePromise = queue.enqueue(sampleEvent);
+    releaseGetAllKeys();
+    await Promise.all([sizePromise, enqueuePromise]);
+
+    expect(await queue.size()).toBe(1);
+    expect(await storage.getItem("topsort.event.__index__")).toBe(JSON.stringify(["rec-1"]));
+    expect(await storage.getItem("topsort.event.rec-1")).not.toBeNull();
+  });
 });

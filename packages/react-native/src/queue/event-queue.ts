@@ -52,7 +52,8 @@ export class EventQueue {
   }
 
   async size(): Promise<number> {
-    return (await this.loadRecordIds()).length;
+    // loadRecordIds may migrate/write the index — must not race with enqueue/persist.
+    return this.withWriteLock(async () => (await this.loadRecordIds()).length);
   }
 
   async enqueue(event: Event): Promise<QueueRecord> {
@@ -212,6 +213,9 @@ export class EventQueue {
   /**
    * Prefer the dedicated index; migrate once from `getAllKeys()` when absent
    * (legacy installs / first AsyncStorage scan).
+   *
+   * Callers that may trigger migration must hold {@link withWriteLock} so a stale
+   * scan cannot overwrite a concurrent enqueue's index and orphan records.
    */
   private async loadRecordIds(): Promise<string[]> {
     const raw = await this.storage.getItem(QUEUE_INDEX_KEY);
