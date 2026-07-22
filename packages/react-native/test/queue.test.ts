@@ -188,6 +188,38 @@ describe("EventQueue", () => {
 
     await queue.flush();
     expect(await queue.size()).toBe(0);
+    expect(await storage.getItem("topsort.event.__index__")).toBe("[]");
+  });
+
+  it("keeps an empty index so size() does not rescan storage after flush", async () => {
+    const base = createMemoryStorageAdapter();
+    let getAllKeysCalls = 0;
+    const storage = {
+      getItem: (key: string) => base.getItem(key),
+      setItem: (key: string, value: string) => base.setItem(key, value),
+      removeItem: (key: string) => base.removeItem(key),
+      getAllKeys: async () => {
+        getAllKeysCalls += 1;
+        return base.getAllKeys();
+      },
+    };
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: true, retry: false }),
+      createId: () => "rec-1",
+    });
+
+    await queue.enqueue(sampleEvent);
+    await queue.flush();
+    const callsAfterFlush = getAllKeysCalls;
+
+    expect(await queue.size()).toBe(0);
+    expect(await storage.getItem("topsort.event.__index__")).toBe("[]");
+    expect(getAllKeysCalls).toBe(callsAfterFlush);
   });
 
   it("keeps the index consistent when size() races with enqueue on first launch", async () => {

@@ -120,7 +120,7 @@ describe("reportEvent with offlineQueue", () => {
       statusText: "Unauthorized",
       body: {},
     });
-    expect(await storage.getAllKeys()).toHaveLength(0);
+    expect(await queuedRecordCount(storage)).toBe(0);
   });
 
   it("flushes queued events when connectivity is restored", async () => {
@@ -138,7 +138,7 @@ describe("reportEvent with offlineQueue", () => {
     await Bun.sleep(10);
     await client.flush();
 
-    expect(await storage.getAllKeys()).toHaveLength(0);
+    expect(await queuedRecordCount(storage)).toBe(0);
   });
 
   it("flushes on AppState active/background transitions", async () => {
@@ -151,7 +151,7 @@ describe("reportEvent with offlineQueue", () => {
     await Bun.sleep(10);
     await client.flush();
 
-    expect(await storage.getAllKeys()).toHaveLength(0);
+    expect(await queuedRecordCount(storage)).toBe(0);
   });
 
   it("survives a simulated app restart via the shared storage adapter", async () => {
@@ -173,7 +173,7 @@ describe("reportEvent with offlineQueue", () => {
     await restarted.whenReady();
     await restarted.flush();
 
-    expect(await storage.getAllKeys()).toHaveLength(0);
+    expect(await queuedRecordCount(storage)).toBe(0);
     restarted.dispose();
   });
 
@@ -319,6 +319,6 @@ describe("reportEvent with offlineQueue", () => {
     await client.flush();
 
     expect(sentIds).toEqual(["imp-a", "imp-b", "imp-c"]);
-    expect(await storage.getAllKeys()).toHaveLength(0);
+    expect(await queuedRecordCount(storage)).toBe(0);
   });
 });

@@ -237,10 +237,8 @@ export class EventQueue {
   }
 
   private async writeIndex(ids: string[]): Promise<void> {
-    if (ids.length === 0) {
-      await this.storage.removeItem(QUEUE_INDEX_KEY);
-      return;
-    }
+    // Always persist the index (including `[]`) so an empty queue does not fall
+    // back to getAllKeys() on every subsequent size()/enqueue/flush.
     await this.storage.setItem(QUEUE_INDEX_KEY, JSON.stringify(ids));
   }
 
