@@ -86,12 +86,14 @@ export class TopsortClient extends CoreTopsortClient {
     await this.ready;
 
     // Preserve durable FIFO: drain backlog before accepting a live send.
-    if ((await this.eventQueue.size()) > 0) {
-      const accepted = await this.acceptIntoQueue(event);
-      if (accepted.ok) {
+    // Size check + enqueue are one lock so a concurrent flush cannot TOCTOU us
+    // into unnecessarily queueing after the backlog has already drained.
+    const backlogAccepted = await this.acceptIntoQueueIfBacklog(event);
+    if (backlogAccepted) {
+      if (backlogAccepted.ok) {
         void this.eventQueue.flush().catch(() => {});
       }
-      return accepted;
+      return backlogAccepted;
     }
 
     try {
@@ -127,6 +129,24 @@ export class TopsortClient extends CoreTopsortClient {
       return { ok: false, retry: true };
     }
   }
+
+  /** @returns `null` when there was no backlog (caller should live-send). */
+  private async acceptIntoQueueIfBacklog(event: Event): Promise<EventResult | null> {
+    const queue = this.eventQueue;
+    if (!queue) {
+      return null;
+    }
+
+    try {
+      const record = await queue.enqueueIfBacklog(event);
+      if (!record) {
+        return null;
+      }
+      return { ok: true, retry: false };
+    } catch {
+      return { ok: false, retry: true };
+    }
+  }
 }
 
 function normalizeOfflineQueue(value: Config["offlineQueue"]): OfflineQueueOptions | null {
@@ -144,7 +164,9 @@ function normalizeOfflineQueue(value: Config["offlineQueue"]): OfflineQueueOptio
  * Matches Android Worker: network/transient → retry; 4xx → permanent (do not enqueue).
  *
  * Note: core maps HTTP 429/5xx to `{ ok: false, retry: true }` (not throws). Thrown
- * `AppError(500, …)` typically means a transport/network failure from api-client.
+ * `AppError(500, …)` typically means a transport/network failure from api-client, which
+ * already wraps non-AppError transport failures. Unknown throws are treated as transient
+ * (same as kt `catch (Exception)`), not programming-error surfaces from core.
  */
 function isEnqueueableFailure(error: unknown): boolean {
   if (!(error instanceof AppError)) {

@@ -39,6 +39,8 @@ export class EventQueue {
   private flushPromise: Promise<{ sent: number; remaining: number }> | null = null;
   /** Serializes mutate paths so concurrent enqueues cannot bypass maxSize. */
   private writeChain: Promise<unknown> = Promise.resolve();
+  /** One getAllKeys pass per instance to recover records orphaned by a mid-write crash. */
+  private didReconcileOrphans = false;
 
   constructor(options: EventQueueOptions) {
     this.storage = options.storage;
@@ -52,31 +54,48 @@ export class EventQueue {
   }
 
   async size(): Promise<number> {
-    // loadRecordIds may migrate/write the index — must not race with enqueue/persist.
-    return this.withWriteLock(async () => (await this.loadRecordIds()).length);
+    // loadRecords may migrate/prune/write the index — must not race with enqueue/persist.
+    return this.withWriteLock(async () => (await this.loadRecords()).length);
   }
 
   async enqueue(event: Event): Promise<QueueRecord> {
+    return this.withWriteLock(async () => this.enqueueUnlocked(event));
+  }
+
+  /**
+   * Atomically enqueue only when a backlog already exists (FIFO path).
+   * Returns `null` when the queue is empty so the caller can live-send.
+   */
+  async enqueueIfBacklog(event: Event): Promise<QueueRecord | null> {
     return this.withWriteLock(async () => {
+      // Use loadRecords (not raw ids) so phantom index entries don't look like backlog.
       const records = await this.loadRecords();
-      await this.enforceCap(records);
-
-      if (this.dropPolicy === "newest" && records.length >= this.maxSize) {
-        // Cap full and dropping newest means reject this enqueue.
-        throw new Error("@topsort/react-native-sdk: offline queue is full (dropPolicy: newest)");
+      if (records.length === 0) {
+        return null;
       }
-
-      const record: QueueRecord = {
-        id: this.createId(),
-        event,
-        enqueuedAt: new Date(this.now()).toISOString(),
-        attempts: 0,
-        nextAttemptAt: this.now(),
-      };
-
-      await this.persist(record);
-      return record;
+      return this.enqueueUnlocked(event);
     });
+  }
+
+  private async enqueueUnlocked(event: Event): Promise<QueueRecord> {
+    const records = await this.loadRecords();
+    await this.enforceCap(records);
+
+    if (this.dropPolicy === "newest" && records.length >= this.maxSize) {
+      // Cap full and dropping newest means reject this enqueue.
+      throw new Error("@topsort/react-native-sdk: offline queue is full (dropPolicy: newest)");
+    }
+
+    const record: QueueRecord = {
+      id: this.createId(),
+      event,
+      enqueuedAt: new Date(this.now()).toISOString(),
+      attempts: 0,
+      nextAttemptAt: this.now(),
+    };
+
+    await this.persist(record);
+    return record;
   }
 
   private async withWriteLock<T>(fn: () => Promise<T>): Promise<T> {
@@ -194,17 +213,24 @@ export class EventQueue {
   private async loadRecords(): Promise<QueueRecord[]> {
     const ids = await this.loadRecordIds();
     const records: QueueRecord[] = [];
+    const livingIds: string[] = [];
 
     for (const id of ids) {
       const raw = await this.storage.getItem(recordStorageKey(id));
       if (!raw) {
+        // Phantom index entry (e.g. crash after delete, before index write).
         continue;
       }
       try {
         records.push(JSON.parse(raw) as QueueRecord);
+        livingIds.push(id);
       } catch {
         await this.storage.removeItem(recordStorageKey(id));
       }
+    }
+
+    if (livingIds.length !== ids.length) {
+      await this.writeIndex(livingIds);
     }
 
     return records;
@@ -223,7 +249,7 @@ export class EventQueue {
       try {
         const ids = JSON.parse(raw) as unknown;
         if (Array.isArray(ids) && ids.every((id) => typeof id === "string")) {
-          return ids;
+          return this.reconcileOrphansOnce(ids);
         }
       } catch {
         // Fall through to migrate from a full key scan.
@@ -232,8 +258,40 @@ export class EventQueue {
 
     const keys = (await this.storage.getAllKeys()).filter(isRecordStorageKey);
     const ids = keys.map((key) => key.slice(QUEUE_KEY_PREFIX.length));
+    this.didReconcileOrphans = true;
     await this.writeIndex(ids);
     return ids;
+  }
+
+  /**
+   * Recover record bodies written before a crash that prevented the index update.
+   * Runs at most once per queue instance so steady-state ops stay O(index).
+   */
+  private async reconcileOrphansOnce(ids: string[]): Promise<string[]> {
+    if (this.didReconcileOrphans) {
+      return ids;
+    }
+    this.didReconcileOrphans = true;
+
+    const keys = (await this.storage.getAllKeys()).filter(isRecordStorageKey);
+    if (keys.length === 0) {
+      return ids;
+    }
+
+    const known = new Set(ids);
+    const merged = [...ids];
+    for (const key of keys) {
+      const id = key.slice(QUEUE_KEY_PREFIX.length);
+      if (!known.has(id)) {
+        known.add(id);
+        merged.push(id);
+      }
+    }
+
+    if (merged.length !== ids.length) {
+      await this.writeIndex(merged);
+    }
+    return merged;
   }
 
   private async writeIndex(ids: string[]): Promise<void> {
@@ -243,6 +301,8 @@ export class EventQueue {
   }
 
   private async persist(record: QueueRecord): Promise<void> {
+    // Record body first, then index: a crash mid-write may orphan the body, which
+    // {@link reconcileOrphansOnce} recovers. Index-first would lose the event entirely.
     await this.storage.setItem(recordStorageKey(record.id), JSON.stringify(record));
     const ids = await this.loadRecordIds();
     if (!ids.includes(record.id)) {
@@ -252,6 +312,8 @@ export class EventQueue {
   }
 
   private async remove(id: string): Promise<void> {
+    // Delete the body first so a crash before the index write cannot re-send a
+    // successfully delivered event. Phantom ids are pruned in {@link loadRecords}.
     await this.storage.removeItem(recordStorageKey(id));
     const ids = (await this.loadRecordIds()).filter((existing) => existing !== id);
     await this.writeIndex(ids);

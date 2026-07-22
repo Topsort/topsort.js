@@ -267,4 +267,86 @@ describe("EventQueue", () => {
     expect(await storage.getItem("topsort.event.__index__")).toBe(JSON.stringify(["rec-1"]));
     expect(await storage.getItem("topsort.event.rec-1")).not.toBeNull();
   });
+
+  it("prunes phantom index entries left by a crash mid-remove", async () => {
+    const storage = createMemoryStorageAdapter();
+    await storage.setItem("topsort.event.__index__", JSON.stringify(["gone", "alive"]));
+    await storage.setItem(
+      "topsort.event.alive",
+      JSON.stringify({
+        id: "alive",
+        event: sampleEvent,
+        enqueuedAt: "2024-10-31T12:00:00.000Z",
+        attempts: 0,
+        nextAttemptAt: 0,
+      }),
+    );
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: true, retry: false }),
+    });
+
+    expect(await queue.size()).toBe(1);
+    expect(await storage.getItem("topsort.event.__index__")).toBe(JSON.stringify(["alive"]));
+
+    await queue.flush();
+    expect(await queue.size()).toBe(0);
+    expect(await storage.getItem("topsort.event.__index__")).toBe("[]");
+  });
+
+  it("recovers orphan record bodies missing from the index", async () => {
+    const storage = createMemoryStorageAdapter();
+    await storage.setItem("topsort.event.__index__", "[]");
+    await storage.setItem(
+      "topsort.event.orphan-1",
+      JSON.stringify({
+        id: "orphan-1",
+        event: sampleEvent,
+        enqueuedAt: "2024-10-31T12:00:00.000Z",
+        attempts: 0,
+        nextAttemptAt: 0,
+      }),
+    );
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: true, retry: false }),
+    });
+
+    expect(await queue.size()).toBe(1);
+    expect(await storage.getItem("topsort.event.__index__")).toBe(JSON.stringify(["orphan-1"]));
+
+    const result = await queue.flush();
+    expect(result).toEqual({ sent: 1, remaining: 0 });
+  });
+
+  it("enqueueIfBacklog is a no-op when the queue is empty", async () => {
+    const storage = createMemoryStorageAdapter();
+    let id = 0;
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: true, retry: false }),
+      createId: () => {
+        id += 1;
+        return `rec-${id}`;
+      },
+    });
+
+    expect(await queue.enqueueIfBacklog(sampleEvent)).toBeNull();
+    expect(await queue.size()).toBe(0);
+
+    await queue.enqueue(sampleEvent);
+    expect(await queue.enqueueIfBacklog(sampleEvent)).not.toBeNull();
+    expect(await queue.size()).toBe(2);
+  });
 });
