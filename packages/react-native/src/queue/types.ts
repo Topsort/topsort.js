@@ -65,11 +65,13 @@ export interface QueueRecord {
 }
 
 export const QUEUE_KEY_PREFIX = "topsort.event.";
+/** JSON array of record ids — avoids scanning all AsyncStorage keys on each op. */
+export const QUEUE_INDEX_KEY = `${QUEUE_KEY_PREFIX}__index__`;
 
 export function recordStorageKey(id: string): string {
   return `${QUEUE_KEY_PREFIX}${id}`;
 }
 
 export function isRecordStorageKey(key: string): boolean {
-  return key.startsWith(QUEUE_KEY_PREFIX);
+  return key.startsWith(QUEUE_KEY_PREFIX) && key !== QUEUE_INDEX_KEY;
 }

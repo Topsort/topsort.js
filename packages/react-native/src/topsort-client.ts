@@ -52,7 +52,8 @@ export class TopsortClient extends CoreTopsortClient {
       queueOptions.appState ?? createDefaultAppStateSource(),
     );
 
-    this.ready = this.flushScheduler.start();
+    // Startup must never take down reportEvent — degrade to direct send if wiring fails.
+    this.ready = this.flushScheduler.start().catch(() => {});
   }
 
   /**
@@ -83,6 +84,15 @@ export class TopsortClient extends CoreTopsortClient {
     }
 
     await this.ready;
+
+    // Preserve durable FIFO: drain backlog before accepting a live send.
+    if ((await this.eventQueue.size()) > 0) {
+      const accepted = await this.acceptIntoQueue(event);
+      if (accepted.ok) {
+        void this.eventQueue.flush().catch(() => {});
+      }
+      return accepted;
+    }
 
     try {
       const result = await super.reportEvent(event);

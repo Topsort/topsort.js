@@ -98,7 +98,9 @@ With the queue enabled:
 | Thrown 4xx (`AppError`, e.g. 401) | not enqueued; still throws |
 | Network / transport failure | enqueued; resolves `{ ok: true, retry: false }` |
 
-When `offlineQueue` is omitted, behavior matches `@topsort/sdk` / Phase 2 exactly.
+When the durable backlog is non-empty, new events are enqueued (and flushed) instead of jumping ahead with a live send — FIFO drain matching Android’s durable queue.
+
+When `offlineQueue` is omitted, behavior matches `@topsort/sdk` / Phase 2 exactly. Queue wiring is best-effort: a flaky NetInfo/AppState peer will not take down `reportEvent`.
 
 ### Storage adapters
 

@@ -16,12 +16,17 @@ export class FlushScheduler {
   ) {}
 
   async start(): Promise<void> {
-    this.wasConnected = await this.connectivity.getIsConnected();
+    try {
+      this.wasConnected = await this.connectivity.getIsConnected();
+    } catch {
+      // Flaky NetInfo must not take down the client — assume online and continue.
+      this.wasConnected = true;
+    }
 
     this.unsubscribers.push(
       this.connectivity.subscribe((isConnected) => {
         if (isConnected && !this.wasConnected) {
-          void this.queue.flush();
+          this.safeFlush();
         }
         this.wasConnected = isConnected;
       }),
@@ -30,13 +35,17 @@ export class FlushScheduler {
     this.unsubscribers.push(
       this.appState.subscribe((state) => {
         if (state === "active" || state === "background") {
-          void this.queue.flush();
+          this.safeFlush();
         }
       }),
     );
 
     if (this.wasConnected) {
-      await this.queue.flush();
+      try {
+        await this.queue.flush();
+      } catch {
+        // Storage/read failures during startup must not reject `ready`.
+      }
     }
   }
 
@@ -45,5 +54,11 @@ export class FlushScheduler {
       unsubscribe();
     }
     this.unsubscribers.length = 0;
+  }
+
+  private safeFlush(): void {
+    void this.queue.flush().catch(() => {
+      // Background flushes must not surface as unhandled rejections.
+    });
   }
 }

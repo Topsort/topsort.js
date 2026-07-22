@@ -15,3 +15,4 @@ export type {
   OfflineQueueOptions,
   QueueRecord,
 } from "./types";
+export { isRecordStorageKey, QUEUE_INDEX_KEY, QUEUE_KEY_PREFIX, recordStorageKey } from "./types";

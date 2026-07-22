@@ -161,4 +161,32 @@ describe("EventQueue", () => {
 
     expect(await queue.size()).toBe(3);
   });
+
+  it("migrates legacy records into the index on first load", async () => {
+    const storage = createMemoryStorageAdapter();
+    await storage.setItem(
+      "topsort.event.legacy-1",
+      JSON.stringify({
+        id: "legacy-1",
+        event: sampleEvent,
+        enqueuedAt: "2024-10-31T12:00:00.000Z",
+        attempts: 0,
+        nextAttemptAt: 0,
+      }),
+    );
+
+    const queue = new EventQueue({
+      storage,
+      maxSize: 10,
+      dropPolicy: "oldest",
+      maxAttempts: 5,
+      send: async () => ({ ok: true, retry: false }),
+    });
+
+    expect(await queue.size()).toBe(1);
+    expect(await storage.getItem("topsort.event.__index__")).toBe(JSON.stringify(["legacy-1"]));
+
+    await queue.flush();
+    expect(await queue.size()).toBe(0);
+  });
 });

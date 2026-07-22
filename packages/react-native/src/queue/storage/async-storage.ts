@@ -22,7 +22,13 @@ function loadAsyncStorage(): AsyncStorageLike {
   }
 }
 
-/** Default durable adapter (plaintext). Prefer {@link createMMKVStorageAdapter} for encryption. */
+/**
+ * Default durable adapter (plaintext). Prefer {@link createMMKVStorageAdapter} for encryption.
+ *
+ * Note: `EventQueue` maintains a dedicated record-id index so steady-state ops do not
+ * call `getAllKeys()` (which is O(all app keys) on AsyncStorage). `getAllKeys` is only
+ * used for a one-time migration when the index is missing.
+ */
 export function createAsyncStorageAdapter(): EventStorageAdapter {
   const storage = loadAsyncStorage();
   return {

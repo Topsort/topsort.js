@@ -4,6 +4,8 @@ import {
   type DropPolicy,
   type EventStorageAdapter,
   isRecordStorageKey,
+  QUEUE_INDEX_KEY,
+  QUEUE_KEY_PREFIX,
   type QueueRecord,
   recordStorageKey,
 } from "./types";
@@ -50,7 +52,7 @@ export class EventQueue {
   }
 
   async size(): Promise<number> {
-    return (await this.loadRecords()).length;
+    return (await this.loadRecordIds()).length;
   }
 
   async enqueue(event: Event): Promise<QueueRecord> {
@@ -189,30 +191,68 @@ export class EventQueue {
   }
 
   private async loadRecords(): Promise<QueueRecord[]> {
-    const keys = (await this.storage.getAllKeys()).filter(isRecordStorageKey);
+    const ids = await this.loadRecordIds();
     const records: QueueRecord[] = [];
 
-    for (const key of keys) {
-      const raw = await this.storage.getItem(key);
+    for (const id of ids) {
+      const raw = await this.storage.getItem(recordStorageKey(id));
       if (!raw) {
         continue;
       }
       try {
         records.push(JSON.parse(raw) as QueueRecord);
       } catch {
-        await this.storage.removeItem(key);
+        await this.storage.removeItem(recordStorageKey(id));
       }
     }
 
     return records;
   }
 
+  /**
+   * Prefer the dedicated index; migrate once from `getAllKeys()` when absent
+   * (legacy installs / first AsyncStorage scan).
+   */
+  private async loadRecordIds(): Promise<string[]> {
+    const raw = await this.storage.getItem(QUEUE_INDEX_KEY);
+    if (raw != null) {
+      try {
+        const ids = JSON.parse(raw) as unknown;
+        if (Array.isArray(ids) && ids.every((id) => typeof id === "string")) {
+          return ids;
+        }
+      } catch {
+        // Fall through to migrate from a full key scan.
+      }
+    }
+
+    const keys = (await this.storage.getAllKeys()).filter(isRecordStorageKey);
+    const ids = keys.map((key) => key.slice(QUEUE_KEY_PREFIX.length));
+    await this.writeIndex(ids);
+    return ids;
+  }
+
+  private async writeIndex(ids: string[]): Promise<void> {
+    if (ids.length === 0) {
+      await this.storage.removeItem(QUEUE_INDEX_KEY);
+      return;
+    }
+    await this.storage.setItem(QUEUE_INDEX_KEY, JSON.stringify(ids));
+  }
+
   private async persist(record: QueueRecord): Promise<void> {
     await this.storage.setItem(recordStorageKey(record.id), JSON.stringify(record));
+    const ids = await this.loadRecordIds();
+    if (!ids.includes(record.id)) {
+      ids.push(record.id);
+      await this.writeIndex(ids);
+    }
   }
 
   private async remove(id: string): Promise<void> {
     await this.storage.removeItem(recordStorageKey(id));
+    const ids = (await this.loadRecordIds()).filter((existing) => existing !== id);
+    await this.writeIndex(ids);
   }
 }
 

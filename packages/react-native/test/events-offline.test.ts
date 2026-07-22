@@ -6,6 +6,7 @@ import {
   type AppStateSource,
   type ConnectivitySource,
   createMemoryStorageAdapter,
+  isRecordStorageKey,
 } from "../src/queue";
 
 const sampleEvent: Event = {
@@ -56,6 +57,12 @@ function createAppStateMock(): AppStateSource & { emit: (state: string) => void 
   };
 }
 
+async function queuedRecordCount(
+  adapter: ReturnType<typeof createMemoryStorageAdapter>,
+): Promise<number> {
+  return (await adapter.getAllKeys()).filter(isRecordStorageKey).length;
+}
+
 describe("reportEvent with offlineQueue", () => {
   let storage: ReturnType<typeof createMemoryStorageAdapter>;
   let connectivity: ReturnType<typeof createConnectivityMock>;
@@ -91,7 +98,7 @@ describe("reportEvent with offlineQueue", () => {
       ok: true,
       retry: false,
     });
-    expect(await storage.getAllKeys()).toHaveLength(1);
+    expect(await queuedRecordCount(storage)).toBe(1);
   });
 
   it("enqueues transport/network failures", async () => {
@@ -101,7 +108,7 @@ describe("reportEvent with offlineQueue", () => {
       ok: true,
       retry: false,
     });
-    expect(await storage.getAllKeys()).toHaveLength(1);
+    expect(await queuedRecordCount(storage)).toBe(1);
   });
 
   it("does not enqueue permanent 4xx failures", async () => {
@@ -121,7 +128,7 @@ describe("reportEvent with offlineQueue", () => {
     returnError(`${baseURL}/${endpoints.events}`);
 
     await client.reportEvent(sampleEvent);
-    expect(await storage.getAllKeys()).toHaveLength(1);
+    expect(await queuedRecordCount(storage)).toBe(1);
 
     mswServer.resetHandlers();
     returnStatus(204, `${baseURL}/${endpoints.events}`);
@@ -203,13 +210,115 @@ describe("reportEvent with offlineQueue", () => {
       ok: true,
       retry: false,
     });
-    expect(await fullStorage.getAllKeys()).toHaveLength(1);
+    expect(await queuedRecordCount(fullStorage)).toBe(1);
 
     // Queue is full; rejecting newest must not throw a raw Error through reportEvent.
     await expect(client.reportEvent(sampleEvent)).resolves.toEqual({
       ok: false,
       retry: true,
     });
-    expect(await fullStorage.getAllKeys()).toHaveLength(1);
+    expect(await queuedRecordCount(fullStorage)).toBe(1);
+  });
+
+  it("still reports events when connectivity startup rejects", async () => {
+    client.dispose();
+    const flakyConnectivity: ConnectivitySource = {
+      async getIsConnected() {
+        throw new Error("NetInfo unavailable");
+      },
+      subscribe() {
+        return () => {};
+      },
+    };
+
+    client = new TopsortClient({
+      apiKey: "apiKey",
+      offlineQueue: {
+        storage: createMemoryStorageAdapter(),
+        connectivity: flakyConnectivity,
+        appState: createAppStateMock(),
+      },
+    });
+
+    returnStatus(204, `${baseURL}/${endpoints.events}`);
+    await expect(client.reportEvent(sampleEvent)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+  });
+
+  it("preserves FIFO when backlog exists before a live send", async () => {
+    const { HttpResponse, http } = await import("msw");
+    client.dispose();
+
+    connectivity = createConnectivityMock(false);
+    storage = createMemoryStorageAdapter();
+    client = new TopsortClient({
+      apiKey: "apiKey",
+      offlineQueue: {
+        storage,
+        connectivity,
+        appState: createAppStateMock(),
+        maxAttempts: 5,
+      },
+    });
+    await client.whenReady();
+
+    const eventA: Event = {
+      impressions: [
+        {
+          id: "imp-a",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+        },
+      ],
+    };
+    const eventB: Event = {
+      impressions: [
+        {
+          id: "imp-b",
+          occurredAt: "2024-10-31T12:00:01Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+        },
+      ],
+    };
+    const eventC: Event = {
+      impressions: [
+        {
+          id: "imp-c",
+          occurredAt: "2024-10-31T12:00:02Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+        },
+      ],
+    };
+
+    returnError(`${baseURL}/${endpoints.events}`);
+    await client.reportEvent(eventA);
+    await client.reportEvent(eventB);
+
+    const sentIds: string[] = [];
+    mswServer.resetHandlers();
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async ({ request }) => {
+        const body = (await request.json()) as Event;
+        const id = body.impressions?.[0]?.id;
+        if (id) {
+          sentIds.push(id);
+        }
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    // Still offline with backlog — C must enqueue behind A/B, not jump the line.
+    await client.reportEvent(eventC);
+    connectivity.setConnected(true);
+    await Bun.sleep(10);
+    await client.flush();
+
+    expect(sentIds).toEqual(["imp-a", "imp-b", "imp-c"]);
+    expect(await storage.getAllKeys()).toHaveLength(0);
   });
 });
