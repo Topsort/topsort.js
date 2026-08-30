@@ -3,7 +3,10 @@ on:
   pull_request:
     paths:
       - "**/*.ts"
+      - "packages/verification/**"
+      - "package.json"
       - "bun.lock" # dependencies have changed
+      - ".github/workflows/test-bun.yml"
   push:
     branches:
       - main

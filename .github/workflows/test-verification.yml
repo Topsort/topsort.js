@@ -1,0 +1,49 @@
+name: Verification
+
+on:
+  pull_request:
+    paths:
+      - "packages/verification/**"
+      - "package.json"
+      - "bun.lock"
+      - "tsconfig.base.json"
+      - "biome.json"
+      - ".github/workflows/test-verification.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/verification/**"
+      - "package.json"
+      - "bun.lock"
+      - "tsconfig.base.json"
+      - "biome.json"
+      - ".github/workflows/test-verification.yml"
+
+jobs:
+  verification:
+    name: Unit, browser, and package checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+
+      - name: Unit tests
+        run: bun run --cwd packages/verification test
+
+      - name: Typecheck
+        run: bun run --cwd packages/verification typecheck
+
+      - name: Biome
+        run: bunx biome check packages/verification
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium firefox webkit
+
+      - name: Browser tests
+        run: bun run --cwd packages/verification test:browser
+
+      - name: Packed artifact checks
+        run: bun run --cwd packages/verification test:package
