@@ -1,0 +1,49 @@
+{
+  "name": "@topsort/verification",
+  "version": "0.1.0",
+  "description": "Topsort third-party verification runtime",
+  "private": true,
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "dist/react.d.ts",
+    "dist/react.js",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "bunup",
+    "build:browser-fixture": "bun build ./e2e/fixture.tsx --outdir ./e2e/dist --format esm --target browser",
+    "serve:browser-fixture": "bun run ./e2e/server.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test",
+    "test:browser": "bun run build && bun run build:browser-fixture && playwright test --config playwright.config.ts",
+    "test:package": "bun run build && bun run ./scripts/verify-package.ts"
+  },
+  "peerDependencies": {
+    "react": ">=18 <20"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.7",
+    "@types/react-test-renderer": "18.3.1",
+    "linkedom": "0.18.12",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-test-renderer": "18.3.1"
+  }
+}
