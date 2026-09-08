@@ -37,6 +37,11 @@
   "peerDependencies": {
     "react": ">=18 <20"
   },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.7",

@@ -80,6 +80,10 @@ const ref = useVerificationRef(runtime, {
 });
 ```
 
+Registration is a safe no-op when `element` is not a valid `HTMLElement`, when
+`verificationTag` is absent or empty, or when `renderKey` is absent or empty.
+No provider resource is loaded in those cases.
+
 The package remains private until a representative real IAS tag, its network/CSP
 requirements, exact element-binding model, and provider cleanup semantics are
 confirmed.
