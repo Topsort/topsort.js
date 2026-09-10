@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { assumedTag, installProviderFixture, openFixture } from "./helpers";
+import { confirmedTag, installProviderFixture, openFixture } from "./helpers";
 
 test("executes inside the exact banner root after consent in every supported browser", async ({
   page,
 }) => {
   const requests = await installProviderFixture(page);
   await openFixture(page);
-  const verificationTag = assumedTag("success", "cross-browser");
+  const verificationTag = confirmedTag("success", "cross-browser");
 
   const waiting = await page.evaluate(
     (tag) =>

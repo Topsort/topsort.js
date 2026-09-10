@@ -1,11 +1,11 @@
-/** Dedicated browser fixture server. Its provider script is simulated and is not IAS code. */
+/** Dedicated browser fixture server. Its provider script is controlled and is not IAS code. */
 import { file } from "bun";
 
 export const VERIFICATION_FIXTURE_PORT = 4177;
 
 const providerFixtureSource = `
 (() => {
-  // Simulated IAS-like fixture only. This is not confirmed provider behaviour.
+  // Controlled bootstrap fixture only. This is not real IAS provider behaviour.
   const script = document.currentScript;
   const root = script?.closest("[data-banner-root]") ?? null;
   const target = window.top ?? window;
@@ -20,7 +20,7 @@ const providerFixtureSource = `
 
 function cspFor(requestUrl: URL): string {
   const providerSource =
-    requestUrl.searchParams.get("csp") === "block" ? "" : " https://pixel.adsafeprotected.com";
+    requestUrl.searchParams.get("csp") === "block" ? "" : " https://staticjs.adsafeprotected.com";
   return [
     "default-src 'self'",
     `script-src 'self'${providerSource}`,

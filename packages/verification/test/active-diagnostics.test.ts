@@ -1,12 +1,12 @@
 import { describe, expect, it } from "bun:test";
 import { parseHTML } from "linkedom";
-import { ASSUMED_IAS_HOSTNAME, parseIasTag, startIasProvider } from "../src/providers/ias";
+import { IAS_HOSTNAME, IAS_PATHNAME, parseIasTag, startIasProvider } from "../src/providers/ias";
 import { createVerificationRuntimeInternal } from "../src/runtime";
 import type { VerificationDiagnosticCode } from "../src/types";
 import { MutableConsentSource, settle } from "./helpers";
 
 const tag = (attempt: string) =>
-  `<script async src="https://${ASSUMED_IAS_HOSTNAME}/verification.js?attempt=${attempt}"></script>`;
+  `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=${attempt.replace(/\D/g, "") || "96261444"}"></script>`;
 
 function setup(resourceTimeoutMs = 1_000) {
   const { document } = parseHTML("<!doctype html><html><body></body></html>");

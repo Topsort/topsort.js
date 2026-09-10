@@ -237,7 +237,11 @@ export function createVerificationRuntimeInternal(
       if (record.element.ownerDocument) {
         record.parsedTag = deps.parseTag(record.tagIdentity, record.element.ownerDocument);
       } else {
-        record.parsedTag = { src: record.tagIdentity, async: true, identity: record.tagIdentity };
+        record.parsedTag = {
+          src: record.tagIdentity,
+          type: "application/javascript",
+          identity: record.tagIdentity,
+        };
       }
     } catch {
       terminate(record, "failed", "invalid_tag");

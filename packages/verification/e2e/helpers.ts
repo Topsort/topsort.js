@@ -1,22 +1,34 @@
-/** Helpers for the simulated provider browser fixture; no behaviour here is confirmed IAS behaviour. */
+/** Helpers for the controlled IAS bootstrap browser fixture; no real IAS code runs here. */
 import type { Page } from "@playwright/test";
 
 export const fixtureOrigin = "http://127.0.0.1:4177";
+const iasOrigin = "https://staticjs.adsafeprotected.com";
+const pubEntityByMode = {
+  success: "96261444",
+  delay: "96261445",
+  network: "96261446",
+  timeout: "96261447",
+} as const;
 
-export function assumedTag(
+export function confirmedTag(
   mode: "success" | "delay" | "network" | "timeout" = "success",
   attempt = "default",
-  secret = "fixture-query-must-not-leak",
 ): string {
-  return `<script async src="https://pixel.adsafeprotected.com/verification.js?fixtureMode=${mode}&attempt=${attempt}&secret=${secret}"></script>`;
+  const advEntityId = `3072912${attempt.replace(/\D/g, "").slice(0, 4)}`;
+  const src = `${iasOrigin}/fw.js?advEntityId=${advEntityId || "3072912"}&pubEntityId=${pubEntityByMode[mode]}`;
+  return `<script type="application/javascript" src="${src}"></script>`;
 }
 
 export async function installProviderFixture(page: Page): Promise<string[]> {
   const requests: string[] = [];
-  await page.route("https://pixel.adsafeprotected.com/**", async (route) => {
+  await page.route(`${iasOrigin}/fw.js?**`, async (route) => {
     const requestUrl = new URL(route.request().url());
     requests.push(requestUrl.href);
-    const mode = requestUrl.searchParams.get("fixtureMode") ?? "success";
+    const pubEntityId = requestUrl.searchParams.get("pubEntityId");
+    const mode =
+      (Object.entries(pubEntityByMode).find(([, value]) => value === pubEntityId)?.[0] as
+        | keyof typeof pubEntityByMode
+        | undefined) ?? "success";
     if (mode === "network") {
       await route.abort("connectionfailed");
       return;
@@ -24,8 +36,6 @@ export async function installProviderFixture(page: Page): Promise<string[]> {
 
     const fixtureUrl = new URL("/fixture-provider.js", fixtureOrigin);
     fixtureUrl.searchParams.set("mode", mode);
-    const delayMs = requestUrl.searchParams.get("delayMs");
-    if (delayMs) fixtureUrl.searchParams.set("delayMs", delayMs);
     const response = await fetch(fixtureUrl);
     await route.fulfill({
       status: response.status,

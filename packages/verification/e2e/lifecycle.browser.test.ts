@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { assumedTag, grantConsent, installProviderFixture, openFixture } from "./helpers";
+import { confirmedTag, grantConsent, installProviderFixture, openFixture } from "./helpers";
 
 test.beforeEach(async ({ browserName }) => {
   test.skip(browserName !== "chromium", "The detailed lifecycle matrix runs in Chromium.");
@@ -13,7 +13,7 @@ test("denied consent never parses or requests the provider", async ({ page }) =>
       window.verificationFixture.renderBanners([
         { id: "denied", label: "Creative", renderKey: "denied", verificationTag: tag },
       ]),
-    assumedTag("success", "denied"),
+    confirmedTag("success", "denied"),
   );
 
   const snapshot = await page.evaluate(() => window.verificationFixture.setConsent("denied"));
@@ -27,7 +27,7 @@ test("two banners with the same tag execute independently", async ({ page }) => 
   await installProviderFixture(page);
   await openFixture(page);
   await grantConsent(page);
-  const verificationTag = assumedTag("success", "shared-tag");
+  const verificationTag = confirmedTag("success", "shared-tag");
   await page.evaluate(
     (tag) =>
       window.verificationFixture.renderBanners([
@@ -51,7 +51,7 @@ test("React rerenders deduplicate the same tuple and replace a changed render ke
   await installProviderFixture(page);
   await openFixture(page);
   await grantConsent(page);
-  const verificationTag = assumedTag("success", "rerender");
+  const verificationTag = confirmedTag("success", "rerender");
   const render = (renderKey: string, label: string) =>
     page.evaluate(
       ({ key, tag, text }) =>
@@ -114,7 +114,7 @@ test("React ref detachment disposes and removes package-owned nodes", async ({ p
       window.verificationFixture.renderBanners([
         { id: "unmount", label: "Unmount", renderKey: "unmount", verificationTag: tag },
       ]),
-    assumedTag("success", "unmount"),
+    confirmedTag("success", "unmount"),
   );
   await expect(page.locator("#unmount script")).toHaveCount(1);
 
@@ -133,7 +133,7 @@ for (const failure of ["invalid", "csp", "network", "timeout"] as const) {
     const verificationTag =
       failure === "invalid"
         ? "<script>unsupported inline fixture</script>"
-        : assumedTag(failure === "csp" ? "success" : failure, failure);
+        : confirmedTag(failure === "csp" ? "success" : failure, failure);
 
     await page.evaluate(
       (tag) =>
@@ -175,7 +175,7 @@ for (const cancellation of ["disposal", "replacement", "consent withdrawal"] as 
         window.verificationFixture.renderBanners([
           { id: "delayed", label: "Delayed", renderKey: "old", verificationTag: tag },
         ]),
-      assumedTag("delay", `${cancellation}-old`),
+      confirmedTag("delay", `${cancellation}-old`),
     );
     await expect.poll(() => requests.length).toBe(1);
 
@@ -206,8 +206,7 @@ test("diagnostics never contain the raw tag or URL query", async ({ page }) => {
   await installProviderFixture(page);
   await openFixture(page);
   await grantConsent(page);
-  const secret = "sensitive-fixture-query-123";
-  const verificationTag = assumedTag("network", "redaction", secret);
+  const verificationTag = confirmedTag("network", "redaction");
   await page.evaluate(
     (tag) =>
       window.verificationFixture.renderBanners([
@@ -227,8 +226,9 @@ test("diagnostics never contain the raw tag or URL query", async ({ page }) => {
     JSON.stringify(window.verificationFixture.snapshot().diagnostics),
   );
   expect(serialized).not.toContain(verificationTag);
-  expect(serialized).not.toContain(secret);
-  expect(serialized).not.toContain("verification.js?");
+  expect(serialized).not.toContain("3072912");
+  expect(serialized).not.toContain("96261446");
+  expect(serialized).not.toContain("fw.js?");
 });
 
 test("accepts and binds an element from a same-origin iframe realm", async ({ page }) => {
@@ -243,7 +243,7 @@ test("accepts and binds an element from a same-origin iframe realm", async ({ pa
         renderKey: "foreign-realm",
         verificationTag: tag,
       }),
-    assumedTag("success", "foreign-realm"),
+    confirmedTag("success", "foreign-realm"),
   );
   await expect
     .poll(async () => (await page.evaluate(() => window.verificationFixture.snapshot())).executions)

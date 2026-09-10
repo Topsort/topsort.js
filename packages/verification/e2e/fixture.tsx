@@ -1,6 +1,6 @@
 /**
- * Browser-only test fixture for the provisional IAS-like adapter contract.
- * Nothing in this file represents confirmed IAS behaviour.
+ * Browser-only test fixture for the confirmed IAS bootstrap grammar.
+ * Provider responses are controlled test code, not real IAS behaviour.
  */
 import { useState } from "react";
 import { createRoot } from "react-dom/client";

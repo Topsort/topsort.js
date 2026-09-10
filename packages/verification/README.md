@@ -16,20 +16,28 @@ import { useVerificationRef } from "@topsort/verification/react";
 The base entrypoint is framework-neutral and SSR-safe. React is loaded only by the
 `/react` subpath and remains an external peer dependency.
 
-## MVP 2 status
+## Confirmed IAS POC status
 
-The IAS adapter is deliberately provisional and unconfirmed. It currently accepts
-only one external script shape:
+The IAS adapter is deliberately narrow for the confirmed web-display POC. It
+currently accepts only this IAS JavaScript measurement script shape:
 
 ```html
-<script async src="https://pixel.adsafeprotected.com/verification.js?..."></script>
+<script
+  type="application/javascript"
+  src="https://staticjs.adsafeprotected.com/fw.js?advEntityId=3072912&pubEntityId=96261444"
+></script>
 ```
 
-The hostname, URL shape, and lifecycle behaviour are assumptions for development,
-not a compatibility or accreditation claim. The parser requires a single external
-HTTPS script, the exact provisional hostname, no credentials, and only `src` and
-`async` attributes. It reconstructs a fresh script node and never executes the
-stored markup, uses `innerHTML`, or appends to `document.head`.
+The parser requires a single external HTTPS script with
+`type="application/javascript"`, exact host `staticjs.adsafeprotected.com`, exact
+path `/fw.js`, and exactly one numeric `advEntityId` plus one numeric
+`pubEntityId`. It rejects credentials, custom ports, fragments, duplicate or
+unexpected parameters, inline JavaScript, unexpected elements, and unexpected
+attributes. HTML tag and attribute names are handled case-insensitively.
+
+The adapter reconstructs a fresh script node with only the validated `type` and
+`src`. It never executes stored markup, uses `innerHTML`, appends the original
+parsed element, appends to `document.head`, or invents an `async` attribute.
 
 The script is inserted into the exact `HTMLElement` supplied to `register`, once
 per registration. Disposal removes Topsort-owned nodes and aborts pending work;
@@ -38,7 +46,7 @@ The adapter currently uses an internal five-second resource timeout as a
 development safeguard; this is not an IAS requirement and is not configurable
 through the public API.
 
-`active` means only that the assumed provider resource emitted a successful
+`active` means only that the provider resource emitted a successful
 `load` event. It does not mean IAS measured an impression, found the element
 viewable, or accepted reporting.
 
@@ -47,13 +55,13 @@ starts, and `denied` terminates. Withdrawal after loading begins invalidates the
 registration and performs best-effort package-owned cleanup.
 
 The consuming page must eventually allow every confirmed IAS origin in the
-appropriate CSP directives. The provisional fixture uses the assumed script
-origin only; real `script-src`, `connect-src`, `img-src`, and `frame-src` origins
-remain blocked on a representative tag.
+appropriate CSP directives. This POC only permits the confirmed bootstrap script
+origin; complete production `script-src`, `connect-src`, `img-src`, and
+`frame-src` requirements remain out of scope until IAS-side validation.
 
-Diagnostics contain only a bounded code, the provisional provider name, and
-elapsed time. They never include the raw tag, its URL query, page content, or
-arbitrary provider errors.
+Diagnostics contain only a bounded code, the provider name, and elapsed time.
+They never include the raw tag, its URL query, page content, or arbitrary
+provider errors.
 
 ## Usage
 
@@ -84,6 +92,5 @@ Registration is a safe no-op when `element` is not a valid `HTMLElement`, when
 `verificationTag` is absent or empty, or when `renderKey` is absent or empty.
 No provider resource is loaded in those cases.
 
-The package remains private until a representative real IAS tag, its network/CSP
-requirements, exact element-binding model, and provider cleanup semantics are
-confirmed.
+The package remains private, pre-production, IAS-specific for this MVP, and not
+certified as a production IAS integration.

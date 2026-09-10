@@ -1,18 +1,14 @@
-/**
- * Provisional IAS compatibility boundary.
- *
- * This hostname and the exact external-script shape are assumptions for MVP 2,
- * not confirmed IAS requirements. Replace this module when a representative tag
- * and its documented lifecycle are available.
- */
-
-export const ASSUMED_IAS_HOSTNAME = "pixel.adsafeprotected.com";
+/** Confirmed IAS web-display POC bootstrap boundary. */
+export const IAS_HOSTNAME = "staticjs.adsafeprotected.com";
+export const IAS_PATHNAME = "/fw.js";
+export const IAS_SCRIPT_TYPE = "application/javascript";
 const MAX_TAG_LENGTH = 16_384;
 const RESOURCE_TIMEOUT_MS = 5_000;
+const EXPECTED_QUERY_PARAMS = new Set(["advEntityId", "pubEntityId"]);
 
 export interface ParsedIasTag {
   readonly src: string;
-  readonly async: boolean;
+  readonly type: typeof IAS_SCRIPT_TYPE;
   /** Safe semantic identity, used only after structural validation. */
   readonly identity: string;
 }
@@ -47,13 +43,40 @@ function parserFor(document: Document): DOMParser {
   return new Parser();
 }
 
-/** Parse and validate only the assumed external IAS script grammar. */
+function isWhitespaceText(node: Node): boolean {
+  return node.nodeType === node.TEXT_NODE && !node.textContent?.trim();
+}
+
+function hasOnlyAllowedNodes(node: Node, allowedElement: Element): boolean {
+  for (const child of [...node.childNodes]) {
+    if (child === allowedElement || isWhitespaceText(child)) continue;
+    return false;
+  }
+  return true;
+}
+
+function hasSingleNumericParam(params: URLSearchParams, name: string): boolean {
+  const values = params.getAll(name);
+  return values.length === 1 && /^\d+$/.test(values[0] ?? "");
+}
+
+function getAttributeCaseInsensitive(element: Element, name: string): string | null {
+  return (
+    [...element.attributes].find((attribute) => attribute.name.toLowerCase() === name)?.value ??
+    null
+  );
+}
+
+/** Parse and validate only the confirmed IAS web-display POC script grammar. */
 export function parseIasTag(value: string, document: Document): ParsedIasTag {
   if (typeof value !== "string") {
     throw new IasAdapterError("provider_load_failed");
   }
   const source = value.trim();
   if (!source || source.length > MAX_TAG_LENGTH) {
+    throw new IasAdapterError("provider_load_failed");
+  }
+  if (!/^<script\b[\s\S]*<\/script>$/i.test(source)) {
     throw new IasAdapterError("provider_load_failed");
   }
 
@@ -69,22 +92,26 @@ export function parseIasTag(value: string, document: Document): ParsedIasTag {
   }
 
   const script = scripts[0];
-  if (!script || script.textContent?.trim()) {
+  if (
+    !script ||
+    script.textContent?.trim() ||
+    !hasOnlyAllowedNodes(parsed.head, script) ||
+    !hasOnlyAllowedNodes(parsed.body, script)
+  ) {
     throw new IasAdapterError("provider_load_failed");
   }
   const attributes = [...script.attributes];
+  const rawSrc = getAttributeCaseInsensitive(script, "src");
+  const rawType = getAttributeCaseInsensitive(script, "type");
   if (
-    attributes.some(({ name }) => name !== "src" && name !== "async") ||
-    !script.hasAttribute("src") ||
-    !script.hasAttribute("async")
+    attributes.some(({ name }) => !["src", "type"].includes(name.toLowerCase())) ||
+    !rawSrc ||
+    !rawType ||
+    rawType.toLowerCase() !== IAS_SCRIPT_TYPE
   ) {
     throw new IasAdapterError("provider_load_failed");
   }
 
-  const rawSrc = script.getAttribute("src");
-  if (!rawSrc) {
-    throw new IasAdapterError("provider_load_failed");
-  }
   let url: URL;
   try {
     url = new URL(rawSrc);
@@ -96,14 +123,24 @@ export function parseIasTag(value: string, document: Document): ParsedIasTag {
     url.username ||
     url.password ||
     url.port ||
-    url.hostname !== ASSUMED_IAS_HOSTNAME
+    url.hash ||
+    url.hostname !== IAS_HOSTNAME ||
+    url.pathname !== IAS_PATHNAME
+  ) {
+    throw new IasAdapterError("provider_load_failed");
+  }
+  const params = url.searchParams;
+  if (
+    [...params.keys()].some((key) => !EXPECTED_QUERY_PARAMS.has(key)) ||
+    !hasSingleNumericParam(params, "advEntityId") ||
+    !hasSingleNumericParam(params, "pubEntityId")
   ) {
     throw new IasAdapterError("provider_load_failed");
   }
 
   return {
     src: url.href,
-    async: true,
+    type: IAS_SCRIPT_TYPE,
     identity: `ias-script:${url.href}`,
   };
 }
@@ -113,8 +150,8 @@ export function startIasProvider(input: IasStartInput): IasProviderSession {
   const { element, parsedTag, resourceTimeoutMs = RESOURCE_TIMEOUT_MS } = input;
   const document = element.ownerDocument;
   const script = document.createElement("script");
+  script.type = parsedTag.type;
   script.src = parsedTag.src;
-  script.async = parsedTag.async;
 
   let settled = false;
   let disposed = false;

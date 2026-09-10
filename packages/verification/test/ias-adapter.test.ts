@@ -1,7 +1,9 @@
 import { describe, expect, it } from "bun:test";
 import { parseHTML } from "linkedom";
 import {
-  ASSUMED_IAS_HOSTNAME,
+  IAS_HOSTNAME,
+  IAS_PATHNAME,
+  IAS_SCRIPT_TYPE,
   type ParsedIasTag,
   parseIasTag,
   startIasProvider,
@@ -14,31 +16,54 @@ function doc() {
   return parseHTML("<!doctype html><html><body></body></html>").document;
 }
 
-const valid = `<script async src="https://${ASSUMED_IAS_HOSTNAME}/verification.js?placement=abc"></script>`;
+const valid = `<SCRIPT TYPE="application/javascript" SRC="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444"></SCRIPT>`;
 
 const granted: ConsentSource = {
   current: () => "granted",
   subscribe: () => () => {},
 };
 
-describe("assumed IAS adapter", () => {
-  it("parses and canonicalizes the narrow external script shape", () => {
+describe("confirmed IAS adapter", () => {
+  it("parses and canonicalizes the IAS-issued JavaScript fragment", () => {
     const parsed = parseIasTag(`  ${valid}  `, doc());
     expect(parsed).toEqual({
-      src: `https://${ASSUMED_IAS_HOSTNAME}/verification.js?placement=abc`,
-      async: true,
-      identity: `ias-script:https://${ASSUMED_IAS_HOSTNAME}/verification.js?placement=abc`,
+      src: `https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444`,
+      type: IAS_SCRIPT_TYPE,
+      identity: `ias-script:https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444`,
+    });
+  });
+
+  it("accepts normal HTML case-insensitivity", () => {
+    const uppercaseMarkup = `<SCRIPT TYPE="APPLICATION/JAVASCRIPT" SRC="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444"></SCRIPT>`;
+    expect(parseIasTag(uppercaseMarkup, doc())).toMatchObject({
+      src: `https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444`,
+      type: IAS_SCRIPT_TYPE,
     });
   });
 
   it.each([
     "<script>evil()</script>",
-    `<script async src="http://${ASSUMED_IAS_HOSTNAME}/x"></script>`,
-    `<script async src="https://not-${ASSUMED_IAS_HOSTNAME}/x"></script>`,
-    `<script async src="https://user:pass@${ASSUMED_IAS_HOSTNAME}/x"></script>`,
-    `<script async src="https://${ASSUMED_IAS_HOSTNAME}/x"></script><script async src="https://${ASSUMED_IAS_HOSTNAME}/y"></script>`,
-    `<script async src="https://${ASSUMED_IAS_HOSTNAME}/x" onload="evil()"></script>`,
-    `<img src="https://${ASSUMED_IAS_HOSTNAME}/x">`,
+    `<script async src="https://pixel.adsafeprotected.com/verification.js?placement=abc"></script>`,
+    `<ins><script src="https://www.googletagservices.com/dcm/dcmads.js"></script></ins>${valid}`,
+    `<script type="application/javascript" src="http://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://not-${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://user:pass@${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}:444${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2#fragment"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}/other.js?advEntityId=1&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=abc&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=abc"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&advEntityId=2&pubEntityId=3"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2&unexpected=3"></script>`,
+    `<script type="text/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script>`,
+    `<script src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2" async></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2" onload="evil()"></script>`,
+    `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=1&pubEntityId=2"></script><script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3&pubEntityId=4"></script>`,
+    `<img src="https://${IAS_HOSTNAME}${IAS_PATHNAME}">`,
+    `text ${valid}`,
   ])("rejects unsupported or unsafe markup: %s", (tag) => {
     expect(() => parseIasTag(tag, doc())).toThrow();
   });
@@ -52,6 +77,8 @@ describe("assumed IAS adapter", () => {
 
     expect(script).not.toBeNull();
     expect(script?.parentNode).toBe(root);
+    expect(script?.getAttribute("type")).toBe(IAS_SCRIPT_TYPE);
+    expect(script?.hasAttribute("async")).toBe(false);
     expect(document.head.querySelector("script")).toBeNull();
 
     session.dispose();
