@@ -5,7 +5,7 @@
   "schedule": ["before 9pm on sunday"],
   "extends": [":dependencyDashboard", ":disableRateLimiting", ":semanticCommits"],
   "rangeStrategy": "pin",
-  "enabledManagers": ["github-actions", "custom.regex", "npm"],
+  "enabledManagers": ["github-actions", "custom.regex", "bun"],
   "commitMessageAction": "",
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "{{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}{{prettyNewMajor}}{{else}}{{#if isSingleVersion}}{{prettyNewVersion}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
