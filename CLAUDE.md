@@ -65,7 +65,7 @@ src/
     index.ts                      # Re-exports all type definitions
     shared.d.ts                   # Config interface (apiKey, host, timeout, userAgent, fetchOptions)
     auctions.d.ts                 # Auction request/response types
-    events.d.ts                   # Event request/response types (impressions, clicks, purchases)
+    events.d.ts                   # Event request/response types (renders, impressions, clicks, purchases)
 test/                             # Unit tests (Bun test runner + MSW)
 e2e/                              # Playwright E2E tests
   server.ts                       # Bun-based static file server for E2E
