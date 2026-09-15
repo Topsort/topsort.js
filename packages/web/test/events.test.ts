@@ -100,6 +100,31 @@ describe("reportEvent", () => {
     });
   });
 
+  it("should successfully report render events", async () => {
+    returnStatus(204, `${baseURL}/${endpoints.events}`);
+    const renderEvent: Event = {
+      renders: [
+        {
+          id: "render-123",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-456",
+          resolvedBidId: "bid-789",
+          placement: {
+            path: "/categories/dairy",
+            position: 1,
+          },
+          deviceType: "mobile",
+          channel: "onsite",
+        },
+      ],
+    };
+
+    await expect(topsortClient.reportEvent(renderEvent)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+  });
+
   it("should successfully report pageview event for cart page with product array", async () => {
     returnStatus(204, `${baseURL}/${endpoints.events}`);
     const cartPageviewEvent: Event = {

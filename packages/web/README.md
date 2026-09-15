@@ -142,6 +142,18 @@ To report an event, first initialize a Topsort Client, then call the `reportEven
 import { TopsortClient, Event } from "@topsort/sdk";
 
 const event: Event = {
+  renders: [
+    {
+      resolvedBidId:
+        "ChAGaP5D2ex-UKEEBCOHwvDjEhABkF4FDAx0S5mMD2cOG0w9GhABkEnL2CB6qKIoqeItVgA_",
+      id: "1720706109.713344-53B92988-7A49-4679-B18E-465943B46148",
+      occurredAt: "2024-07-11T13:55:08Z",
+      opaqueUserId: "38e0a5ff-9f8a-4e80-8969-e5e3f01348e8",
+      placement: {
+        path: "/categories/sports",
+      },
+    },
+  ],
   impressions: [
     {
       resolvedBidId:
@@ -223,6 +235,8 @@ topsortClient.reportEvent(event)
 - `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`. When keepalive is enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
 
 `event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
+
+Events can be reported as `renders`, `impressions`, `clicks`, `purchases` and `pageviews`. A **render** means an ad was inserted into the page, whether or not it ever became visible; an **impression** means it became visible to the consumer. Renders are for sponsored ads only, so `resolvedBidId` is required and there is no `entity` or `additionalAttribution` field. Renders are never chargeable.
 
 #### Sample response
 

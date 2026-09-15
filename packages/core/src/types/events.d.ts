@@ -220,6 +220,55 @@ export interface InteractionObject {
 }
 
 /**
+ * A render means an ad was inserted into the page (IAB "rendered"), regardless of whether
+ * it ever became visible to the consumer. Renders are used for viewability reporting: the
+ * gap between renders and impressions is what an ad was served but never seen.
+ * Renders are for sponsored ads only, so `resolvedBidId` is required — there is no organic
+ * equivalent, and no `entity` or `additionalAttribution` field.
+ * Renders are never chargeable and never attributable.
+ * @interface Render
+ * @extends {BaseEvent}
+ */
+export interface Render extends BaseEvent {
+  /**
+   * The `resolvedBidId` field received from the `/v2/auctions` response.
+   * Required: renders describe sponsored ads only.
+   * @type {string}
+   * @required
+   * @example "WyJiX01mazE1IiwiMTJhNTU4MjgtOGVhZC00Mjk5LTgzMjctY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0="
+   */
+  resolvedBidId: string;
+
+  /**
+   * Optional channel where the render occurred.
+   * @type {ChannelType}
+   * @optional
+   */
+  channel?: ChannelType;
+
+  /**
+   * Optional device type the ad was rendered on.
+   * @type {DeviceType}
+   * @optional
+   */
+  deviceType?: DeviceType;
+
+  /**
+   * Page information describing which page the ad was rendered on.
+   * @type {Page}
+   * @optional
+   */
+  page?: Page;
+
+  /**
+   * Placement information describing where the ad was rendered.
+   * @type {Placement}
+   * @optional
+   */
+  placement?: Placement;
+}
+
+/**
  * An impression means a promotable has become visible to the consumer.
  * For promoted entities, include the `resolvedBidId` field from the `/v2/auctions` response.
  * For unpromoted entities, include the `entity` field to describe what was seen.
@@ -571,6 +620,16 @@ export interface Event {
    * @maxItems 50
    */
   purchases?: Purchase[];
+
+  /**
+   * Render events to report.
+   * An ad was inserted into the page, whether or not it became visible.
+   * @type {Render[]}
+   * @optional
+   * @minItems 0
+   * @maxItems 50
+   */
+  renders?: Render[];
 }
 
 /**
