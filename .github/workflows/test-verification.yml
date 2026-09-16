@@ -38,3 +38,9 @@ jobs:
 
       - name: Biome
         run: bunx biome check packages/verification
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium firefox webkit
+
+      - name: Browser tests
+        run: bun run --cwd packages/verification test:browser
