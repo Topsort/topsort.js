@@ -31,7 +31,8 @@
     "serve:browser-fixture": "bun run ./e2e/server.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
-    "test:browser": "bun run build && bun run build:browser-fixture && playwright test --config playwright.config.ts"
+    "test:browser": "bun run build && bun run build:browser-fixture && playwright test --config playwright.config.ts",
+    "test:package": "bun run build && bun run ./scripts/verify-package.ts"
   },
   "peerDependencies": {
     "react": ">=18 <20"
