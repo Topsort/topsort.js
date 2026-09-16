@@ -1,0 +1,26 @@
+{
+  "name": "@topsort/verification",
+  "version": "0.1.0",
+  "description": "Topsort third-party verification runtime",
+  "private": true,
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "bunup",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}
