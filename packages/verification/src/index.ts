@@ -1,3 +1,4 @@
+export { createVerificationRuntime } from "./runtime";
 export type {
   ConsentSource,
   ConsentState,
