@@ -73,4 +73,13 @@ describe("verification diagnostics and imports", () => {
 
     expect(entrypoint.createVerificationRuntime).toBeFunction();
   });
+
+  it("keeps the React entrypoint import safe without browser globals", async () => {
+    expect(globalThis.window).toBeUndefined();
+    expect(globalThis.document).toBeUndefined();
+
+    const entrypoint = await import("../src/react");
+
+    expect(entrypoint.useVerificationRef).toBeFunction();
+  });
 });

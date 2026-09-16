@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
     }
   },
   "files": [
@@ -17,6 +21,8 @@
     "README.md",
     "dist/index.d.ts",
     "dist/index.js",
+    "dist/react.d.ts",
+    "dist/react.js",
     "package.json"
   ],
   "scripts": {
@@ -24,7 +30,21 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test"
   },
+  "peerDependencies": {
+    "react": ">=18 <20"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "linkedom": "0.18.12"
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.7",
+    "@types/react-test-renderer": "18.3.1",
+    "linkedom": "0.18.12",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-test-renderer": "18.3.1"
   }
 }
