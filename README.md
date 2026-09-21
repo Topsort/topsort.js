@@ -1,5 +1,7 @@
 # Topsort SDK
 
+[![npm version](https://shields.io)](https://npmjs.com)
+
 This repository holds the official Topsort javascript client library. This project is built with [TypeScript][typescript] and uses [Bun][bun] for package management and testing.
 
 [typescript]: https://www.typescriptlang.org
