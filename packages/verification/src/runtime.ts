@@ -350,19 +350,6 @@ export function createVerificationRuntimeInternal(
     const renderKey = typeof input.renderKey === "string" ? input.renderKey : "";
     const existing = registrationsByElement.get(input.element);
 
-    if (!tagIdentity) {
-      if (existing) {
-        terminate(existing, "disposed", "replaced_registration");
-      }
-      const handle = createStandaloneHandle();
-      try {
-        options.onDiagnostic?.({ code: "invalid_tag", provider: "ias", elapsedMs: 0 });
-      } catch {
-        // Diagnostics must not escape register.
-      }
-      return handle;
-    }
-
     if (!renderKey) {
       if (existing) {
         terminate(existing, "disposed", "replaced_registration");
