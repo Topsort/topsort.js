@@ -36,6 +36,10 @@
         "react-native-mmkv",
       ],
     },
+    "packages/verification": {
+      "name": "@topsort/verification",
+      "version": "0.1.0",
+    },
     "packages/web": {
       "name": "@topsort/sdk",
       "version": "0.5.0",
@@ -272,6 +276,8 @@
     "@topsort/sdk": ["@topsort/sdk@workspace:packages/web"],
 
     "@topsort/sdk-core": ["@topsort/sdk-core@workspace:packages/core"],
+
+    "@topsort/verification": ["@topsort/verification@workspace:packages/verification"],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 
