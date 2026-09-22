@@ -42,3 +42,19 @@ storage that already ran.
 Diagnostics contain only a bounded code, provider name, and elapsed time. `active` means
 only that the provider resource emitted a successful `load` event; it does not mean IAS
 measured an impression, found the element viewable, or accepted reporting.
+
+## React
+
+React consumers can use the isolated callback-ref bridge without adding React to the base
+entrypoint:
+
+```ts
+import { useVerificationRef } from "@topsort/verification/react";
+
+const ref = useVerificationRef(runtime, {
+  verificationTag: banner.content.verificationTag,
+  renderKey: banner.adId,
+});
+```
+
+React is an optional peer dependency and is loaded only through the `/react` subpath.
