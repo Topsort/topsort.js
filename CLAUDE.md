@@ -90,6 +90,10 @@ dist/                             # Build output (gitignored)
 - **Naming**: camelCase for variables/functions, PascalCase for classes/interfaces/types. Files use kebab-case (e.g., `api-client.ts`, `validate-config.ts`).
 - **Type declarations**: Shared types live in `src/types/` as `.d.ts` files. Internal interfaces (not exported) go in the same file as their usage.
 - **Error handling**: Throw `AppError` (not native `Error`). `AppError` carries `status`, `statusText`, `body`, and a `retry` flag.
+- **Verification adapter errors**: Provider adapters in `packages/verification` may use an
+  internal typed error to classify browser-resource failures. These errors are converted to
+  bounded diagnostics and never cross the package's public API; they must not introduce a
+  dependency on the API-specific `@topsort/sdk-core` package.
 - **Exports**: Barrel files (`index.ts`) re-export from subdirectories. The main entry is `src/index.ts`.
 - **PR titles**: Must follow Conventional Commits format (enforced by CI). Must start with lowercase after the prefix. Allowed prefixes: `feat`, `fix`, `chore`, `docs`, `revert`, `build`, `ci`, `refactor`, `perf`, `test`.
 

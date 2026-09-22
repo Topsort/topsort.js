@@ -30,6 +30,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
 
+      - name: Unit tests
+        run: bun run --cwd packages/verification test
+
       - name: Typecheck
         run: bun run --cwd packages/verification typecheck
 
