@@ -37,15 +37,22 @@ export async function installProviderFixture(page: Page): Promise<string[]> {
     const fixtureUrl = new URL("/fixture-provider.js", fixtureOrigin);
     fixtureUrl.searchParams.set("mode", mode);
     const response = await fetch(fixtureUrl);
-    await route.fulfill({
-      status: response.status,
-      body: await response.text(),
-      contentType: response.headers.get("content-type") ?? "text/javascript",
-      headers: {
-        "Cache-Control": response.headers.get("cache-control") ?? "no-store",
-        "X-Verification-Fixture": "simulated-provider",
-      },
-    });
+    try {
+      await route.fulfill({
+        status: response.status,
+        body: await response.text(),
+        contentType: response.headers.get("content-type") ?? "text/javascript",
+        headers: {
+          "Cache-Control": response.headers.get("cache-control") ?? "no-store",
+          "X-Verification-Fixture": "simulated-provider",
+        },
+      });
+    } catch (error) {
+      // Timeout and disposal tests intentionally remove the script while this fixture is delayed.
+      // Browsers may cancel that request before the delayed response is ready to be fulfilled.
+      if (route.request().failure() !== null || page.isClosed()) return;
+      throw error;
+    }
   });
   return requests;
 }
