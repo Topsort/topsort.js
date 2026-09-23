@@ -125,7 +125,7 @@ test("React ref detachment disposes and removes package-owned nodes", async ({ p
   expect(await page.locator("[data-banner-root] script").count()).toBe(0);
 });
 
-for (const failure of ["invalid", "csp", "network", "timeout"] as const) {
+for (const failure of ["invalid", "csp", "network"] as const) {
   test(`${failure} failure leaves the creative present and interactive`, async ({ page }) => {
     const requests = await installProviderFixture(page);
     await openFixture(page, failure === "csp" ? "block" : "allow");
@@ -142,12 +142,7 @@ for (const failure of ["invalid", "csp", "network", "timeout"] as const) {
         ]),
       verificationTag,
     );
-    const expectedCode =
-      failure === "invalid"
-        ? "invalid_tag"
-        : failure === "timeout"
-          ? "provider_load_timeout"
-          : "provider_load_failed";
+    const expectedCode = failure === "invalid" ? "invalid_tag" : "provider_load_failed";
     await expect
       .poll(async () =>
         (await page.evaluate(() => window.verificationFixture.snapshot())).diagnostics.map(
@@ -164,6 +159,32 @@ for (const failure of ["invalid", "csp", "network", "timeout"] as const) {
     if (failure === "invalid") expect(requests).toHaveLength(0);
   });
 }
+
+test("a provider that takes longer than five seconds can still become active", async ({ page }) => {
+  const requests = await installProviderFixture(page);
+  await openFixture(page);
+  await grantConsent(page);
+
+  await page.evaluate(
+    (tag) =>
+      window.verificationFixture.renderBanners([
+        { id: "slow", label: "Slow provider", renderKey: "slow", verificationTag: tag },
+      ]),
+    confirmedTag("slow", "slow"),
+  );
+
+  await expect.poll(() => requests.length).toBe(1);
+  await expect
+    .poll(
+      async () =>
+        (await page.evaluate(() => window.verificationFixture.snapshot())).diagnostics.map(
+          ({ code }) => code,
+        ),
+      { timeout: 7_000 },
+    )
+    .toContain("active");
+  await expect(page.getByRole("button", { name: /Slow provider/ })).toBeVisible();
+});
 
 for (const cancellation of ["disposal", "replacement", "consent withdrawal"] as const) {
   test(`${cancellation} before delayed load prevents active`, async ({ page }) => {

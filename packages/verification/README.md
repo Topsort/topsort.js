@@ -243,7 +243,6 @@ the raw tag, its URL query, page content, or arbitrary provider errors.
 | `consent_denied` | Consent was denied before provider startup. |
 | `consent_withdrawn` | Consent ceased to be granted after provider startup began. |
 | `element_not_ready` | The supplied element was not connected when startup was attempted. |
-| `provider_load_timeout` | The provider resource did not settle within the runtime timeout. |
 | `provider_load_failed` | The browser reported that the provider resource failed to load. |
 | `provider_start_failed` | Provider startup failed for another contained reason. |
 | `replaced_registration` | A different registration replaced the one owned by the element. |
@@ -285,7 +284,7 @@ Check that:
 - `resolvedBidId` was supplied as a non-empty render key;
 - the page's CSP and browser extensions allow the IAS resource.
 
-Use `onDiagnostic` to distinguish consent, validation, element, timeout, and network failures.
+Use `onDiagnostic` to distinguish consent, validation, element, and network failures.
 
 ### The diagnostic says `active`, but IAS has no report yet
 

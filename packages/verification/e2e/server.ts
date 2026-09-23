@@ -50,8 +50,8 @@ Bun.serve({
       if (mode === "failure") {
         return new Response("simulated provider failure", { status: 503 });
       }
-      if (mode === "delay" || mode === "timeout") {
-        const fallback = mode === "timeout" ? 5_500 : 300;
+      if (mode === "delay" || mode === "slow") {
+        const fallback = mode === "slow" ? 5_500 : 300;
         const delayMs = Number(url.searchParams.get("delayMs") ?? fallback);
         await Bun.sleep(Number.isFinite(delayMs) ? delayMs : fallback);
       }
