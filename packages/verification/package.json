@@ -27,8 +27,11 @@
   ],
   "scripts": {
     "build": "bunup",
+    "build:browser-fixture": "bun build ./e2e/fixture.tsx --outdir ./e2e/dist --format esm --target browser",
+    "serve:browser-fixture": "bun run ./e2e/server.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "bun test"
+    "test": "bun test",
+    "test:browser": "bun run build && bun run build:browser-fixture && playwright test --config playwright.config.ts"
   },
   "peerDependencies": {
     "react": ">=18 <20"

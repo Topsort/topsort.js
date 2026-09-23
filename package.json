@@ -12,6 +12,7 @@
     "typecheck:verification": "bun run --cwd packages/verification typecheck",
     "test": "bun run typecheck && bun run --cwd packages/web test && bun run --cwd packages/react-native test && bun run --cwd packages/react-native test:harness && bun run test:verification",
     "test:verification": "bun run --cwd packages/verification test",
+    "test:verification:browser": "bun run --cwd packages/verification test:browser",
     "test:e2e": "bun run --cwd packages/web test:e2e",
     "format": "biome check",
     "format:fix": "biome check --write",
