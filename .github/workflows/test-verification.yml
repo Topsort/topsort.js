@@ -21,6 +21,24 @@ on:
       - ".github/workflows/test-verification.yml"
 
 jobs:
+  react-19-compatibility:
+    name: React 19 compatibility
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Install React 19 without changing the workspace lockfile
+        run: >-
+          bun add --cwd packages/verification --no-save
+          react@19.2.7 react-dom@19.2.7 react-test-renderer@19.2.7
+          @types/react@19 @types/react-dom@19 @types/react-test-renderer@19
+      - name: Test the React adapter
+        run: bun run --cwd packages/verification test test/react.test.ts
+      - name: Typecheck with React 19
+        run: bun run --cwd packages/verification typecheck
+
   verification:
     name: Unit, browser, and package checks
     runs-on: ubuntu-24.04
