@@ -1,25 +1,196 @@
-# @topsort/verification
+# Topsort Verification
 
-Private, browser-side third-party verification runtime for Topsort-served banners.
+`@topsort/verification` runs supported third-party verification tags beside the exact
+Topsort-served ad that they measure. It provides consent gating, safe tag validation,
+per-render lifecycle management, bounded diagnostics, and an optional React callback-ref
+integration.
 
-This package remains private and is not approved for production use or publication.
+The initial release supports IAS monitoring tags for web display banners. Support for
+additional providers, tag formats, mobile-app inventory, and direct browser script loading
+will be added separately.
 
-## Installation and imports
+## Installation
 
-The private workspace can be consumed by approved repository fixtures only:
+Using npm:
 
-```ts
-import { createVerificationRuntime } from "@topsort/verification";
-import { useVerificationRef } from "@topsort/verification/react";
+```bash
+npm install @topsort/verification
 ```
 
-The base entrypoint is framework-neutral and SSR-safe. React is loaded only by the
-`/react` subpath and remains an external peer dependency.
+Using yarn:
 
-## Confirmed IAS POC status
+```bash
+yarn add @topsort/verification
+```
 
-The IAS adapter is deliberately narrow for the confirmed web-display POC. It
-currently accepts only this IAS JavaScript measurement script shape:
+The package currently ships as an ES module for npm-based applications and bundlers. It does
+not yet provide an IIFE build for direct `<script>` installation.
+
+## Supported integration
+
+The initial support boundary is intentionally narrow:
+
+- web display banners rendered into the page DOM;
+- Topsort auction winners carrying `asset[0].content.verificationTag`;
+- IAS JavaScript monitoring tags using the confirmed `staticjs.adsafeprotected.com/fw.js`
+  format;
+- one registration for each rendered ad instance;
+- framework-neutral JavaScript and an optional React callback-ref integration.
+
+It does not currently support:
+
+- IAS blocking wrappers or IAS-hosted creatives;
+- arbitrary HTML, inline scripts, or unconfirmed IAS tag formats;
+- providers other than IAS;
+- native mobile-app measurement through OM SDK or OMID;
+- direct `<script>` or IIFE installation;
+- automatic banner discovery.
+
+## Quick start
+
+Create one runtime for the page or application and connect it to the marketplace's consent
+system:
+
+```ts
+import {
+  createVerificationRuntime,
+  type ConsentSource,
+  type ConsentState,
+  type VerificationHandle,
+} from "@topsort/verification";
+
+let consentState: ConsentState = "unknown";
+const consentListeners = new Set<(state: ConsentState) => void>();
+
+const consentSource: ConsentSource = {
+  current: () => consentState,
+  subscribe(listener) {
+    consentListeners.add(listener);
+    return () => consentListeners.delete(listener);
+  },
+};
+
+// Call this from the marketplace's consent-management integration.
+function updateVerificationConsent(nextState: ConsentState) {
+  consentState = nextState;
+  for (const listener of consentListeners) listener(nextState);
+}
+
+const runtime = createVerificationRuntime({
+  consentSource,
+  onDiagnostic(event) {
+    console.debug("Topsort verification", event);
+  },
+});
+```
+
+After the winning creative has been inserted into the DOM, register it with the runtime:
+
+```ts
+const winner = auctionResponse.results[0]?.winners[0];
+const bannerRoot = document.querySelector<HTMLElement>("#rendered-banner");
+let verificationHandle: VerificationHandle | undefined;
+
+if (winner && bannerRoot) {
+  verificationHandle = runtime.register({
+    verificationTag: winner.asset?.[0]?.content?.verificationTag ?? "",
+    renderKey: winner.resolvedBidId,
+    element: bannerRoot,
+  });
+}
+
+// Later, when this particular rendered ad is removed or replaced:
+verificationHandle?.dispose();
+```
+
+Keep the returned handle for the lifetime of that rendered ad. Dispose it when the creative is
+actually replaced, unmounted, or removed.
+
+When the page-level integration itself is torn down, dispose the runtime:
+
+```ts
+runtime.dispose();
+```
+
+## Consent
+
+The marketplace owns consent collection and supplies a `ConsentSource`. The package does not
+read cookies, infer consent, or integrate with a consent-management platform automatically.
+
+```ts
+interface ConsentSource {
+  current(): "unknown" | "granted" | "denied";
+  subscribe(
+    listener: (state: "unknown" | "granted" | "denied") => void,
+  ): () => void;
+}
+```
+
+The current lifecycle is:
+
+- `unknown`: the registration waits without parsing or loading the provider tag;
+- `granted`: the IAS tag is validated and the provider resource is inserted;
+- `denied`: the registration terminates without loading IAS;
+- consent withdrawal after loading starts: the registration terminates and package-owned
+  resources are removed on a best-effort basis.
+
+An initially denied registration is terminal. If consent is granted later, register the
+rendered creative again. Removing package-owned resources cannot undo provider requests,
+globals, storage, or other effects that have already occurred.
+
+## Registering a rendered ad
+
+`runtime.register()` accepts:
+
+| Field | Type | Description |
+|---|---|---|
+| `verificationTag` | `string` | The supported provider tag returned with the winning creative. |
+| `renderKey` | `string` | A unique identity for this rendered winner. Use its `resolvedBidId`. |
+| `element` | `HTMLElement` | The connected DOM element containing the creative being measured. |
+
+The element must already be connected to the document when consent permits provider startup.
+Registration safely becomes a no-op when the element is invalid, the tag is absent or empty,
+or the render key is absent or empty.
+
+One runtime can manage many rendered ads. The same campaign-level IAS tag can be registered
+for several elements; each distinct element and `resolvedBidId` represents an independent ad
+instance.
+
+Registering a different tag or render key for an element replaces the existing registration
+for that element. Repeating the same element, tag, and render key returns the existing handle
+instead of starting IAS twice.
+
+Verification failure never removes, hides, or disables the creative.
+
+## React
+
+React support is provided through a separate entrypoint so that the framework-neutral bundle
+does not depend on React:
+
+```tsx
+import { createVerificationRuntime } from "@topsort/verification";
+import { useVerificationRef } from "@topsort/verification/react";
+
+function SponsoredBanner({ runtime, winner }) {
+  const verificationRef = useVerificationRef(runtime, {
+    verificationTag: winner.asset?.[0]?.content?.verificationTag ?? "",
+    renderKey: winner.resolvedBidId,
+  });
+
+  return (
+    <div ref={verificationRef}>
+      <img src={winner.asset[0].url} alt="Sponsored" />
+    </div>
+  );
+}
+```
+
+React is an optional peer dependency. Importing the base `@topsort/verification` entrypoint
+does not load React.
+
+## Supported IAS tag
+
+The confirmed IAS web-display integration accepts one external JavaScript tag of this form:
 
 ```html
 <script
@@ -28,69 +199,120 @@ currently accepts only this IAS JavaScript measurement script shape:
 ></script>
 ```
 
-The parser requires a single external HTTPS script with
-`type="application/javascript"`, exact host `staticjs.adsafeprotected.com`, exact
-path `/fw.js`, and exactly one numeric `advEntityId` plus one numeric
-`pubEntityId`. It rejects credentials, custom ports, fragments, duplicate or
-unexpected parameters, inline JavaScript, unexpected elements, and unexpected
-attributes. HTML tag and attribute names are handled case-insensitively.
+The parser accepts normal HTML case-insensitivity but requires:
 
-The adapter reconstructs a fresh script node with only the validated `type` and
-`src`. It never executes stored markup, uses `innerHTML`, appends the original
-parsed element, appends to `document.head`, or invents an `async` attribute.
+- exactly one external `<script>` element;
+- HTTPS;
+- hostname `staticjs.adsafeprotected.com`;
+- path `/fw.js`;
+- exactly one numeric `advEntityId`;
+- exactly one numeric `pubEntityId`;
+- `type="application/javascript"`;
+- no inline JavaScript, extra elements, unexpected attributes, credentials, custom port,
+  fragment, duplicate parameters, or unexpected query parameters.
 
-The script is inserted into the exact `HTMLElement` supplied to `register`, once
-per registration. Disposal removes Topsort-owned nodes and aborts pending work;
-it cannot undo provider code, requests, globals, or storage that already ran.
-The adapter currently uses an internal five-second resource timeout as a
-development safeguard; this is not an IAS requirement and is not configurable
-through the public API.
+The original markup is never inserted or evaluated. The package creates a new script element
+containing only the validated `type` and canonical `src`, then inserts it into the exact
+element supplied to `register()`.
 
-`active` means only that the provider resource emitted a successful
-`load` event. It does not mean IAS measured an impression, found the element
-viewable, or accepted reporting.
+Tags outside this confirmed format are rejected. Contact Topsort before using another IAS tag
+format or provider.
 
-Consent is checked before parsing or loading the tag: `unknown` waits, `granted`
-starts, and `denied` terminates. Withdrawal after loading begins invalidates the
-registration and performs best-effort package-owned cleanup.
+## Diagnostics
 
-The consuming page must eventually allow every confirmed IAS origin in the
-appropriate CSP directives. This POC only permits the confirmed bootstrap script
-origin; complete production `script-src`, `connect-src`, `img-src`, and
-`frame-src` requirements remain out of scope until IAS-side validation.
-
-Diagnostics contain only a bounded code, the provider name, and elapsed time.
-They never include the raw tag, its URL query, page content, or arbitrary
-provider errors.
-
-## Usage
+Pass `onDiagnostic` when creating the runtime to observe bounded lifecycle events:
 
 ```ts
-import { createVerificationRuntime } from "@topsort/verification";
-
-const runtime = createVerificationRuntime({ consentSource });
-const handle = runtime.register({
-  verificationTag: banner.content.verificationTag,
-  renderKey: banner.adId,
-  element: bannerRoot,
+const runtime = createVerificationRuntime({
+  consentSource,
+  onDiagnostic({ code, provider, elapsedMs }) {
+    verificationLogger.info({ code, provider, elapsedMs });
+  },
 });
 ```
 
-React consumers can use the callback-ref bridge without adding React to the base
-entrypoint:
+Diagnostic records contain only a code, provider name, and elapsed time. They do not contain
+the raw tag, its URL query, page content, or arbitrary provider errors.
 
-```ts
-import { useVerificationRef } from "@topsort/verification/react";
+| Code | Meaning |
+|---|---|
+| `registered` | The runtime accepted ownership of the registration. |
+| `active` | The provider script emitted a successful browser `load` event. |
+| `disposed` | The registration was explicitly disposed. |
+| `invalid_tag` | The tag was absent, malformed, or outside the supported grammar. |
+| `consent_denied` | Consent was denied before provider startup. |
+| `consent_withdrawn` | Consent ceased to be granted after provider startup began. |
+| `element_not_ready` | The supplied element was not connected when startup was attempted. |
+| `provider_load_timeout` | The provider resource did not settle within the runtime timeout. |
+| `provider_load_failed` | The browser reported that the provider resource failed to load. |
+| `provider_start_failed` | Provider startup failed for another contained reason. |
+| `replaced_registration` | A different registration replaced the one owned by the element. |
 
-const ref = useVerificationRef(runtime, {
-  verificationTag: banner.content.verificationTag,
-  renderKey: banner.adId,
-});
+`active` is deliberately narrow: it means the IAS bootstrap resource loaded successfully in
+the browser. It does not prove that IAS measured an impression, classified it as viewable, or
+accepted it into reporting. Confirm measurement through IAS reporting or with IAS support.
+
+## Content Security Policy
+
+The page must allow the IAS bootstrap script in its Content Security Policy. For the confirmed
+tag, the minimum script source is:
+
+```text
+script-src https://staticjs.adsafeprotected.com
 ```
 
-Registration is a safe no-op when `element` is not a valid `HTMLElement`, when
-`verificationTag` is absent or empty, or when `renderKey` is absent or empty.
-No provider resource is loaded in those cases.
+IAS may make subsequent requests that require additional `connect-src`, `img-src`, or
+`frame-src` origins. Obtain the production requirements from IAS and validate them against the
+marketplace's page before rollout. A successful script `load` event alone does not establish
+that every downstream IAS request was permitted.
 
-The package remains private, pre-production, IAS-specific for this MVP, and not
-certified as a production IAS integration.
+## Browser support
+
+The runtime is tested in current Chromium, Firefox, and WebKit through Playwright. It requires
+standard browser DOM APIs, including `HTMLElement`, `DOMParser`, and dynamic script elements.
+The package entrypoints are safe to import in an SSR environment, but registration requires a
+browser element.
+
+## Troubleshooting
+
+### No IAS request is made
+
+Check that:
+
+- consent is `granted`;
+- the element is connected to the document;
+- the tag exactly matches the supported IAS grammar;
+- `resolvedBidId` was supplied as a non-empty render key;
+- the page's CSP and browser extensions allow the IAS resource.
+
+Use `onDiagnostic` to distinguish consent, validation, element, timeout, and network failures.
+
+### The diagnostic says `active`, but IAS has no report yet
+
+`active` describes browser resource loading, not IAS measurement acceptance. Confirm that
+downstream IAS network requests are not blocked, then allow for the reporting delay agreed with
+IAS.
+
+### Ad blocking is enabled
+
+Ad blockers can prevent IAS resources from loading. This is reported as a provider load failure
+and is separate from consent.
+
+## Development
+
+This package lives in the
+[`Topsort/topsort.js`](https://github.com/Topsort/topsort.js/tree/main/packages/verification)
+repository.
+
+```bash
+bun install
+bun run --cwd packages/verification test
+bun run --cwd packages/verification typecheck
+bun run --cwd packages/verification build
+bun run --cwd packages/verification test:browser
+bun run --cwd packages/verification test:package
+```
+
+## License
+
+MIT

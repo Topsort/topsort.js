@@ -1,9 +1,28 @@
 {
   "name": "@topsort/verification",
   "version": "0.1.0",
-  "description": "Topsort third-party verification runtime",
+  "description": "Browser runtime for third-party verification of Topsort-served ads",
   "private": true,
   "type": "module",
+  "author": "Topsort",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Topsort/topsort.js.git",
+    "directory": "packages/verification"
+  },
+  "bugs": {
+    "url": "https://github.com/Topsort/topsort.js/issues"
+  },
+  "homepage": "https://github.com/Topsort/topsort.js/tree/main/packages/verification#readme",
+  "keywords": [
+    "ads",
+    "advertising",
+    "ias",
+    "topsort",
+    "verification",
+    "viewability"
+  ],
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -17,6 +36,7 @@
     }
   },
   "files": [
+    "CHANGELOG.md",
     "LICENSE",
     "README.md",
     "dist/index.d.ts",

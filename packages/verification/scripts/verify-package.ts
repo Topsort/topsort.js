@@ -62,6 +62,7 @@ async function main(): Promise<void> {
     );
     const packedPaths = dryRun.files.map(({ path }) => path).sort();
     const expectedPaths = [
+      "CHANGELOG.md",
       "LICENSE",
       "README.md",
       "dist/index.d.ts",
