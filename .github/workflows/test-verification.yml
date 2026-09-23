@@ -44,3 +44,6 @@ jobs:
 
       - name: Browser tests
         run: bun run --cwd packages/verification test:browser
+
+      - name: Packed artifact checks
+        run: bun run --cwd packages/verification test:package

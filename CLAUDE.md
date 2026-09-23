@@ -2,7 +2,8 @@
 
 ## Project Overview
 
-topsort.js is the official `@topsort/sdk` -- a fully typed TypeScript client for the Topsort Auctions and Events APIs. It is distributed as CJS, ESM, and IIFE bundles, making it usable in Node.js, modern bundlers, and directly in the browser via a `<script>` tag.
+topsort.js contains the official Topsort web and React Native SDKs, their shared core,
+and the private pre-production `@topsort/verification` browser runtime.
 
 ## Git Workflow
 
@@ -42,6 +43,10 @@ topsort.js is the official `@topsort/sdk` -- a fully typed TypeScript client for
 | `bun run format:fix` | Auto-fix lint and formatting issues (Biome)          |
 | `bun run serve:e2e`  | Start the local E2E test server (port 8080 by default) |
 | `bun run prepare`    | Install Lefthook git hooks                           |
+| `bun run build:verification` | Build the private verification package       |
+| `bun run test:verification` | Run verification unit tests                   |
+| `bun run test:verification:browser` | Run verification Playwright tests     |
+| `bun run test:verification:package` | Validate the packed verification artifact |
 
 ## Architecture
 
@@ -73,6 +78,14 @@ e2e/                              # Playwright E2E tests
   public/index.html               # Test HTML page that loads the IIFE bundle
 dist/                             # Build output (gitignored)
 ```
+
+### Verification package
+
+`packages/verification` is a private, pre-production browser package for attaching
+provider verification to an exact rendered banner element. Its base entrypoint is
+framework-neutral and its optional `@topsort/verification/react` subpath provides a
+React callback-ref bridge. The current provider adapter intentionally accepts only the
+confirmed IAS web-display POC tag grammar. It is not part of the npm publishing workflow.
 
 ### How It Works
 
@@ -130,6 +143,7 @@ dist/                             # Build output (gitignored)
 | Workflow                  | Trigger (paths)            | What it does                                       |
 | ------------------------- | -------------------------- | -------------------------------------------------- |
 | **Bun** (test-bun.yml)   | `**/*.ts`, `./bun.lockb`  | Runs unit tests; runs E2E tests   |
+| **Verification** (test-verification.yml) | `packages/verification/**` and workspace config | Runs verification unit, type, browser, and packed-artifact checks |
 | **Biome** (validate-biome.yml) | `**/*.ts`, `**/*.json` | Runs `biome ci` on changed files                   |
 | **Conventional Commits** (validate-convco.yml) | All PRs | Validates PR title matches Conventional Commits    |
 | **Typos** (validate-typos.yml) | `**/*.md`             | Spell-checks Markdown files                        |
