@@ -19,7 +19,6 @@ export type VerificationDiagnosticCode =
   | "consent_denied"
   | "consent_withdrawn"
   | "element_not_ready"
-  | "provider_load_timeout"
   | "provider_load_failed"
   | "provider_start_failed"
   | "replaced_registration";

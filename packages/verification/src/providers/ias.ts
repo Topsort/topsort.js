@@ -3,7 +3,6 @@ export const IAS_HOSTNAME = "staticjs.adsafeprotected.com";
 export const IAS_PATHNAME = "/fw.js";
 export const IAS_SCRIPT_TYPE = "application/javascript";
 const MAX_TAG_LENGTH = 16_384;
-const RESOURCE_TIMEOUT_MS = 5_000;
 const EXPECTED_QUERY_PARAMS = new Set(["advEntityId", "pubEntityId"]);
 
 export interface ParsedIasTag {
@@ -13,7 +12,7 @@ export interface ParsedIasTag {
   readonly identity: string;
 }
 
-export type IasFailureCode = "provider_load_timeout" | "provider_load_failed";
+export type IasFailureCode = "provider_load_failed";
 
 export class IasAdapterError extends Error {
   constructor(readonly code: IasFailureCode | "provider_aborted") {
@@ -31,8 +30,6 @@ export interface IasProviderSession {
 export interface IasStartInput {
   readonly element: HTMLElement;
   readonly parsedTag: ParsedIasTag;
-  /** Internal test seam; production uses the fixed provisional timeout. */
-  readonly resourceTimeoutMs?: number;
 }
 
 function parserFor(document: Document): DOMParser {
@@ -147,7 +144,7 @@ export function parseIasTag(value: string, document: Document): ParsedIasTag {
 
 /** Insert one fresh script into the exact supplied root and return an abortable session. */
 export function startIasProvider(input: IasStartInput): IasProviderSession {
-  const { element, parsedTag, resourceTimeoutMs = RESOURCE_TIMEOUT_MS } = input;
+  const { element, parsedTag } = input;
   const document = element.ownerDocument;
   const script = document.createElement("script");
   script.type = parsedTag.type;
@@ -155,7 +152,6 @@ export function startIasProvider(input: IasStartInput): IasProviderSession {
 
   let settled = false;
   let disposed = false;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   let resolveSettled!: () => void;
   let rejectSettled!: (error: IasAdapterError) => void;
   const settledPromise = new Promise<void>((resolve, reject) => {
@@ -166,10 +162,6 @@ export function startIasProvider(input: IasStartInput): IasProviderSession {
   const cleanup = () => {
     script.removeEventListener("load", onLoad);
     script.removeEventListener("error", onError);
-    if (timer !== undefined) {
-      clearTimeout(timer);
-      timer = undefined;
-    }
   };
   const finish = (error?: IasAdapterError) => {
     if (settled) return;
@@ -189,9 +181,6 @@ export function startIasProvider(input: IasStartInput): IasProviderSession {
 
   script.addEventListener("load", onLoad);
   script.addEventListener("error", onError);
-  timer = setTimeout(() => {
-    if (!disposed) finish(new IasAdapterError("provider_load_timeout"));
-  }, resourceTimeoutMs);
 
   try {
     element.appendChild(script);

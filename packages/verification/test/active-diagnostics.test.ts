@@ -8,7 +8,7 @@ import { MutableConsentSource, settle } from "./helpers";
 const tag = (attempt: string) =>
   `<script type="application/javascript" src="https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=${attempt.replace(/\D/g, "") || "96261444"}"></script>`;
 
-function setup(resourceTimeoutMs = 1_000) {
+function setup() {
   const { document } = parseHTML("<!doctype html><html><body></body></html>");
   const element = document.createElement("div");
   document.body.appendChild(element);
@@ -23,7 +23,7 @@ function setup(resourceTimeoutMs = 1_000) {
       isHTMLElement: (value): value is HTMLElement => value === element,
       parseTag: parseIasTag,
       startProvider: ({ element: root, parsedTag }) =>
-        startIasProvider({ element: root, parsedTag, resourceTimeoutMs }),
+        startIasProvider({ element: root, parsedTag }),
     },
   );
 
@@ -68,16 +68,22 @@ describe("active diagnostic boundaries", () => {
     expect(diagnostics).not.toContain("active");
   });
 
-  it("never emits active when the provider times out", async () => {
-    const { diagnostics, element, runtime } = setup(1);
-    runtime.register({ element, renderKey: "timeout", verificationTag: tag("timeout") });
+  it("keeps waiting until a delayed provider loads", async () => {
+    const { diagnostics, element, runtime } = setup();
+    runtime.register({ element, renderKey: "delayed", verificationTag: tag("delayed") });
+    const script = element.querySelector("script") as HTMLScriptElement;
 
     await Bun.sleep(10);
     await settle();
 
-    expect(diagnostics).toContain("provider_load_timeout");
+    expect(diagnostics).toEqual(["registered"]);
     expect(diagnostics).not.toContain("active");
-    expect(element.querySelector("script")).toBeNull();
+    expect(script.parentNode).toBe(element);
+
+    dispatch(script, "load");
+    await settle();
+
+    expect(diagnostics).toEqual(["registered", "active"]);
   });
 
   it("never emits active after disposal before load", async () => {

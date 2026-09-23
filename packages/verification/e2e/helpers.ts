@@ -7,11 +7,11 @@ const pubEntityByMode = {
   success: "96261444",
   delay: "96261445",
   network: "96261446",
-  timeout: "96261447",
+  slow: "96261447",
 } as const;
 
 export function confirmedTag(
-  mode: "success" | "delay" | "network" | "timeout" = "success",
+  mode: "success" | "delay" | "network" | "slow" = "success",
   attempt = "default",
 ): string {
   const advEntityId = `3072912${attempt.replace(/\D/g, "").slice(0, 4)}`;
@@ -48,7 +48,7 @@ export async function installProviderFixture(page: Page): Promise<string[]> {
         },
       });
     } catch (error) {
-      // Timeout and disposal tests intentionally remove the script while this fixture is delayed.
+      // Disposal tests intentionally remove the script while this fixture is delayed.
       // Browsers may cancel that request before the delayed response is ready to be fulfilled.
       if (route.request().failure() !== null || page.isClosed()) return;
       throw error;
