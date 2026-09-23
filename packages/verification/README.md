@@ -135,8 +135,8 @@ The current lifecycle is:
 - `unknown`: the registration waits without parsing or loading the provider tag;
 - `granted`: the IAS tag is validated and the provider resource is inserted;
 - `denied`: the registration terminates without loading IAS;
-- consent withdrawal after loading starts: the registration terminates and package-owned
-  resources are removed on a best-effort basis.
+- consent becoming `unknown` or `denied` after loading starts: the registration terminates and
+  package-owned resources are removed on a best-effort basis. A later grant does not restart it.
 
 An initially denied registration is terminal. If consent is granted later, register the
 rendered creative again or reload the page. A provider failure is also terminal for that

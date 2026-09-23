@@ -241,8 +241,36 @@ for (const cancellation of ["disposal", "replacement", "consent withdrawal"] as 
     await page.waitForTimeout(700);
     const snapshot = await page.evaluate(() => window.verificationFixture.snapshot());
     expect(snapshot.diagnostics.map(({ code }) => code)).not.toContain("active");
+    expect(snapshot.banners[0]?.scriptCount).toBe(0);
+    expect(requests).toHaveLength(1);
   });
 }
+
+test("unknown consent during provider loading is terminal and never reinjects", async ({
+  page,
+}) => {
+  const requests = await installProviderFixture(page);
+  await openFixture(page);
+  await grantConsent(page);
+  await page.evaluate(
+    (tag) =>
+      window.verificationFixture.renderBanners([
+        { id: "unknown", label: "Unknown", renderKey: "unknown", verificationTag: tag },
+      ]),
+    confirmedTag("delay", "unknown"),
+  );
+  await expect.poll(() => requests.length).toBe(1);
+
+  await page.evaluate(() => window.verificationFixture.setConsent("unknown"));
+  await page.evaluate(() => window.verificationFixture.setConsent("granted"));
+  await page.waitForTimeout(700);
+
+  const snapshot = await page.evaluate(() => window.verificationFixture.snapshot());
+  expect(requests).toHaveLength(1);
+  expect(snapshot.banners[0]?.scriptCount).toBe(0);
+  expect(snapshot.consentSubscribers).toBe(0);
+  expect(snapshot.diagnostics.map(({ code }) => code)).toEqual(["registered", "consent_withdrawn"]);
+});
 
 test("diagnostics never contain the raw tag or URL query", async ({ page }) => {
   await installProviderFixture(page);
