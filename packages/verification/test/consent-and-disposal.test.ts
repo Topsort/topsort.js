@@ -145,4 +145,29 @@ describe("verification consent and disposal", () => {
     expect(provider.sessions.map((session) => session.disposeCalls)).toEqual([1, 1]);
     expect(consentSource.listeners.size).toBe(0);
   });
+
+  it("does not attach consent after a registered diagnostic disposes the runtime", () => {
+    const consentSource = new MutableConsentSource("unknown");
+    const scopedDiagnostics: VerificationDiagnosticCode[] = [];
+    let runtime!: ReturnType<typeof createTestRuntime>;
+    runtime = createTestRuntime(
+      {
+        consentSource,
+        onDiagnostic({ code }) {
+          if (code === "registered") runtime.dispose();
+        },
+      },
+      { startProvider: new ImmediateProvider().start, isHTMLElement: isTestElement },
+    );
+
+    runtime.register({
+      element: asHTMLElement(new TestElement()),
+      renderKey: "render-1",
+      verificationTag: "tag",
+      onDiagnostic: ({ code }) => scopedDiagnostics.push(code),
+    });
+
+    expect(consentSource.listeners.size).toBe(0);
+    expect(scopedDiagnostics).toEqual(["registered", "disposed"]);
+  });
 });

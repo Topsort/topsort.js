@@ -92,4 +92,55 @@ describe("verification registration identity", () => {
     expect(provider.starts).toHaveLength(2);
     expect(provider.starts[0]?.element).not.toBe(provider.starts[1]?.element);
   });
+
+  it("updates registration-scoped diagnostics without restarting the same tuple", async () => {
+    const provider = new ImmediateProvider();
+    const consentSource = new MutableConsentSource("unknown");
+    const runtime = createTestRuntime(
+      { consentSource },
+      { startProvider: provider.start, isHTMLElement: isTestElement },
+    );
+    const element = asHTMLElement(new TestElement());
+    const first: VerificationDiagnosticCode[] = [];
+    const second: VerificationDiagnosticCode[] = [];
+
+    runtime.register({
+      element,
+      renderKey: "render-1",
+      verificationTag: "same-tag",
+      onDiagnostic: ({ code }) => first.push(code),
+    });
+    runtime.register({
+      element,
+      renderKey: "render-1",
+      verificationTag: "same-tag",
+      onDiagnostic: ({ code }) => second.push(code),
+    });
+    consentSource.set("granted");
+    await settle();
+
+    expect(first).toEqual(["registered"]);
+    expect(second).toEqual(["active"]);
+    expect(provider.starts).toHaveLength(1);
+  });
+
+  it("silently disposes an existing registration when its replacement has no tag", async () => {
+    const provider = new ImmediateProvider();
+    const diagnostics: VerificationDiagnosticCode[] = [];
+    const runtime = createTestRuntime(
+      {
+        consentSource: new MutableConsentSource("granted"),
+        onDiagnostic: ({ code }) => diagnostics.push(code),
+      },
+      { startProvider: provider.start, isHTMLElement: isTestElement },
+    );
+    const element = asHTMLElement(new TestElement());
+
+    runtime.register({ element, renderKey: "render-1", verificationTag: "tag" });
+    await settle();
+    runtime.register({ element, renderKey: "render-2" });
+
+    expect(provider.sessions[0]?.disposeCalls).toBe(1);
+    expect(diagnostics).toEqual(["registered", "active", "replaced_registration"]);
+  });
 });

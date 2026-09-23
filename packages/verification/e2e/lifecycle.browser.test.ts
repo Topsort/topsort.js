@@ -1,10 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { confirmedTag, grantConsent, installProviderFixture, openFixture } from "./helpers";
 
-test.beforeEach(async ({ browserName }) => {
-  test.skip(browserName !== "chromium", "The detailed lifecycle matrix runs in Chromium.");
-});
-
 test("denied consent never parses or requests the provider", async ({ page }) => {
   const requests = await installProviderFixture(page);
   await openFixture(page);
@@ -43,6 +39,31 @@ test("two banners with the same tag execute independently", async ({ page }) => 
   const snapshot = await page.evaluate(() => window.verificationFixture.snapshot());
   expect(snapshot.executions.map(({ rootId }) => rootId).sort()).toEqual(["banner-a", "banner-b"]);
   expect(snapshot.diagnostics.filter(({ code }) => code === "active")).toHaveLength(2);
+  expect(
+    snapshot.scopedDiagnostics
+      .filter(({ code }) => code === "active")
+      .map(({ bannerId }) => bannerId)
+      .sort(),
+  ).toEqual(["banner-a", "banner-b"]);
+});
+
+test("a creative without a verification tag is a silent no-op", async ({ page }) => {
+  const requests = await installProviderFixture(page);
+  await openFixture(page);
+  await grantConsent(page);
+
+  await page.evaluate(() =>
+    window.verificationFixture.renderBanners([
+      { id: "unverified", label: "Unverified creative", renderKey: "unverified" },
+    ]),
+  );
+
+  const snapshot = await page.evaluate(() => window.verificationFixture.snapshot());
+  expect(snapshot.diagnostics).toEqual([]);
+  expect(snapshot.scopedDiagnostics).toEqual([]);
+  expect(snapshot.banners[0]?.scriptCount).toBe(0);
+  expect(requests).toEqual([]);
+  await expect(page.getByRole("button", { name: /Unverified creative/ })).toBeVisible();
 });
 
 test("React rerenders deduplicate the same tuple and replace a changed render key", async ({

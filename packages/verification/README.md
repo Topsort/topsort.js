@@ -93,9 +93,13 @@ let verificationHandle: VerificationHandle | undefined;
 
 if (winner && bannerRoot) {
   verificationHandle = runtime.register({
-    verificationTag: winner.asset?.[0]?.content?.verificationTag ?? "",
+    verificationTag: winner.asset?.[0]?.content?.verificationTag,
     renderKey: winner.resolvedBidId,
     element: bannerRoot,
+    onDiagnostic(event) {
+      // This callback is scoped to this rendered winner.
+      verificationLogger.info({ placement: "rendered-banner", ...event });
+    },
   });
 }
 
@@ -135,8 +139,13 @@ The current lifecycle is:
   resources are removed on a best-effort basis.
 
 An initially denied registration is terminal. If consent is granted later, register the
-rendered creative again. Removing package-owned resources cannot undo provider requests,
-globals, storage, or other effects that have already occurred.
+rendered creative again or reload the page. A provider failure is also terminal for that
+registration and requires a new registration to retry. Removing package-owned resources cannot
+undo provider requests, globals, storage, or other effects that have already occurred.
+
+`granted` is an assertion supplied by the marketplace. It must mean that the marketplace has
+satisfied every applicable region-, purpose-, and vendor-specific requirement for loading IAS.
+The package does not make that policy decision.
 
 ## Registering a rendered ad
 
@@ -144,13 +153,16 @@ globals, storage, or other effects that have already occurred.
 
 | Field | Type | Description |
 |---|---|---|
-| `verificationTag` | `string` | The supported provider tag returned with the winning creative. |
+| `verificationTag` | `string \| null \| undefined` | The supported provider tag returned with the winning creative. Missing or blank means that verification is not enabled for this creative. |
 | `renderKey` | `string` | A unique identity for this rendered winner. Use its `resolvedBidId`. |
 | `element` | `HTMLElement` | The connected DOM element containing the creative being measured. |
+| `onDiagnostic` | `(event) => void` | Optional diagnostics scoped to this registration. Use the callback closure for safe placement correlation. |
 
 The element must already be connected to the document when consent permits provider startup.
-Registration safely becomes a no-op when the element is invalid, the tag is absent or empty,
-or the render key is absent or empty.
+An absent or blank tag safely becomes a silent no-op because most creatives will not necessarily
+use verification. It still disposes any previous registration owned by the same element, so a
+verified creative can be replaced by an unverified one safely. Invalid elements, missing render
+keys, disposed runtimes, and malformed non-empty tags produce bounded diagnostics.
 
 One runtime can manage many rendered ads. The same campaign-level IAS tag can be registered
 for several elements; each distinct element and `resolvedBidId` represents an independent ad
@@ -173,7 +185,7 @@ import { useVerificationRef } from "@topsort/verification/react";
 
 function SponsoredBanner({ runtime, winner }) {
   const verificationRef = useVerificationRef(runtime, {
-    verificationTag: winner.asset?.[0]?.content?.verificationTag ?? "",
+    verificationTag: winner.asset?.[0]?.content?.verificationTag,
     renderKey: winner.resolvedBidId,
   });
 
@@ -234,18 +246,28 @@ const runtime = createVerificationRuntime({
 Diagnostic records contain only a code, provider name, and elapsed time. They do not contain
 the raw tag, its URL query, page content, or arbitrary provider errors.
 
+`elapsedMs` is measured from the call to `register()`. It includes time spent waiting for consent
+and must not be interpreted as IAS download latency. Use a registration-level `onDiagnostic`
+callback when an event must be associated with a particular placement; the callback can close
+over the marketplace's own non-sensitive placement identity. When global and registration-level
+callbacks are both configured, both receive the event.
+
 | Code | Meaning |
 |---|---|
 | `registered` | The runtime accepted ownership of the registration. |
 | `active` | The provider script emitted a successful browser `load` event. |
 | `disposed` | The registration was explicitly disposed. |
-| `invalid_tag` | The tag was absent, malformed, or outside the supported grammar. |
+| `invalid_tag` | A non-empty tag was malformed or outside the supported grammar. |
 | `consent_denied` | Consent was denied before provider startup. |
 | `consent_withdrawn` | Consent ceased to be granted after provider startup began. |
+| `consent_source_failed` | The marketplace consent adapter threw or otherwise failed. |
+| `invalid_element` | The supplied value was not a browser `HTMLElement`. |
+| `invalid_render_key` | The supplied render key was absent or blank. |
 | `element_not_ready` | The supplied element was not connected when startup was attempted. |
 | `provider_load_failed` | The browser reported that the provider resource failed to load. |
 | `provider_start_failed` | Provider startup failed for another contained reason. |
 | `replaced_registration` | A different registration replaced the one owned by the element. |
+| `runtime_disposed` | Registration was attempted after the runtime was disposed. |
 
 `active` is deliberately narrow: it means the IAS bootstrap resource loaded successfully in
 the browser. It does not prove that IAS measured an impression, classified it as viewable, or
