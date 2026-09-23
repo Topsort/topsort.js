@@ -8,6 +8,7 @@ import {
 import type {
   ConsentState,
   RegisterVerificationInput,
+  VerificationDiagnostic,
   VerificationDiagnosticCode,
   VerificationHandle,
   VerificationRuntime,
@@ -53,6 +54,7 @@ interface Registration {
   readonly tagIdentity: string;
   readonly startedAt: number;
   readonly handle: VerificationHandle;
+  onDiagnostic: ((event: VerificationDiagnostic) => void) | null;
   status: VerificationStatus;
   generation: number;
   consentState: ConsentState;
@@ -93,18 +95,60 @@ export function createVerificationRuntimeInternal(
   const deps: RuntimeDependencies = { ...defaultDependencies, ...dependencies };
   const registrationsByElement = new WeakMap<HTMLElement, Registration>();
   const registrations = new Set<Registration>();
+  const pendingDiagnostics: Array<{
+    event: VerificationDiagnostic;
+    registrationCallback: ((event: VerificationDiagnostic) => void) | null;
+  }> = [];
   let runtimeDisposed = false;
+  let dispatchingDiagnostics = false;
+
+  function notify(
+    event: VerificationDiagnostic,
+    registrationCallback: ((event: VerificationDiagnostic) => void) | null = null,
+  ): void {
+    pendingDiagnostics.push({ event, registrationCallback });
+    if (dispatchingDiagnostics) return;
+
+    dispatchingDiagnostics = true;
+    try {
+      while (pendingDiagnostics.length > 0) {
+        const pending = pendingDiagnostics.shift();
+        if (!pending) continue;
+        try {
+          options?.onDiagnostic?.(pending.event);
+        } catch {
+          // Diagnostics are observational and must never affect verification lifecycle.
+        }
+        try {
+          pending.registrationCallback?.(pending.event);
+        } catch {
+          // Registration-scoped diagnostics are observational too.
+        }
+      }
+    } finally {
+      dispatchingDiagnostics = false;
+    }
+  }
 
   function emit(record: Registration, code: VerificationDiagnosticCode): void {
-    try {
-      options.onDiagnostic?.({
+    notify(
+      {
         code,
         provider: "ias",
         elapsedMs: Math.max(0, deps.now() - record.startedAt),
-      });
-    } catch {
-      // Diagnostics are observational and must never affect creative or verification lifecycle.
-    }
+      },
+      record.onDiagnostic,
+    );
+  }
+
+  function emitInput(
+    code: VerificationDiagnosticCode,
+    input?: Pick<RegisterVerificationInput, "onDiagnostic"> | null,
+  ): void {
+    notify(
+      { code, provider: "ias", elapsedMs: 0 },
+      typeof input?.onDiagnostic === "function" ? input.onDiagnostic : null,
+    );
   }
 
   function removeOwnership(record: Registration): void {
@@ -316,7 +360,7 @@ export function createVerificationRuntimeInternal(
       }
       handleConsent(record, options.consentSource.current());
     } catch {
-      terminate(record, "failed", "provider_start_failed");
+      terminate(record, "failed", "consent_source_failed");
     }
   }
 
@@ -328,32 +372,29 @@ export function createVerificationRuntimeInternal(
 
   function register(input: RegisterVerificationInput): VerificationHandle {
     if (runtimeDisposed) {
+      emitInput("runtime_disposed", input);
       return createStandaloneHandle();
     }
 
     if (!deps.isHTMLElement(input?.element)) {
+      emitInput("invalid_element", input);
       return createStandaloneHandle();
     }
 
     if (typeof input.verificationTag !== "string" || !input.verificationTag.trim()) {
       const existing = registrationsByElement.get(input.element);
       if (existing) terminate(existing, "disposed", "replaced_registration");
-      const handle = createStandaloneHandle();
-      try {
-        options.onDiagnostic?.({ code: "invalid_tag", provider: "ias", elapsedMs: 0 });
-      } catch {
-        // Diagnostics must not escape register.
-      }
-      return handle;
+      return createStandaloneHandle();
     }
     const tagIdentity = input.verificationTag.trim();
-    const renderKey = typeof input.renderKey === "string" ? input.renderKey : "";
+    const renderKey = typeof input.renderKey === "string" ? input.renderKey.trim() : "";
     const existing = registrationsByElement.get(input.element);
 
     if (!renderKey) {
       if (existing) {
         terminate(existing, "disposed", "replaced_registration");
       }
+      emitInput("invalid_render_key", input);
       return createStandaloneHandle();
     }
 
@@ -364,6 +405,7 @@ export function createVerificationRuntimeInternal(
       existing.status !== "failed" &&
       existing.status !== "disposed"
     ) {
+      existing.onDiagnostic = typeof input.onDiagnostic === "function" ? input.onDiagnostic : null;
       return existing.handle;
     }
 
@@ -382,6 +424,7 @@ export function createVerificationRuntimeInternal(
       tagIdentity,
       startedAt: deps.now(),
       handle,
+      onDiagnostic: typeof input.onDiagnostic === "function" ? input.onDiagnostic : null,
       status: "registered" as const,
       generation: 0,
       consentState: "unknown" as const,
@@ -393,7 +436,14 @@ export function createVerificationRuntimeInternal(
     registrationsByElement.set(record.element, record);
     registrations.add(record);
     emit(record, "registered");
-    attachConsent(record);
+    if (
+      !runtimeDisposed &&
+      record.status !== "failed" &&
+      record.status !== "disposed" &&
+      registrationsByElement.get(record.element) === record
+    ) {
+      attachConsent(record);
+    }
     return handle;
   }
 

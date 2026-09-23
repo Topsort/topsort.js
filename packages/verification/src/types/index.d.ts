@@ -6,9 +6,10 @@ export interface ConsentSource {
 }
 
 export interface RegisterVerificationInput {
-  verificationTag: string;
+  verificationTag?: string | null;
   renderKey: string;
   element: HTMLElement;
+  onDiagnostic?: (event: VerificationDiagnostic) => void;
 }
 
 export type VerificationDiagnosticCode =
@@ -18,10 +19,14 @@ export type VerificationDiagnosticCode =
   | "invalid_tag"
   | "consent_denied"
   | "consent_withdrawn"
+  | "consent_source_failed"
+  | "invalid_element"
+  | "invalid_render_key"
   | "element_not_ready"
   | "provider_load_failed"
   | "provider_start_failed"
-  | "replaced_registration";
+  | "replaced_registration"
+  | "runtime_disposed";
 
 export interface VerificationDiagnostic {
   code: VerificationDiagnosticCode;

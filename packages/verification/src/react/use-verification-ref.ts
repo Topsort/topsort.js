@@ -1,10 +1,12 @@
 import { useCallback, useRef } from "react";
-import type { RegisterVerificationInput, VerificationHandle, VerificationRuntime } from "../types";
+import type {
+  RegisterVerificationInput,
+  VerificationDiagnostic,
+  VerificationHandle,
+  VerificationRuntime,
+} from "../types";
 
-export interface UseVerificationRefOptions
-  extends Omit<RegisterVerificationInput, "element" | "verificationTag"> {
-  verificationTag?: string | null;
-}
+export interface UseVerificationRefOptions extends Omit<RegisterVerificationInput, "element"> {}
 
 /**
  * Binds verification to the committed element supplied by React.
@@ -17,6 +19,12 @@ export function useVerificationRef(
 ): (element: HTMLElement | null) => void {
   const handleRef = useRef<VerificationHandle | null>(null);
   const elementRef = useRef<HTMLElement | null>(null);
+  const diagnosticRef = useRef(options.onDiagnostic);
+  diagnosticRef.current = options.onDiagnostic;
+  const onDiagnostic = useCallback(
+    (event: VerificationDiagnostic) => diagnosticRef.current?.(event),
+    [],
+  );
   return useCallback(
     (element: HTMLElement | null) => {
       if (element && elementRef.current === element && handleRef.current) {
@@ -30,9 +38,10 @@ export function useVerificationRef(
           element,
           verificationTag: options.verificationTag,
           renderKey: options.renderKey,
+          onDiagnostic,
         });
       }
     },
-    [runtime, options.verificationTag, options.renderKey],
+    [runtime, options.verificationTag, options.renderKey, onDiagnostic],
   );
 }

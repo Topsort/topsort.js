@@ -4,14 +4,14 @@
  */
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { createVerificationRuntime } from "../src";
-import { useVerificationRef } from "../src/react";
 import type {
   ConsentSource,
   ConsentState,
   VerificationDiagnostic,
   VerificationHandle,
-} from "../src/types";
+} from "../dist/index.js";
+import { createVerificationRuntime } from "../dist/index.js";
+import { useVerificationRef } from "../dist/react.js";
 
 interface BannerInput {
   id: string;
@@ -35,6 +35,7 @@ interface FixtureSnapshot {
   }>;
   consentSubscribers: number;
   diagnostics: VerificationDiagnostic[];
+  scopedDiagnostics: Array<VerificationDiagnostic & { bannerId: string }>;
   executions: FixtureExecution[];
   parseCount: number;
 }
@@ -78,6 +79,7 @@ class MutableConsentSource implements ConsentSource {
 }
 
 const diagnostics: VerificationDiagnostic[] = [];
+const scopedDiagnostics: Array<VerificationDiagnostic & { bannerId: string }> = [];
 const consentSource = new MutableConsentSource();
 const runtime = createVerificationRuntime({
   consentSource,
@@ -102,7 +104,11 @@ Object.defineProperty(window, "DOMParser", {
 
 function Banner({ id, label, renderKey, verificationTag }: BannerInput) {
   const [clicks, setClicks] = useState(0);
-  const ref = useVerificationRef(runtime, { verificationTag, renderKey });
+  const ref = useVerificationRef(runtime, {
+    verificationTag,
+    renderKey,
+    onDiagnostic: (event) => scopedDiagnostics.push({ bannerId: id, ...event }),
+  });
   return (
     <article id={id} data-banner-root={id} ref={ref}>
       <button
@@ -151,6 +157,7 @@ function snapshot(): FixtureSnapshot {
     banners,
     consentSubscribers: consentSource.subscriberCount(),
     diagnostics: [...diagnostics],
+    scopedDiagnostics: [...scopedDiagnostics],
     executions: [...window.__verificationFixtureExecutions],
     parseCount,
   };

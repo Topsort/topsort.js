@@ -2,10 +2,19 @@ import { describe, expect, it } from "bun:test";
 import React, { StrictMode } from "react";
 import { act, create } from "react-test-renderer";
 import { useVerificationRef } from "../src/react";
-import type { VerificationHandle, VerificationRuntime } from "../src/types";
+import type {
+  RegisterVerificationInput,
+  VerificationHandle,
+  VerificationRuntime,
+} from "../src/types";
 
 function runtimeStub() {
-  const registrations: Array<{ element: HTMLElement; renderKey: string; tag: string }> = [];
+  const registrations: Array<{
+    element: HTMLElement;
+    renderKey: string;
+    tag: string | null | undefined;
+    onDiagnostic: RegisterVerificationInput["onDiagnostic"];
+  }> = [];
   const disposed: string[] = [];
   const runtime: VerificationRuntime = {
     register(input) {
@@ -13,6 +22,7 @@ function runtimeStub() {
         element: input.element,
         renderKey: input.renderKey,
         tag: input.verificationTag,
+        onDiagnostic: input.onDiagnostic,
       });
       const handle: VerificationHandle = {
         dispose: () => disposed.push(input.renderKey),
@@ -74,5 +84,32 @@ describe("React verification ref", () => {
     });
     expect(registrations).toHaveLength(1);
     act(() => tree.unmount());
+  });
+
+  it("uses the latest diagnostic callback without restarting verification", () => {
+    const { runtime, registrations } = runtimeStub();
+    const element = {} as HTMLElement;
+    const first: string[] = [];
+    const second: string[] = [];
+    function Banner({ destination }: { destination: string[] }) {
+      const ref = useVerificationRef(runtime, {
+        verificationTag: "tag",
+        renderKey: "a",
+        onDiagnostic: ({ code }) => destination.push(code),
+      });
+      return React.createElement("div", { ref });
+    }
+    let tree!: ReturnType<typeof create>;
+    act(() => {
+      tree = create(React.createElement(Banner, { destination: first }), {
+        createNodeMock: () => element,
+      });
+    });
+    act(() => tree.update(React.createElement(Banner, { destination: second })));
+
+    expect(registrations).toHaveLength(1);
+    registrations[0]?.onDiagnostic?.({ code: "active", provider: "ias", elapsedMs: 1 });
+    expect(first).toEqual([]);
+    expect(second).toEqual(["active"]);
   });
 });
