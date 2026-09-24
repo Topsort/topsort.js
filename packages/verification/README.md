@@ -23,8 +23,10 @@ Using yarn:
 yarn add @topsort/verification
 ```
 
-The package currently ships as an ES module for npm-based applications and bundlers. It does
-not yet provide an IIFE build for direct `<script>` installation.
+The package ships as an ES module for npm-based applications and bundlers. Use `import` rather
+than CommonJS `require()`. The `default` export conditions resolve to the same ES module files
+for compatible tooling; they do not provide a CommonJS build. The package does not yet provide
+an IIFE build for direct `<script>` installation.
 
 ## Supported integration
 
