@@ -36,7 +36,7 @@ describe("verification async race containment", () => {
     expect(diagnostics).toEqual(["registered", "disposed"]);
   });
 
-  it("disposes late completion after consent becomes unknown and starts a fresh attempt", async () => {
+  it("makes consent loss during provider startup terminal", async () => {
     const provider = new ControlledProvider();
     const consentSource = new MutableConsentSource("granted");
     const diagnostics: VerificationDiagnosticCode[] = [];
@@ -57,16 +57,12 @@ describe("verification async race containment", () => {
     await settle();
 
     expect(staleSession.disposeCalls).toBe(1);
-    expect(diagnostics).toEqual(["registered"]);
+    expect(consentSource.listeners.size).toBe(0);
+    expect(diagnostics).toEqual(["registered", "consent_withdrawn"]);
 
     consentSource.set("granted");
-    expect(provider.pending).toHaveLength(2);
-    const currentSession = new FakeSession();
-    provider.pending[1]?.resolve(currentSession);
-    await settle();
-
-    expect(currentSession.disposeCalls).toBe(0);
-    expect(diagnostics).toEqual(["registered", "active"]);
+    expect(provider.pending).toHaveLength(1);
+    expect(diagnostics).toEqual(["registered", "consent_withdrawn"]);
   });
 
   it("cannot revive work superseded on the same element", async () => {

@@ -318,17 +318,11 @@ export function createVerificationRuntimeInternal(
     }
 
     if (state === "unknown") {
-      if (record.status === "active") {
-        // Once provider code has executed, losing consent is terminal for this registration.
+      if (record.providerStarted) {
+        // Once provider startup has inserted a resource, consent loss is terminal. Removing
+        // the element cannot reliably cancel a request or prevent execution in every browser.
         terminate(record, "disposed", "consent_withdrawn");
         return;
-      }
-
-      if (record.status === "loading_provider") {
-        // Invalidate pending work and abort any already-created provider session.
-        record.generation += 1;
-        record.providerStarted = false;
-        disposeSession(record);
       }
       record.status = "waiting_for_consent";
       return;
