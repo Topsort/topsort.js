@@ -8,6 +8,8 @@ import type {
   VerificationRuntime,
 } from "../src/types";
 
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
 function runtimeStub() {
   const registrations: Array<{
     element: HTMLElement;
@@ -69,8 +71,8 @@ describe("React verification ref", () => {
     expect(registrations).toHaveLength(0);
   });
 
-  it("is safe under React 18 StrictMode ref lifecycle", () => {
-    const { runtime, registrations } = runtimeStub();
+  it("keeps exactly one live registration under the supported StrictMode ref lifecycle", () => {
+    const { runtime, registrations, disposed } = runtimeStub();
     const element = {} as HTMLElement;
     function Banner() {
       const ref = useVerificationRef(runtime, { verificationTag: "tag", renderKey: "a" });
@@ -82,8 +84,10 @@ describe("React verification ref", () => {
         createNodeMock: () => element,
       });
     });
-    expect(registrations).toHaveLength(1);
+    expect(registrations.length).toBeGreaterThanOrEqual(1);
+    expect(registrations.length - disposed.length).toBe(1);
     act(() => tree.unmount());
+    expect(disposed).toHaveLength(registrations.length);
   });
 
   it("uses the latest diagnostic callback without restarting verification", () => {
