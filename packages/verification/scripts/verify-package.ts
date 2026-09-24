@@ -9,6 +9,10 @@ interface PackResult {
   files: Array<{ path: string; size: number }>;
 }
 
+interface PackageManifest {
+  files?: string[];
+}
+
 const packageRoot = fileURLToPath(new URL("../", import.meta.url));
 const repositoryRoot = fileURLToPath(new URL("../../../", import.meta.url));
 
@@ -38,12 +42,11 @@ async function write(path: string, contents: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  const packageManifest = JSON.parse(
+    await readFile(join(packageRoot, "package.json"), "utf8"),
+  ) as PackageManifest;
   const baseBundlePath = join(packageRoot, "dist/index.js");
   const reactBundlePath = join(packageRoot, "dist/react.js");
-  const baseBundle = await readFile(baseBundlePath, "utf8");
-  if (/\bfrom\s*["']react(?:\/|["'])|\brequire\(["']react(?:\/|["'])/.test(baseBundle)) {
-    throw new Error("base bundle unexpectedly depends on React");
-  }
 
   const sizes = await Promise.all(
     [baseBundlePath, reactBundlePath].map(async (path) => {
@@ -57,25 +60,6 @@ async function main(): Promise<void> {
   const temporaryRoot = await mkdtemp(join(tmpdir(), "topsort-verification-pack-"));
   try {
     const npmCache = join(temporaryRoot, "npm-cache");
-    const dryRun = parsePackResult(
-      await run(["npm", "pack", "--dry-run", "--json", "--ignore-scripts", "--cache", npmCache]),
-    );
-    const packedPaths = dryRun.files.map(({ path }) => path).sort();
-    const expectedPaths = [
-      "CHANGELOG.md",
-      "LICENSE",
-      "README.md",
-      "dist/index.d.ts",
-      "dist/index.js",
-      "dist/react.d.ts",
-      "dist/react.js",
-      "package.json",
-    ];
-    if (JSON.stringify(packedPaths) !== JSON.stringify(expectedPaths)) {
-      throw new Error(`unexpected npm pack contents: ${JSON.stringify(packedPaths)}`);
-    }
-    console.log(`npm pack --dry-run files: ${JSON.stringify(packedPaths)}`);
-
     const pack = parsePackResult(
       await run([
         "npm",
@@ -88,6 +72,13 @@ async function main(): Promise<void> {
         npmCache,
       ]),
     );
+    const packedPaths = pack.files.map(({ path }) => path).sort();
+    const expectedPaths = [...new Set(["package.json", ...(packageManifest.files ?? [])])].sort();
+    if (JSON.stringify(packedPaths) !== JSON.stringify(expectedPaths)) {
+      throw new Error(`unexpected npm pack contents: ${JSON.stringify(packedPaths)}`);
+    }
+    console.log(`npm pack files: ${JSON.stringify(packedPaths)}`);
+
     const extractedRoot = join(temporaryRoot, "extracted");
     await mkdir(extractedRoot, { recursive: true });
     await run(["tar", "-xzf", join(temporaryRoot, pack.filename), "-C", extractedRoot]);
@@ -96,10 +87,6 @@ async function main(): Promise<void> {
     const installedPackage = join(consumerRoot, "node_modules/@topsort/verification");
     await mkdir(dirname(installedPackage), { recursive: true });
     await rename(join(extractedRoot, "package"), installedPackage);
-    await symlink(
-      join(repositoryRoot, "node_modules/react"),
-      join(consumerRoot, "node_modules/react"),
-    );
     await write(join(consumerRoot, "package.json"), '{"private":true,"type":"module"}\n');
     await write(
       join(consumerRoot, "base.mjs"),
@@ -117,9 +104,13 @@ if (typeof entry.useVerificationRef !== "function") throw new Error("React subpa
 `,
     );
 
-    await run(["bun", "run", "base.mjs"], consumerRoot);
-    await run(["bun", "run", "react.mjs"], consumerRoot);
-    console.log("packed artifact imports: base SSR-safe; React subpath resolved");
+    await run(["node", "base.mjs"], consumerRoot);
+    await symlink(
+      join(repositoryRoot, "node_modules/react"),
+      join(consumerRoot, "node_modules/react"),
+    );
+    await run(["node", "react.mjs"], consumerRoot);
+    console.log("packed artifact imports with Node: base SSR-safe; React subpath resolved");
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }
