@@ -24,7 +24,7 @@ describe("verification consent and disposal", () => {
         isHTMLElement: isTestElement,
         parseTag: (value) => {
           parseCalls += 1;
-          return { src: value, type: "application/javascript", identity: value };
+          return { src: value, type: "application/javascript" };
         },
       },
     );

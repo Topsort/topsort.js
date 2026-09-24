@@ -21,7 +21,6 @@ describe("confirmed IAS adapter", () => {
     expect(parsed).toEqual({
       src: `https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444`,
       type: IAS_SCRIPT_TYPE,
-      identity: `ias-script:https://${IAS_HOSTNAME}${IAS_PATHNAME}?advEntityId=3072912&pubEntityId=96261444`,
     });
   });
 

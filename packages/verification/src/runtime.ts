@@ -23,8 +23,6 @@ export interface ProviderSession {
 
 export interface ProviderStartInput {
   element: HTMLElement;
-  renderKey: string;
-  tagIdentity: string;
   parsedTag: ParsedIasTag;
 }
 
@@ -35,7 +33,6 @@ export type ProviderStartHook = (
 type VerificationStatus =
   | "registered"
   | "waiting_for_consent"
-  | "waiting_for_element"
   | "loading_provider"
   | "active"
   | "failed"
@@ -216,7 +213,6 @@ export function createVerificationRuntimeInternal(
     void session.settled.catch((error: unknown) => {
       if (!isCurrent(record, generation)) return;
       const code = error instanceof IasAdapterError ? error.code : "provider_start_failed";
-      if (code === "provider_aborted") return;
       terminate(record, "failed", code);
     });
   }
@@ -226,7 +222,7 @@ export function createVerificationRuntimeInternal(
     generation: number,
     session: { dispose(): void; settled?: Promise<void> },
   ): void {
-    if (!isCurrent(record, generation) || record.consentState !== "granted") {
+    if (!isCurrent(record, generation)) {
       try {
         session.dispose();
       } catch {
@@ -243,7 +239,7 @@ export function createVerificationRuntimeInternal(
     observeSession(record, generation, normalizedSession);
     void normalizedSession.settled.then(
       () => {
-        if (!isCurrent(record, generation) || record.consentState !== "granted") return;
+        if (!isCurrent(record, generation)) return;
         record.status = "active";
         emit(record, "active");
       },
@@ -262,8 +258,6 @@ export function createVerificationRuntimeInternal(
     try {
       const result = deps.startProvider({
         element: record.element,
-        renderKey: record.renderKey,
-        tagIdentity: record.tagIdentity,
         parsedTag,
       });
       if (result instanceof Promise) {
@@ -285,7 +279,6 @@ export function createVerificationRuntimeInternal(
     }
 
     if (!record.element.isConnected) {
-      record.status = "waiting_for_element";
       terminate(record, "failed", "element_not_ready");
       return;
     }
@@ -328,7 +321,7 @@ export function createVerificationRuntimeInternal(
       return;
     }
 
-    if (state === "granted" && (previousState !== "granted" || record.status === "registered")) {
+    if (state === "granted" && previousState !== "granted") {
       beginProvider(record);
     }
   }
@@ -392,13 +385,7 @@ export function createVerificationRuntimeInternal(
       return createStandaloneHandle();
     }
 
-    if (
-      existing &&
-      existing.renderKey === renderKey &&
-      existing.tagIdentity === tagIdentity &&
-      existing.status !== "failed" &&
-      existing.status !== "disposed"
-    ) {
+    if (existing && existing.renderKey === renderKey && existing.tagIdentity === tagIdentity) {
       existing.onDiagnostic = typeof input.onDiagnostic === "function" ? input.onDiagnostic : null;
       return existing.handle;
     }

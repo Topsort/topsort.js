@@ -42,10 +42,6 @@ export async function installProviderFixture(page: Page): Promise<string[]> {
         status: response.status,
         body: await response.text(),
         contentType: response.headers.get("content-type") ?? "text/javascript",
-        headers: {
-          "Cache-Control": response.headers.get("cache-control") ?? "no-store",
-          "X-Verification-Fixture": "simulated-provider",
-        },
       });
     } catch (error) {
       // Disposal tests intentionally remove the script while this fixture is delayed.
