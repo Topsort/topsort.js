@@ -2,13 +2,12 @@
   "name": "@topsort/verification",
   "version": "0.1.0",
   "description": "Browser runtime for third-party verification of Topsort-served ads",
-  "private": true,
   "type": "module",
   "author": "Topsort",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Topsort/topsort.js.git",
+    "url": "git+https://github.com/Topsort/topsort.js.git",
     "directory": "packages/verification"
   },
   "bugs": {
