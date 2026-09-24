@@ -9,15 +9,20 @@ The initial release supports IAS monitoring tags for web display banners. Suppor
 additional providers, tag formats, mobile-app inventory, and direct browser script loading
 will be added separately.
 
+> **Pre-release status:** `@topsort/verification` is currently a private workspace package and is
+> not yet available from npm. The installation commands below apply once version `0.1.0` is
+> published. The supported commercial boundary for that release is the IAS web-display integration
+> documented here.
+
 ## Installation
 
-Using npm:
+Once `0.1.0` is published, install it with npm:
 
 ```bash
 npm install @topsort/verification
 ```
 
-Using yarn:
+Or with yarn:
 
 ```bash
 yarn add @topsort/verification
@@ -33,7 +38,8 @@ an IIFE build for direct `<script>` installation.
 The initial support boundary is intentionally narrow:
 
 - web display banners rendered into the page DOM;
-- Topsort auction winners carrying `asset[0].content.verificationTag`;
+- Topsort auction winners carrying a campaign-configured
+  `asset[0].content.verificationTag` value in the asset's open content object;
 - IAS JavaScript monitoring tags using the confirmed `staticjs.adsafeprotected.com/fw.js`
   format;
 - one registration for each rendered ad instance;
@@ -166,6 +172,13 @@ use verification. It still disposes any previous registration owned by the same 
 verified creative can be replaced by an unverified one safely. Invalid elements, missing render
 keys, disposed runtimes, and malformed non-empty tags produce bounded diagnostics.
 
+Calling `register()` after `runtime.dispose()` emits `runtime_disposed` and returns an inert
+handle. It does not create a registration or load a provider resource.
+
+`verificationTag` is not a dedicated field in the shared auction SDK types. Banner templates use an
+open `content` object, and participating campaigns configure this key in that object. Marketplaces
+must preserve the value from the winning auction response through their rendering path.
+
 One runtime can manage many rendered ads. The same campaign-level IAS tag can be registered
 for several elements; each distinct element and `resolvedBidId` represents an independent ad
 instance.
@@ -199,8 +212,13 @@ function SponsoredBanner({ runtime, winner }) {
 }
 ```
 
-React is an optional peer dependency. Importing the base `@topsort/verification` entrypoint
-does not load React.
+React is an optional peer dependency with the supported range `>=18 <20`. Importing the base
+`@topsort/verification` entrypoint does not load React.
+
+Terminal registrations are not automatically retried by the React helper. After initial consent
+denial, consent withdrawal, an element-not-ready failure, or provider failure, remount the component
+or supply a new `renderKey` after correcting the underlying condition. Reloading the page also
+creates a fresh runtime and registration.
 
 ## Supported IAS tag
 
