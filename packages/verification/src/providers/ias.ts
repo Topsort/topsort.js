@@ -8,14 +8,12 @@ const EXPECTED_QUERY_PARAMS = new Set(["advEntityId", "pubEntityId"]);
 export interface ParsedIasTag {
   readonly src: string;
   readonly type: typeof IAS_SCRIPT_TYPE;
-  /** Safe semantic identity, used only after structural validation. */
-  readonly identity: string;
 }
 
 export type IasFailureCode = "provider_load_failed";
 
 export class IasAdapterError extends Error {
-  constructor(readonly code: IasFailureCode | "provider_aborted") {
+  constructor(readonly code: IasFailureCode) {
     super(code);
     this.name = "IasAdapterError";
   }
@@ -138,7 +136,6 @@ export function parseIasTag(value: string, document: Document): ParsedIasTag {
   return {
     src: url.href,
     type: IAS_SCRIPT_TYPE,
-    identity: `ias-script:${url.href}`,
   };
 }
 

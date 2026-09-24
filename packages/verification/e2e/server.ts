@@ -1,7 +1,7 @@
 /** Dedicated browser fixture server. Its provider script is controlled and is not IAS code. */
 import { file } from "bun";
 
-export const VERIFICATION_FIXTURE_PORT = 4177;
+const VERIFICATION_FIXTURE_PORT = 4177;
 
 const providerFixtureSource = `
 (() => {
@@ -47,19 +47,12 @@ Bun.serve({
     }
     if (url.pathname === "/fixture-provider.js") {
       const mode = url.searchParams.get("mode") ?? "success";
-      if (mode === "failure") {
-        return new Response("simulated provider failure", { status: 503 });
-      }
       if (mode === "delay" || mode === "slow") {
-        const fallback = mode === "slow" ? 5_500 : 300;
-        const delayMs = Number(url.searchParams.get("delayMs") ?? fallback);
-        await Bun.sleep(Number.isFinite(delayMs) ? delayMs : fallback);
+        await Bun.sleep(mode === "slow" ? 5_500 : 300);
       }
       return new Response(providerFixtureSource, {
         headers: {
-          "Cache-Control": "public, max-age=3600",
           "Content-Type": "text/javascript; charset=utf-8",
-          "X-Verification-Fixture": "simulated-provider",
         },
       });
     }

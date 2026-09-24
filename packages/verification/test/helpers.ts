@@ -20,7 +20,6 @@ export function createTestRuntime(
     parseTag: (value) => ({
       src: value,
       type: "application/javascript",
-      identity: value,
     }),
     ...dependencies,
   });

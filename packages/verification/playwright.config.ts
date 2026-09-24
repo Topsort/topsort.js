@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const VERIFICATION_FIXTURE_PORT = 4177;
-export const verificationFixtureUrl = `http://127.0.0.1:${VERIFICATION_FIXTURE_PORT}`;
+const verificationFixtureUrl = `http://127.0.0.1:${VERIFICATION_FIXTURE_PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
