@@ -9,14 +9,12 @@ The initial release supports IAS monitoring tags for web display banners. Suppor
 additional providers, tag formats, mobile-app inventory, and direct browser script loading
 will be added separately.
 
-> **Pre-release status:** `@topsort/verification` is currently a private workspace package and is
-> not yet available from npm. The installation commands below apply once version `0.1.0` is
-> published. The supported commercial boundary for that release is the IAS web-display integration
-> documented here.
+The supported commercial boundary for version `0.1.0` is the IAS web-display integration
+documented here.
 
 ## Installation
 
-Once `0.1.0` is published, install it with npm:
+Install it with npm:
 
 ```bash
 npm install @topsort/verification
