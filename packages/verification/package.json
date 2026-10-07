@@ -66,10 +66,10 @@
   "devDependencies": {
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
-    "@types/react-test-renderer": "18.3.1",
+    "@types/react-test-renderer": "19.3.0",
     "linkedom": "0.18.13",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-test-renderer": "18.3.1"
+    "react-test-renderer": "19.3.0"
   }
 }
