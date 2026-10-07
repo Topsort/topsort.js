@@ -4,7 +4,7 @@
   "timezone": "Europe/Lisbon",
   "schedule": ["before 9pm on sunday"],
   "extends": [":dependencyDashboard", ":disableRateLimiting", ":semanticCommits"],
-  "rangeStrategy": "pin",
+  "rangeStrategy": "auto",
   "enabledManagers": ["github-actions", "custom.regex", "bun"],
   "commitMessageAction": "",
   "commitMessageTopic": "{{depName}}",
