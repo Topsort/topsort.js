@@ -29,6 +29,11 @@
     {
       "matchPackageNames": ["msw"],
       "allowedVersions": "<=2.4.3"
+    },
+    {
+      "description": "Automerge patch, minor, pin and digest updates once CI passes",
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "automerge": true
     }
   ],
   "customManagers": [
@@ -47,5 +52,11 @@
   "labels": ["dependencies"],
   "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   "prHeader": "",
-  "prFooter": ""
+  "prFooter": "",
+  "platformAutomerge": false,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am"],
+    "automerge": true
+  }
 }
