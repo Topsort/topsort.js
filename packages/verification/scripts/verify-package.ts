@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, readFile, rename, rm, stat, symlink } from "node:fs/pro
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { runInNewContext } from "node:vm";
 import { gzipSync } from "node:zlib";
 
 interface PackResult {
@@ -11,6 +12,10 @@ interface PackResult {
 
 interface PackageManifest {
   files?: string[];
+}
+
+interface IifeContext {
+  TopsortVerification?: Record<string, unknown>;
 }
 
 const packageRoot = fileURLToPath(new URL("../", import.meta.url));
@@ -47,14 +52,24 @@ async function main(): Promise<void> {
   ) as PackageManifest;
   const baseBundlePath = join(packageRoot, "dist/index.js");
   const reactBundlePath = join(packageRoot, "dist/react.js");
+  const iifeBundlePath = join(packageRoot, "dist/verification.iife.js");
 
   const sizes = await Promise.all(
-    [baseBundlePath, reactBundlePath].map(async (path) => {
+    [baseBundlePath, reactBundlePath, iifeBundlePath].map(async (path) => {
       const bytes = (await stat(path)).size;
       const gzipBytes = gzipSync(await readFile(path)).byteLength;
       return { file: path.slice(packageRoot.length), bytes, gzipBytes };
     }),
   );
+  const baseSize = sizes.find(({ file }) => file === "dist/index.js");
+  const iifeSize = sizes.find(({ file }) => file === "dist/verification.iife.js");
+  if (!baseSize || !iifeSize) throw new Error("verification bundle size metadata is missing");
+  if (iifeSize.bytes > baseSize.bytes + 2_048) {
+    throw new Error("IIFE bundle exceeds the base runtime by more than 2 KiB");
+  }
+  if (iifeSize.gzipBytes > baseSize.gzipBytes + 1_024) {
+    throw new Error("gzipped IIFE bundle exceeds the base runtime by more than 1 KiB");
+  }
   console.log(`bundle sizes: ${JSON.stringify(sizes)}`);
 
   const temporaryRoot = await mkdtemp(join(tmpdir(), "topsort-verification-pack-"));
@@ -103,14 +118,33 @@ if (typeof entry.createVerificationRuntime !== "function") throw new Error("base
 if (typeof entry.useVerificationRef !== "function") throw new Error("React subpath export missing");
 `,
     );
+    await write(
+      join(consumerRoot, "iife.mjs"),
+      `await import("@topsort/verification/iife");
+const keys = Object.keys(globalThis.TopsortVerification ?? {});
+if (JSON.stringify(keys) !== JSON.stringify(["createVerificationRuntime"])) {
+  throw new Error(\`unexpected IIFE subpath API: \${JSON.stringify(keys)}\`);
+}
+`,
+    );
 
     await run(["node", "base.mjs"], consumerRoot);
+    await run(["node", "iife.mjs"], consumerRoot);
+    const iifeSource = await readFile(join(installedPackage, "dist/verification.iife.js"), "utf8");
+    const iifeContext: IifeContext = {};
+    runInNewContext(iifeSource, iifeContext);
+    const publicKeys = Object.keys(iifeContext.TopsortVerification ?? {});
+    if (JSON.stringify(publicKeys) !== JSON.stringify(["createVerificationRuntime"])) {
+      throw new Error(`unexpected IIFE global API: ${JSON.stringify(publicKeys)}`);
+    }
     await symlink(
       join(repositoryRoot, "node_modules/react"),
       join(consumerRoot, "node_modules/react"),
     );
     await run(["node", "react.mjs"], consumerRoot);
-    console.log("packed artifact imports with Node: base SSR-safe; React subpath resolved");
+    console.log(
+      "packed artifact validation passed: base SSR-safe; IIFE global executable without React; React subpath resolved",
+    );
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }

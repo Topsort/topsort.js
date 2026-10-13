@@ -40,6 +40,16 @@ Bun.serve({
         headers: { "Content-Security-Policy": cspFor(url) },
       });
     }
+    if (url.pathname === "/iife.html") {
+      return new Response(file("./e2e/public/iife.html"), {
+        headers: { "Content-Security-Policy": cspFor(url) },
+      });
+    }
+    if (url.pathname === "/verification.iife.js") {
+      return new Response(file("./dist/verification.iife.js"), {
+        headers: { "Content-Type": "text/javascript; charset=utf-8" },
+      });
+    }
     if (url.pathname === "/fixture.js") {
       return new Response(file("./e2e/dist/fixture.js"), {
         headers: { "Content-Type": "text/javascript; charset=utf-8" },

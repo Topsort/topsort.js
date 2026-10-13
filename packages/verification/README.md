@@ -6,8 +6,7 @@ per-render lifecycle management, bounded diagnostics, and an optional React call
 integration.
 
 The initial release supports IAS monitoring tags for web display banners. Support for
-additional providers, tag formats, mobile-app inventory, and direct browser script loading
-will be added separately.
+additional providers, tag formats, and mobile-app inventory will be added separately.
 
 The supported commercial boundary for version `0.1.0` is the IAS web-display integration
 documented here.
@@ -28,8 +27,19 @@ yarn add @topsort/verification
 
 The package ships as an ES module for npm-based applications and bundlers. Use `import` rather
 than CommonJS `require()`. The `default` export conditions resolve to the same ES module files
-for compatible tooling; they do not provide a CommonJS build. The package does not yet provide
-an IIFE build for direct `<script>` installation.
+for compatible tooling; they do not provide a CommonJS build.
+
+For direct browser installation, load the classic-script build before creating the runtime:
+
+```html
+<script src="https://unpkg.com/@topsort/verification/dist/verification.iife.js"></script>
+<script src="/configure-topsort-verification.js"></script>
+```
+
+The first script exposes `window.TopsortVerification.createVerificationRuntime`. The external
+configuration script must create the runtime with the marketplace's consent source and register
+rendered ads as shown below. Loading the IIFE does not assume consent or start IAS by itself.
+Use ordered scripts rather than `async` so configuration cannot run before the global exists.
 
 ## Supported integration
 
@@ -49,7 +59,6 @@ It does not currently support:
 - arbitrary HTML, inline scripts, or unconfirmed IAS tag formats;
 - providers other than IAS;
 - native mobile-app measurement through OM SDK or OMID;
-- direct `<script>` or IIFE installation;
 - automatic banner discovery.
 
 ## Quick start
@@ -83,6 +92,18 @@ function updateVerificationConsent(nextState: ConsentState) {
 }
 
 const runtime = createVerificationRuntime({
+  consentSource,
+  onDiagnostic(event) {
+    console.debug("Topsort verification", event);
+  },
+});
+```
+
+The same runtime setup is available to classic-script installations through the browser global:
+
+```js
+// consentSource is the marketplace-owned adapter defined above.
+const runtime = window.TopsortVerification.createVerificationRuntime({
   consentSource,
   onDiagnostic(event) {
     console.debug("Topsort verification", event);
@@ -293,8 +314,9 @@ accepted it into reporting. Confirm measurement through IAS reporting or with IA
 
 ## Content Security Policy
 
-The page must allow the IAS bootstrap script in its Content Security Policy. For the confirmed
-tag, the minimum script source is:
+The page must add the IAS bootstrap origin to its applicable `script-src` or
+`script-src-elem` Content Security Policy without replacing the sources already required by the
+site:
 
 ```text
 script-src https://staticjs.adsafeprotected.com
@@ -305,12 +327,19 @@ IAS may make subsequent requests that require additional `connect-src`, `img-src
 marketplace's page before rollout. A successful script `load` event alone does not establish
 that every downstream IAS request was permitted.
 
+For classic-script installation, the policy must also permit the origin hosting
+`verification.iife.js`. Sites using nonces, hashes, `strict-dynamic`, or Trusted Types should
+validate the integration against their own policy.
+
 ## Browser support
 
 The runtime is tested in current Chromium, Firefox, and WebKit through Playwright. It requires
 standard browser DOM APIs, including `HTMLElement`, `DOMParser`, and dynamic script elements.
 The package entrypoints are safe to import in an SSR environment, but registration requires a
 browser element.
+
+The IIFE is a classic-script distribution, not a legacy-browser compatibility build. It adds no
+polyfills and does not change the supported browser capabilities of the runtime.
 
 ## Troubleshooting
 
