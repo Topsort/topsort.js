@@ -50,7 +50,7 @@ jobs:
           if npm view "@topsort/sdk@${VERSION}" version > /dev/null 2>&1; then
             echo "@topsort/sdk@${VERSION} is already on npm; skipping."
           else
-            npm publish --provenance --access public --no-git-checks
+            npm publish --provenance --access public
           fi
 
       - name: Publish React Native SDK to npm
@@ -61,5 +61,5 @@ jobs:
           if npm view "@topsort/react-native-sdk@${VERSION}" version > /dev/null 2>&1; then
             echo "@topsort/react-native-sdk@${VERSION} is already on npm; skipping."
           else
-            npm publish --provenance --access public --no-git-checks
+            npm publish --provenance --access public
           fi
