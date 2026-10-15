@@ -39,6 +39,7 @@
   ],
   "scripts": {
     "build": "bunup",
+    "prepack": "bun run build",
     "test": "bun test",
     "test:harness": "bun run build && bun test ./harness/smoke.test.ts"
   },
