@@ -53,6 +53,7 @@ const auctionDetails: Auction = {
       geoTargeting: { location: "US" },
       opaqueUserId: "71303ce0-de89-496d-8270-6434589615e8",
       page: { pageId: "category-cat123", type: "category", value: "cat123" },
+      filter: { operator: "and", attributes: ["brand:nike", "color:black"] },
     },
     {
       type: "banners",

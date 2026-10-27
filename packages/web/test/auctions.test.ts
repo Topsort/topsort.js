@@ -1,5 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { AppError, type Auction, baseURL, endpoints } from "@topsort/sdk-core";
+import { HttpResponse, http } from "msw";
 import { TopsortClient } from "../src";
 import {
   mswServer,
@@ -163,5 +164,31 @@ describe("createAuction", () => {
         },
       ],
     });
+  });
+
+  it("should send the attribute filter on listings auctions", async () => {
+    let sentBody: unknown;
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.auctions}`, async ({ request }) => {
+        sentBody = await request.json();
+        return HttpResponse.json({
+          results: [{ resultType: "listings", winners: [], error: false }],
+        });
+      }),
+    );
+    const auction: Auction = {
+      auctions: [
+        {
+          type: "listings",
+          slots: 2,
+          searchQuery: "running shoes",
+          filter: { operator: "and", attributes: ["brand:nike", "color:black"] },
+        },
+      ],
+    };
+
+    await topsortClient.createAuction(auction);
+
+    expect(sentBody).toEqual(auction);
   });
 });

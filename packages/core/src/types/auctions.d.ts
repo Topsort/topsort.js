@@ -100,6 +100,33 @@ interface AuctionProduct {
 }
 
 /**
+ * Product attribute filter for the purpose of running an auction.
+ * Narrows the bids selected by the auction's triggers to those whose product attributes match.
+ * Requires filterable attributes to be configured for the marketplace.
+ * @interface AttributesFilter
+ */
+interface AttributesFilter {
+  /**
+   * `and` keeps bids whose product has all the attributes, `or` keeps bids whose product has any.
+   * @type {("and"|"or")}
+   * @required
+   * @example "and"
+   */
+  operator: "and" | "or";
+
+  /**
+   * Attributes in `key:value` format, matched as exact strings.
+   * The attribute name and value are limited to 40 characters each.
+   * @type {string[]}
+   * @required
+   * @minItems 1
+   * @maxItems 5
+   * @example ["brand:nike", "color:black"]
+   */
+  attributes: string[];
+}
+
+/**
  * Base interface for all auction types.
  * Describes the intent of running an auction.
  * @interface AuctionBase
@@ -183,6 +210,13 @@ interface AuctionBase {
  * @extends {AuctionBase}
  */
 interface SponsoredListingAuction extends AuctionBase {
+  /**
+   * Product attribute filter applied to the bids selected by `products`, `category` or `searchQuery`.
+   * @type {AttributesFilter}
+   * @optional
+   */
+  filter?: AttributesFilter;
+
   /**
    * Discriminator for sponsored listings auction type.
    * @type {"listings"}
