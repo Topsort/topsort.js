@@ -1,5 +1,6 @@
 {
   "name": "@topsort/react-native-sdk",
+  "private": true,
   "version": "0.5.0",
   "description": "The official Topsort SDK for React Native",
   "main": "dist/index.cjs",
