@@ -52,14 +52,3 @@ jobs:
           else
             npm publish --provenance --access public
           fi
-
-      - name: Publish React Native SDK to npm
-        id: publish-react-native
-        working-directory: packages/react-native
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "@topsort/react-native-sdk@${VERSION}" version > /dev/null 2>&1; then
-            echo "@topsort/react-native-sdk@${VERSION} is already on npm; skipping."
-          else
-            npm publish --provenance --access public
-          fi

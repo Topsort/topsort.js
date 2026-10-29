@@ -137,8 +137,10 @@ Install Playwright browsers with `bunx playwright install` before running browse
 
 - A manually published GitHub release triggers the workflow.
 - It installs locked dependencies, runs root tests and builds, and runs web E2E.
-- It attempts to publish `@topsort/sdk` and `@topsort/react-native-sdk` with npm trusted publishing
-  and provenance, skipping a package when that version already exists on npm.
+- It publishes `@topsort/sdk` with npm trusted publishing and provenance, skipping it when that
+  version already exists on npm.
+- `@topsort/react-native-sdk` is marked `private` while it is under development and is not
+  included in the release workflow.
 - `@topsort/verification` is private and is not currently included in the release workflow.
 
 ## Pre-commit Hooks (Lefthook)
