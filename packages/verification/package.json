@@ -34,6 +34,9 @@
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js",
       "default": "./dist/react.js"
+    },
+    "./iife": {
+      "default": "./dist/verification.iife.js"
     }
   },
   "files": [
@@ -44,10 +47,12 @@
     "dist/index.js",
     "dist/react.d.ts",
     "dist/react.js",
+    "dist/verification.iife.js",
     "package.json"
   ],
   "scripts": {
-    "build": "bunup",
+    "build": "bunup && bun run build:iife",
+    "build:iife": "bun build ./src/iife.ts --outfile ./dist/verification.iife.js --format iife --target browser --minify",
     "build:browser-fixture": "bun build ./e2e/fixture.tsx --outdir ./e2e/dist --format esm --target browser",
     "serve:browser-fixture": "bun run ./e2e/server.ts",
     "typecheck": "bun run build && tsc --noEmit -p tsconfig.json",
