@@ -48,7 +48,7 @@
       "extractVersionTemplate": "^v(?<version>.*)$"
     }
   ],
-  "rebaseWhen": "never",
+  "rebaseWhen": "conflicted",
   "labels": ["dependencies"],
   "prBodyTemplate": "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   "prHeader": "",
