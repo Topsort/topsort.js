@@ -19,7 +19,7 @@ This repository holds the official Topsort javascript client library. This proje
       - [Parameters](#parameters-1)
         - [Config Parameters](#config-parameters-1)
       - [Sample response](#sample-response-1)
-      - [Retryable Errors](#retryable-errors)
+    - [Error handling](#error-handling)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -41,8 +41,9 @@ yarn add @topsort/sdk --save
 
 To create an auction, first initialize a Topsort Client, then call the `createAuction` function:
 
-```js
-import { TopsortClient, Auction } from "@topsort/sdk";
+```ts
+import { TopsortClient } from "@topsort/sdk";
+import type { Auction } from "@topsort/sdk";
 
 const auctionDetails: Auction = {
   auctions: [
@@ -87,16 +88,21 @@ topsortClient.createAuction(auctionDetails)
 
 ##### Config Parameters
 - `apiKey`: Your Topsort API Key
-- `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
-- `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
+- `host`: Optional API host. Defaults to `https://api.topsort.com`.
+- `userAgent`: Optional string appended to the `X-UA` header that the SDK sends with every request. Example: `my-app/1.2.0`
+- `timeout`: Optional timeout in milliseconds. There is no default timeout. If the timeout is reached, the call rejects with an `AppError`, see [Error handling](#error-handling).
 - `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`.
 
-`auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/reference/createauctions) for body specification.
+`auctionDetails`: An object containing the details of the auction to be created, please refer to [Topsort's Auction API doc](https://docs.topsort.com/en/api-reference/auctions/create-auctions) for body specification.
+
+Send the same `opaqueUserId` on every auction and event for a shopper. Purchase attribution depends on it being consistent and long lived. Server-side integrations must forward the id generated in the browser. Each auction in the response has its own `error` flag, so check `results[i].error` even when the call succeeds.
+
+A `listings` auction takes either `products` or `category`. For `banners`, leave `category` and `searchQuery` empty for a landing page banner, set `category` for a category banner, and set `searchQuery` for a keyword banner. Category ids must match your catalog ids exactly. `category.ids` requires a product to belong to all of them, and `category.disjunctions` requires at least one match in each group. `filter` (available since 0.6.0) takes up to 5 `key:value` attributes.
 
 ##### Overriding fetch options
 
-By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. If you want to pass other options
-or disable fetch due to the browser/engine version required, you can do so by overriding the `fetchOptions` object.
+By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. If you want to pass other options,
+you can do so with the `fetchOptions` object. It is merged over the defaults, so to turn keepalive off pass `{ keepalive: false }`.
 
 #### Sample response
 
@@ -110,6 +116,7 @@ or disable fetch due to the browser/engine version required, you can do so by ov
           "rank": 1,
           "type": "product",
           "id": "p_Mfk11",
+          "campaignId": "82588593-85c5-47c0-b125-07e315b7f2b3",
           "resolvedBidId": "WyJiX01mazExIiwiMTJhNTU4MjgtOGVhZC00Mjk5LTMyNjYtY2ViYjAwMmEwZmE4IiwibGlzdGluZ3MiLCJkZWZhdWx0IiwiIl0=="
         }
       ],
@@ -122,25 +129,16 @@ or disable fetch due to the browser/engine version required, you can do so by ov
   ]
 }
 ```
-400:
-```json
-{
-  "status": 400,
-  "statusText": "No Content",
-  "body": {
-    "errCode": "bad_request",
-    "docUrl": "https://docs.topsort.com/reference/errors",
-    "message": "The request could not be parsed.",
-  },
-}
-```
+
+A rejected call throws an `AppError`, see [Error handling](#error-handling).
 
 ### Events
 
 To report an event, first initialize a Topsort Client, then call the `reportEvent` function:
 
-```js
-import { TopsortClient, Event } from "@topsort/sdk";
+```ts
+import { TopsortClient } from "@topsort/sdk";
+import type { Event } from "@topsort/sdk";
 
 const event: Event = {
   renders: [
@@ -193,6 +191,7 @@ const event: Event = {
           productId: "p_Mfk11",
           quantity: 1,
           unitPrice: 49.99,
+          vendorId: "v_8fj2D",
         },
       ],
     },
@@ -231,13 +230,16 @@ topsortClient.reportEvent(event)
 
 ##### Config Parameters
 - `apiKey`: Your Topsort API Key
-- `userAgent`: Optional user agent to be added as part of the request. Example: `Mozilla/5.0`
-- `timeout`: Optional timeout in milliseconds. Default is 30 seconds. If timeout is reached, the call will be rejected with an [AbortError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#aborterror).
-- `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`. When keepalive is enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
+- `host`: Optional API host. Defaults to `https://api.topsort.com`.
+- `userAgent`: Optional string appended to the `X-UA` header that the SDK sends with every request. Example: `my-app/1.2.0`
+- `timeout`: Optional timeout in milliseconds. There is no default timeout. If the timeout is reached, the call rejects with an `AppError`, see [Error handling](#error-handling).
+- `fetchOptions`: Optional fetch options to pass to the fetch call. Defaults to `{ keepalive: true }`. To turn keepalive off pass `{ keepalive: false }`. When keepalive is enabled, requests will continue even if the page is being unloaded, which is useful for analytics and event tracking.
 
-`event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/reference/reportevents) for body specification.
+`event`: An object containing the details of the event to be reported, please refer to [Topsort's Event API doc](https://docs.topsort.com/en/api-reference/events/report-events) for body specification. Each event array accepts at most 50 events per request.
 
 Events can be reported as `renders`, `impressions`, `clicks`, `purchases` and `pageviews`. A **render** means an ad was inserted into the page, whether or not it ever became visible; an **impression** means it became visible to the consumer. Renders are for sponsored ads only, so `resolvedBidId` is required and there is no `entity` or `additionalAttribution` field. Renders are never chargeable.
+
+Report a render when you insert the ad into the page and an impression when it becomes visible. Each event needs a unique `id`. It makes reporting idempotent, so when you retry an event, resend it with the same `id`. Use the same `opaqueUserId` that you send on auctions. Purchase `unitPrice` is a decimal in the marketplace's major currency unit. Set `vendorId` on a purchase item when a product is sold by several vendors or you want halo attribution.
 
 #### Sample response
 
@@ -248,19 +250,7 @@ Events can be reported as `renders`, `impressions`, `clicks`, `purchases` and `p
   "retry": false
 }
 ```
-400:
-```json
-{
-  "status": 400,
-  "statusText": "No Content",
-  "body": {
-    "errCode": "bad_request",
-    "docUrl": "https://docs.topsort.com/reference/errors",
-    "message": "The request could not be parsed."
-  }
-}
-```
-429:
+429 or 5xx with a JSON body:
 ```json
 {
   "ok": false,
@@ -268,9 +258,28 @@ Events can be reported as `renders`, `impressions`, `clicks`, `purchases` and `p
 }
 ```
 
-#### Retryable Errors
+### Error handling
 
-The `reportEvent` function returns `"retry": true` if the response status code is `429` or any `5xx`. This enables you to identify when it’s appropriate to retry the function call.
+Failed calls reject with an `AppError` (exported from the package) that has the fields `status`, `statusText`, `body` and `retry`. `AppError` is a plain class, not a subclass of `Error`, so check it with `instanceof AppError`.
+
+```ts
+import { AppError } from "@topsort/sdk";
+
+try {
+  await topsortClient.createAuction(auctionDetails);
+} catch (error) {
+  if (error instanceof AppError) {
+    console.error(error.status, error.body, error.retry);
+  }
+}
+```
+
+- `reportEvent` resolves with `{ ok: false, retry: true }` when the response status is `429` or any `5xx` and the response body is JSON. Retry the call with the same event object, so each event keeps its `id`.
+- Any other failure rejects with an `AppError` and `retry` is `false`. Examples: a `400` (`body` holds the API error, such as `{ "errCode": "bad_request", "message": "..." }`), a missing `apiKey` (`401`), a network failure, a timeout, or a `5xx` response whose body is not JSON.
+- Network failures and timeouts reject with an `AppError` with status `500`, and `body` holds the error message.
+- `createAuction` never resolves with `retry`. For a `429` or `5xx` response it rejects with an `AppError` whose `retry` is `true`.
+
+The type definitions currently require `page.value`, `items[].quantity` and the winner `campaignId`, although the API treats them as optional.
 
 ## Contributing
 
