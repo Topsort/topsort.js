@@ -97,7 +97,7 @@ topsortClient.createAuction(auctionDetails)
 
 Send the same `opaqueUserId` on every auction and event for a shopper. Purchase attribution depends on it being consistent and long lived. Server-side integrations must forward the id generated in the browser. Each auction in the response has its own `error` flag, so check `results[i].error` even when the call succeeds.
 
-A `listings` auction takes exactly one of `products`, `category` or `searchQuery`. For `banners`, leave `category` and `searchQuery` empty for a landing page banner, set `category` for a category banner, and set `searchQuery` for a keyword banner. Category ids must match your catalog ids exactly. `category.ids` requires a product to belong to all of them, and `category.disjunctions` requires at least one match in each group. `filter` (available since 0.6.0, listings only) takes an `operator` (`and` or `or`) and up to 5 `key:value` attributes.
+A `listings` auction takes at least one and at most two of `products`, `category` and `searchQuery`. For `banners`, leave `category` and `searchQuery` empty for a landing page banner, set `category` for a category banner, and set `searchQuery` for a keyword banner. Category ids must match your catalog ids exactly. `category.ids` requires a product to belong to all of them, and `category.disjunctions` requires at least one match in each group. `filter` (available since 0.6.0, listings only) takes an `operator` (`and` or `or`) and up to 5 `key:value` attributes.
 
 ##### Overriding fetch options
 
