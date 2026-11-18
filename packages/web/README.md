@@ -97,7 +97,7 @@ topsortClient.createAuction(auctionDetails)
 
 Send the same `opaqueUserId` on every auction and event for a shopper. Purchase attribution depends on it being consistent and long lived. Server-side integrations must forward the id generated in the browser. Each auction in the response has its own `error` flag, so check `results[i].error` even when the call succeeds.
 
-A `listings` auction takes either `products` or `category`. For `banners`, leave `category` and `searchQuery` empty for a landing page banner, set `category` for a category banner, and set `searchQuery` for a keyword banner. Category ids must match your catalog ids exactly. `category.ids` requires a product to belong to all of them, and `category.disjunctions` requires at least one match in each group. `filter` (available since 0.6.0) takes up to 5 `key:value` attributes.
+A `listings` auction takes exactly one of `products`, `category` or `searchQuery`. For `banners`, leave `category` and `searchQuery` empty for a landing page banner, set `category` for a category banner, and set `searchQuery` for a keyword banner. Category ids must match your catalog ids exactly. `category.ids` requires a product to belong to all of them, and `category.disjunctions` requires at least one match in each group. `filter` (available since 0.6.0, listings only) takes an `operator` (`and` or `or`) and up to 5 `key:value` attributes.
 
 ##### Overriding fetch options
 
@@ -277,7 +277,7 @@ try {
 - `reportEvent` resolves with `{ ok: false, retry: true }` when the response status is `429` or any `5xx` and the response body is JSON. Retry the call with the same event object, so each event keeps its `id`.
 - Any other failure rejects with an `AppError` and `retry` is `false`. Examples: a `400` (`body` holds the API error, such as `{ "errCode": "bad_request", "message": "..." }`), a missing `apiKey` (`401`), a network failure, a timeout, or a `5xx` response whose body is not JSON.
 - Network failures and timeouts reject with an `AppError` with status `500`, and `body` holds the error message.
-- `createAuction` never resolves with `retry`. For a `429` or `5xx` response it rejects with an `AppError` whose `retry` is `true`.
+- `createAuction` never resolves with `retry`. For a `429` or `5xx` response with a JSON body it rejects with an `AppError` whose `retry` is `true`. If the body is not JSON, it rejects with `status` 500 and `retry` `false`, and the original status is lost.
 
 The type definitions currently require `page.value`, `items[].quantity` and the winner `campaignId`, although the API treats them as optional.
 
