@@ -80,4 +80,18 @@ describe("apiClient", () => {
       body: {},
     });
   });
+
+  it("should not retry a successful response whose body is not JSON", async () => {
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.auctions}`, () => HttpResponse.html("<html>OK</html>")),
+    );
+    await expect(
+      apiClient.post(`${baseURL}/${endpoints.auctions}`, {} as Event, { apiKey: "apiKey" }),
+    ).rejects.toEqual({
+      status: 500,
+      statusText: "Internal Server Error",
+      retry: false,
+      body: expect.any(String),
+    });
+  });
 });

@@ -274,10 +274,9 @@ try {
 }
 ```
 
-- `reportEvent` resolves with `{ ok: false, retry: true }` when the response status is `429` or any `5xx` and the response body is JSON. Retry the call with the same event object, so each event keeps its `id`.
-- Any other failure rejects with an `AppError` and `retry` is `false`. Examples: a `400` (`body` holds the API error, such as `{ "errCode": "bad_request", "message": "..." }`), a missing `apiKey` (`401`), a network failure, a timeout, or a `5xx` response whose body is not JSON.
-- Network failures and timeouts reject with an `AppError` with status `500`, and `body` holds the error message.
-- `createAuction` never resolves with `retry`. For a `429` or `5xx` response with a JSON body it rejects with an `AppError` whose `retry` is `true`. If the body is not JSON, it rejects with `status` 500 and `retry` `false`, and the original status is lost.
+- `reportEvent` resolves with `{ ok: false, retry: true }` when the response status is `408`, `429` or any `5xx`, whatever the response body, and when the request fails with a network error or a timeout. Retry the call with the same event object, so each event keeps its `id`.
+- Any other failure rejects with an `AppError` and `retry` is `false`. Examples: a `400` (`body` holds the API error, such as `{ "errCode": "bad_request", "message": "..." }`) or a missing `apiKey` (`401`). When an error response body is not JSON, `body` is `undefined` and `status` keeps the response status.
+- `createAuction` never resolves with `retry`. It rejects with an `AppError` whose `retry` is `true` for the same retryable cases. Network failures and timeouts reject with status `500`, and `body` holds the error message.
 
 The type definitions currently require `page.value`, `items[].quantity` and the winner `campaignId`, although the API treats them as optional.
 
