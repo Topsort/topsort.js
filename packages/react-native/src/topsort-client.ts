@@ -5,6 +5,7 @@ import {
   type EventResult,
 } from "@topsort/sdk-core";
 import { version } from "../package.json";
+import { applyDeviceContext } from "./device-context";
 import {
   createAsyncStorageAdapter,
   createDefaultAppStateSource,
@@ -43,7 +44,7 @@ export class TopsortClient extends CoreTopsortClient {
       maxSize: queueOptions.maxSize ?? DEFAULT_MAX_SIZE,
       dropPolicy: queueOptions.dropPolicy ?? "oldest",
       maxAttempts: queueOptions.maxAttempts ?? DEFAULT_MAX_ATTEMPTS,
-      send: (event) => super.reportEvent(event),
+      send: (event) => this.reportWithDeviceContext(event),
     });
 
     this.flushScheduler = new FlushScheduler(
@@ -78,9 +79,14 @@ export class TopsortClient extends CoreTopsortClient {
     this.flushScheduler?.stop();
   }
 
+  /** Every wire send, including queued retries, gets the device-context fill. */
+  private reportWithDeviceContext(event: Event): Promise<EventResult> {
+    return super.reportEvent(applyDeviceContext(event));
+  }
+
   override async reportEvent(event: Event): Promise<EventResult> {
     if (!this.eventQueue) {
-      return super.reportEvent(event);
+      return this.reportWithDeviceContext(event);
     }
 
     await this.ready;
@@ -97,7 +103,7 @@ export class TopsortClient extends CoreTopsortClient {
     }
 
     try {
-      const result = await super.reportEvent(event);
+      const result = await this.reportWithDeviceContext(event);
       if (result.ok || !result.retry) {
         return result;
       }

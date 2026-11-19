@@ -1,5 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { AppError, baseURL, type Event, endpoints } from "@topsort/sdk-core";
+import { HttpResponse, http } from "msw";
 import { TopsortClient } from "../src";
 import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
 import {
@@ -320,5 +321,56 @@ describe("reportEvent with offlineQueue", () => {
 
     expect(sentIds).toEqual(["imp-a", "imp-b", "imp-c"]);
     expect(await queuedRecordCount(storage)).toBe(0);
+  });
+
+  it("fills omitted deviceType when a queued event is flushed", async () => {
+    returnError(`${baseURL}/${endpoints.events}`);
+    await client.reportEvent(sampleEvent);
+
+    let deviceType: string | undefined;
+    mswServer.resetHandlers();
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async ({ request }) => {
+        const body = (await request.json()) as Event;
+        deviceType = body.impressions?.[0]?.deviceType;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    await client.flush();
+
+    expect(deviceType).toBe("mobile");
+    expect(sampleEvent.impressions?.[0]?.deviceType).toBeUndefined();
+  });
+
+  it("keeps an explicit deviceType when a queued event is flushed", async () => {
+    const event: Event = {
+      impressions: [
+        {
+          id: "imp-desktop",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+          deviceType: "desktop",
+        },
+      ],
+    };
+
+    returnError(`${baseURL}/${endpoints.events}`);
+    await client.reportEvent(event);
+
+    let deviceType: string | undefined;
+    mswServer.resetHandlers();
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async ({ request }) => {
+        const body = (await request.json()) as Event;
+        deviceType = body.impressions?.[0]?.deviceType;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    await client.flush();
+
+    expect(deviceType).toBe("desktop");
   });
 });

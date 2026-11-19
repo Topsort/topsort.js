@@ -52,6 +52,10 @@ const result = await client.reportEvent({
 
 See the [web SDK README](../web/README.md) for full auction and event payload shapes.
 
+## Device context
+
+`reportEvent` sets `deviceType` to `"mobile"` on impressions, clicks, purchases, page views, and renders when that field is omitted. An explicit `"mobile"` or `"desktop"` value is sent unchanged. Auction requests are left as the caller wrote them.
+
 ## Offline event queue
 
 This is the React Native analog of the web SDK's `keepalive` default: events that fail with a **retryable** core signal (`{ ok: false, retry: true }` for HTTP 429/5xx) or a **network/transport** failure are persisted locally and flushed when connectivity returns or the app transitions through `AppState` `active` / `background`.

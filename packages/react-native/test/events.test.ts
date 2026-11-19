@@ -1,5 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { AppError, baseURL, type Event, endpoints } from "@topsort/sdk-core";
+import { HttpResponse, http } from "msw";
 import { TopsortClient } from "../src";
 import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
 
@@ -98,5 +99,94 @@ describe("reportEvent", () => {
       ok: true,
       retry: false,
     });
+  });
+
+  it("fills omitted deviceType with mobile on the wire", async () => {
+    let body: Event | undefined;
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async ({ request }) => {
+        body = (await request.json()) as Event;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    const event: Event = {
+      impressions: [
+        {
+          id: "imp-1",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+        },
+      ],
+      clicks: [
+        {
+          id: "click-1",
+          occurredAt: "2024-10-31T12:00:01Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+        },
+      ],
+      purchases: [
+        {
+          id: "purchase-1",
+          occurredAt: "2024-10-31T12:00:02Z",
+          opaqueUserId: "user-1",
+          items: [{ productId: "p-1", quantity: 1, unitPrice: 2 }],
+        },
+      ],
+      pageviews: [
+        {
+          id: "page-1",
+          occurredAt: "2024-10-31T12:00:03Z",
+          opaqueUserId: "user-1",
+          page: { pageId: "home", type: "home", value: "/" },
+        },
+      ],
+      renders: [
+        {
+          id: "render-1",
+          occurredAt: "2024-10-31T12:00:04Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+        },
+      ],
+    };
+
+    await expect(topsortClient.reportEvent(event)).resolves.toEqual({
+      ok: true,
+      retry: false,
+    });
+
+    expect(body?.impressions?.[0]?.deviceType).toBe("mobile");
+    expect(body?.clicks?.[0]?.deviceType).toBe("mobile");
+    expect(body?.purchases?.[0]?.deviceType).toBe("mobile");
+    expect(body?.pageviews?.[0]?.deviceType).toBe("mobile");
+    expect(body?.renders?.[0]?.deviceType).toBe("mobile");
+    expect(event.impressions?.[0]?.deviceType).toBeUndefined();
+  });
+
+  it("keeps an explicit deviceType on the wire", async () => {
+    let body: Event | undefined;
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async ({ request }) => {
+        body = (await request.json()) as Event;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    await topsortClient.reportEvent({
+      impressions: [
+        {
+          id: "imp-desktop",
+          occurredAt: "2024-10-31T12:00:00Z",
+          opaqueUserId: "user-1",
+          resolvedBidId: "bid-1",
+          deviceType: "desktop",
+        },
+      ],
+    });
+
+    expect(body?.impressions?.[0]?.deviceType).toBe("desktop");
   });
 });
