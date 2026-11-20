@@ -57,7 +57,7 @@
     },
     "packages/web": {
       "name": "@topsort/sdk",
-      "version": "0.6.1",
+      "version": "0.6.2",
       "devDependencies": {
         "@topsort/sdk-core": "workspace:*",
       },
