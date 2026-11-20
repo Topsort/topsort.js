@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
-import { AppError, baseURL, type Event, endpoints } from "@topsort/sdk-core";
+import { baseURL, type Event, endpoints } from "@topsort/sdk-core";
 import { TopsortClient } from "../src";
 import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
 import {
@@ -186,7 +186,10 @@ describe("reportEvent with offlineQueue", () => {
     });
 
     returnError(`${baseURL}/${endpoints.events}`);
-    await expect(plain.reportEvent(sampleEvent)).rejects.toBeInstanceOf(AppError);
+    await expect(plain.reportEvent(sampleEvent)).resolves.toEqual({
+      ok: false,
+      retry: true,
+    });
   });
 
   it("returns retryable result when newest dropPolicy rejects a full queue", async () => {
