@@ -10,32 +10,39 @@ class APIClient {
   ) {}
 
   private async handleResponse(response: TransportResponse): Promise<unknown> {
-    let data: unknown;
-
-    if (response.status !== 204) {
-      data = await response.json();
-    }
-
     if (!response.ok) {
-      const retry = response.status === 429 || response.status >= 500;
+      // Gateways can answer with an empty or HTML body, so the error body is best effort.
+      let data: unknown;
+      try {
+        data = await response.json();
+      } catch {
+        data = undefined;
+      }
+      const retry = response.status === 408 || response.status === 429 || response.status >= 500;
       throw new AppError(response.status, response.statusText, data, retry);
     }
 
-    return data;
+    if (response.status === 204) {
+      return undefined;
+    }
+
+    try {
+      return await response.json();
+    } catch (error) {
+      throw new AppError(500, "Internal Server Error", errorMessage(error));
+    }
   }
 
   private async request(endpoint: string, options: TransportRequest): Promise<unknown> {
+    const sanitizedUrl = this.sanitizeUrl(endpoint);
+    let response: TransportResponse;
     try {
-      const sanitizedUrl = this.sanitizeUrl(endpoint);
-      const response = await this.transport.request(sanitizedUrl, options);
-      return await this.handleResponse(response);
+      response = await this.transport.request(sanitizedUrl, options);
     } catch (error) {
-      if (error instanceof AppError) {
-        throw error;
-      }
-      const message = error instanceof Error ? error.message : "Unknown error";
-      throw new AppError(500, "Internal Server Error", message);
+      // Network failures and timeouts mean no response arrived, so the request can be retried.
+      throw new AppError(500, "Internal Server Error", errorMessage(error), true);
     }
+    return this.handleResponse(response);
   }
 
   private setupTimeoutSignal(config: Config): AbortSignal | undefined {
@@ -74,6 +81,10 @@ class APIClient {
       });
     }
   }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error";
 }
 
 export default APIClient;

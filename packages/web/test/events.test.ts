@@ -1,5 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { AppError, baseURL, type Event, endpoints } from "@topsort/sdk-core";
+import { delay, HttpResponse, http } from "msw";
 import { TopsortClient } from "../src";
 import { mswServer, returnError, returnStatus } from "../src/constants/handlers.constant";
 
@@ -50,9 +51,64 @@ describe("reportEvent", () => {
     });
   });
 
-  it("should handle fetch error", async () => {
+  it("should return retry for a network error", async () => {
     returnError(`${baseURL}/${endpoints.events}`);
-    expect(async () => await topsortClient.reportEvent({} as Event)).toThrow(AppError);
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+      ok: false,
+      retry: true,
+    });
+  });
+
+  it("should return retry for a timeout", async () => {
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async () => {
+        await delay(200);
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    topsortClient = new TopsortClient({ apiKey: "apiKey", timeout: 10 });
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+      ok: false,
+      retry: true,
+    });
+  });
+
+  for (const status of [408, 502, 503]) {
+    it(`should return retry for a ${status} with an empty body`, async () => {
+      mswServer.use(
+        http.post(`${baseURL}/${endpoints.events}`, () => new HttpResponse(null, { status })),
+      );
+      await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+        ok: false,
+        retry: true,
+      });
+    });
+  }
+
+  it("should return retry for a 502 with an HTML body", async () => {
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, () =>
+        HttpResponse.html("<html>Bad Gateway</html>", { status: 502 }),
+      ),
+    );
+    await expect(topsortClient.reportEvent({} as Event)).resolves.toEqual({
+      ok: false,
+      retry: true,
+    });
+  });
+
+  it("should keep the status of a 4xx with an HTML body", async () => {
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, () =>
+        HttpResponse.html("<html>Forbidden</html>", { status: 403 }),
+      ),
+    );
+    await expect(topsortClient.reportEvent({} as Event)).rejects.toEqual({
+      status: 403,
+      statusText: "Forbidden",
+      retry: false,
+      body: undefined,
+    });
   });
 
   it("should handle invalid URL error", async () => {
