@@ -3,7 +3,7 @@
 ## Project Overview
 
 topsort.js contains the official Topsort web and React Native SDKs, their shared core,
-and the private pre-production `@topsort/verification` browser runtime.
+and the pre-production `@topsort/verification` browser runtime.
 
 ## Git Workflow
 
@@ -72,7 +72,7 @@ packages/
 
 ### Verification package
 
-`packages/verification` is a private, pre-production browser package for attaching
+`packages/verification` is a pre-production browser package for attaching
 provider verification to an exact rendered banner element. Its base entrypoint is
 framework-neutral and its optional `@topsort/verification/react` subpath provides a
 React callback-ref bridge. The current provider adapter intentionally accepts only the
@@ -95,7 +95,7 @@ confirmed IAS web-display POC tag grammar. It is not part of the npm publishing 
 - **Imports**: Biome auto-organizes imports (the `organizeImports` assist action is enabled).
 - **Naming**: camelCase for variables/functions, PascalCase for classes/interfaces/types. Files use kebab-case (e.g., `api-client.ts`, `validate-config.ts`).
 - **Type declarations**: Shared types live in `src/types/` as `.d.ts` files. Internal interfaces (not exported) go in the same file as their usage.
-- **Error handling**: Throw `AppError` (not native `Error`). `AppError` carries `status`, `statusText`, `body`, and a `retry` flag.
+- **Error handling**: In `packages/core` and the request path, throw `AppError` (not native `Error`). `AppError` carries `status`, `statusText`, `body`, and a `retry` flag. The React Native offline queue and storage adapters currently throw plain `Error` for local setup and queue-full failures.
 - **Verification adapter errors**: Provider adapters in `packages/verification` may use an
   internal typed error to classify browser-resource failures. These errors are converted to
   bounded diagnostics and never cross the package's public API; they must not introduce a
@@ -150,7 +150,7 @@ Install Playwright browsers with `bunx playwright install` before running browse
   version already exists on npm.
 - `@topsort/react-native-sdk` is marked `private` while it is under development and is not
   included in the release workflow.
-- `@topsort/verification` is private and is not currently included in the release workflow.
+- `@topsort/verification` has no `private` flag but is not currently included in the release workflow.
 
 ## Pre-commit Hooks (Lefthook)
 
