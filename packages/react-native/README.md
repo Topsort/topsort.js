@@ -4,6 +4,8 @@ Official [Topsort](https://topsort.com) SDK for React Native. Same `createAuctio
 
 ## Installation
 
+> This package is not currently published to npm; the commands below apply once it is.
+
 Install the SDK and its required peer dependencies:
 
 ```sh
@@ -114,7 +116,7 @@ You can also pass any object implementing `EventStorageAdapter` (`getItem` / `se
 
 ## Versioning
 
-Each package has its own `version` in `packages/web/package.json` and `packages/react-native/package.json`. Versions are independent — bump only the package(s) you are releasing. On a GitHub release, the publish workflow publishes each package only when that version is not already on npm.
+Each package has its own `version` in `packages/web/package.json` and `packages/react-native/package.json`. Versions are independent — bump only the package(s) you are releasing. The React Native package is not published by the release workflow (it is marked `private`); on a GitHub release only `@topsort/sdk` is published, and only when that version is not already on npm.
 
 ## License
 
