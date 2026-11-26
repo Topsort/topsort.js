@@ -1,6 +1,6 @@
-import { afterEach, beforeAll, describe, expect, it } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, spyOn } from "bun:test";
 import { APIClient, baseURL, type Config, type Event, endpoints } from "@topsort/sdk-core";
-import { HttpResponse, http } from "msw";
+import { delay, HttpResponse, http } from "msw";
 import { version } from "../package.json";
 import { mswServer, returnAuctionSuccess, returnStatus } from "../src/constants/handlers.constant";
 import { webTransport } from "../src/transport";
@@ -79,6 +79,45 @@ describe("apiClient", () => {
       retry: true,
       body: {},
     });
+  });
+
+  it("should cancel the request with the caller signal when a timeout is set", async () => {
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async () => {
+        await delay(2000);
+        return HttpResponse.json({});
+      }),
+    );
+    const caller = new AbortController();
+    const pending = apiClient.post(`${baseURL}/${endpoints.events}`, {} as Event, {
+      apiKey: "apiKey",
+      timeout: 5000,
+      fetchOptions: { signal: caller.signal },
+    });
+    caller.abort();
+
+    await expect(pending).rejects.toEqual({
+      status: 500,
+      statusText: "Internal Server Error",
+      retry: true,
+      body: expect.any(String),
+    });
+  });
+
+  it("should remove the caller abort listener once a request with a timeout settles", async () => {
+    mswServer.use(http.post(`${baseURL}/${endpoints.events}`, () => HttpResponse.json({})));
+    const caller = new AbortController();
+    const add = spyOn(caller.signal, "addEventListener");
+    const remove = spyOn(caller.signal, "removeEventListener");
+
+    await apiClient.post(`${baseURL}/${endpoints.events}`, {} as Event, {
+      apiKey: "apiKey",
+      timeout: 5000,
+      fetchOptions: { signal: caller.signal },
+    });
+
+    expect(add).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalledWith("abort", add.mock.calls[0]?.[1]);
   });
 
   it("should not retry a successful response whose body is not JSON", async () => {

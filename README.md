@@ -105,6 +105,9 @@ A `listings` auction takes at least one and at most two of `products`, `category
 
 By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. If you want to pass other options,
 you can do so with the `fetchOptions` object. It is merged over the defaults, so to turn keepalive off pass `{ keepalive: false }`.
+Headers in `fetchOptions` are added to the request, but they cannot replace the headers the SDK sets (`Authorization`,
+`X-UA`, `Content-Type` and `Accept`). The SDK also keeps its own `method` and `body`. A `signal` in `fetchOptions`
+still cancels the request when `timeout` is set: either one aborts it.
 
 #### Sample response
 
