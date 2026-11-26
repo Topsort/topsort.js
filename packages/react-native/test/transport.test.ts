@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, spyOn } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "bun:test";
 import { rnTransport } from "../src/transport";
 
 const sdkHeaders = {
@@ -9,8 +9,11 @@ const sdkHeaders = {
 };
 
 describe("rnTransport", () => {
-  const fetchSpy = spyOn(globalThis, "fetch");
-  afterEach(() => fetchSpy.mockReset());
+  let fetchSpy: Mock<typeof fetch>;
+  beforeEach(() => {
+    fetchSpy = spyOn(globalThis, "fetch");
+  });
+  afterEach(() => fetchSpy.mockRestore());
 
   it("sends the SDK headers and timeout signal when fetchOptions sets them", async () => {
     fetchSpy.mockResolvedValue(new Response(null, { status: 204 }));

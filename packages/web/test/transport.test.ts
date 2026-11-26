@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, spyOn } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, type Mock, spyOn } from "bun:test";
 import { buildFetchInit, type TransportRequest } from "@topsort/sdk-core";
 import { webTransport } from "../src/transport";
 
@@ -67,8 +67,11 @@ describe("buildFetchInit", () => {
 });
 
 describe("webTransport", () => {
-  const fetchSpy = spyOn(globalThis, "fetch");
-  afterEach(() => fetchSpy.mockReset());
+  let fetchSpy: Mock<typeof fetch>;
+  beforeEach(() => {
+    fetchSpy = spyOn(globalThis, "fetch");
+  });
+  afterEach(() => fetchSpy.mockRestore());
 
   const sentInit = async (options?: Record<string, unknown>): Promise<RequestInit> => {
     fetchSpy.mockResolvedValue(new Response(null, { status: 204 }));
