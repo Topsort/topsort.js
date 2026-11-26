@@ -97,7 +97,7 @@ describe("webTransport", () => {
   });
 
   it("measures the body limit in bytes, not characters", async () => {
-    // "é" is two bytes in UTF-8: the body has 60 KiB characters but is one byte over 60 KiB.
-    expect((await sentInit(undefined, `${"a".repeat(60 * 1024 - 1)}é`)).keepalive).toBe(false);
+    // "€" is three bytes in UTF-8: the body is under 60 KiB in characters but one byte over in bytes.
+    expect((await sentInit(undefined, `${"a".repeat(60 * 1024 - 2)}€`)).keepalive).toBe(false);
   });
 });
