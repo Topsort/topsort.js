@@ -103,7 +103,8 @@ A `listings` auction takes at least one and at most two of `products`, `category
 
 ##### Overriding fetch options
 
-By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. If you want to pass other options,
+By default, we pass `{ keepalive: true }` to fetch while making requests to our APIs. Request bodies larger than 60 KiB
+are sent without keepalive, because browsers reject keepalive requests above 64 KiB. If you want to pass other options,
 you can do so with the `fetchOptions` object. It is merged over the defaults, so to turn keepalive off pass `{ keepalive: false }`.
 Headers in `fetchOptions` are added to the request, but they cannot replace the headers the SDK sets (`Authorization`,
 `X-UA`, `Content-Type` and `Accept`). The SDK also keeps its own `method` and `body`. A `signal` in `fetchOptions`
