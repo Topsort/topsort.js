@@ -46,36 +46,49 @@ class APIClient {
   }
 
   // A caller signal in fetchOptions also aborts the timeout signal, so either one cancels the request.
-  private setupTimeoutSignal(config: Config): AbortSignal | undefined {
-    if (config.timeout != null) {
-      const controller = new AbortController();
-      setTimeout(() => controller.abort(), config.timeout);
-      const callerSignal = config.fetchOptions?.signal as AbortSignal | undefined;
-      if (callerSignal?.aborted) {
-        controller.abort();
-      } else {
-        callerSignal?.addEventListener("abort", () => controller.abort());
-      }
-      return controller.signal;
+  // cleanup clears the timer and the caller listener once the request settles.
+  private setupTimeoutSignal(config: Config): { signal?: AbortSignal; cleanup: () => void } {
+    if (config.timeout == null) {
+      return { cleanup: () => {} };
     }
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    const timer = setTimeout(abort, config.timeout);
+    const callerSignal = config.fetchOptions?.signal as AbortSignal | undefined;
+    if (callerSignal?.aborted) {
+      controller.abort();
+    } else {
+      callerSignal?.addEventListener("abort", abort);
+    }
+    return {
+      signal: controller.signal,
+      cleanup: () => {
+        clearTimeout(timer);
+        callerSignal?.removeEventListener("abort", abort);
+      },
+    };
   }
 
   public async post(endpoint: string, body: unknown, config: Config): Promise<unknown> {
-    const signal = this.setupTimeoutSignal(config);
-    return this.request(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-UA": config.userAgent
-          ? `${this.sdkPackageName} ${this.sdkVersion} ${config.userAgent}`
-          : `${this.sdkPackageName} ${this.sdkVersion}`,
-        Authorization: `Bearer ${config.apiKey}`,
-      },
-      body: JSON.stringify(body),
-      signal,
-      options: config.fetchOptions,
-    });
+    const { signal, cleanup } = this.setupTimeoutSignal(config);
+    try {
+      return await this.request(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-UA": config.userAgent
+            ? `${this.sdkPackageName} ${this.sdkVersion} ${config.userAgent}`
+            : `${this.sdkPackageName} ${this.sdkVersion}`,
+          Authorization: `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify(body),
+        signal,
+        options: config.fetchOptions,
+      });
+    } finally {
+      cleanup();
+    }
   }
 
   private sanitizeUrl(url: string): string {

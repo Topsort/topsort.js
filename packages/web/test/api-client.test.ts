@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it } from "bun:test";
+import { afterEach, beforeAll, describe, expect, it, spyOn } from "bun:test";
 import { APIClient, baseURL, type Config, type Event, endpoints } from "@topsort/sdk-core";
 import { delay, HttpResponse, http } from "msw";
 import { version } from "../package.json";
@@ -102,6 +102,22 @@ describe("apiClient", () => {
       retry: true,
       body: expect.any(String),
     });
+  });
+
+  it("should remove the caller abort listener once a request with a timeout settles", async () => {
+    mswServer.use(http.post(`${baseURL}/${endpoints.events}`, () => HttpResponse.json({})));
+    const caller = new AbortController();
+    const add = spyOn(caller.signal, "addEventListener");
+    const remove = spyOn(caller.signal, "removeEventListener");
+
+    await apiClient.post(`${baseURL}/${endpoints.events}`, {} as Event, {
+      apiKey: "apiKey",
+      timeout: 5000,
+      fetchOptions: { signal: caller.signal },
+    });
+
+    expect(add).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalledWith("abort", add.mock.calls[0]?.[1]);
   });
 
   it("should not retry a successful response whose body is not JSON", async () => {

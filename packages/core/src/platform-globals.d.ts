@@ -1,6 +1,7 @@
 interface AbortSignal {
   readonly aborted: boolean;
   addEventListener(type: "abort", listener: () => void): void;
+  removeEventListener(type: "abort", listener: () => void): void;
 }
 
 declare class AbortController {
@@ -14,3 +15,4 @@ declare class URL {
 }
 
 declare function setTimeout(handler: () => void, timeout?: number): number;
+declare function clearTimeout(id?: number): void;
