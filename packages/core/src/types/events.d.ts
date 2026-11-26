@@ -213,10 +213,10 @@ export interface InteractionObject {
 
   /**
    * When type is `listing`, signals the specific interaction flavor with the listing.
-   * @type {"image" | "add_to_cart" | "purchase_now"}
+   * @type {"product" | "like" | "add-to-cart"}
    * @optional
    */
-  clickType?: "image" | "add_to_cart" | "purchase_now";
+  clickType?: "product" | "like" | "add-to-cart";
 }
 
 /**
@@ -376,10 +376,10 @@ export interface Click extends AdditionalEventBase {
 
   /**
    * For sponsored events only, signals the specific interaction flavor with the listing.
-   * @type {"image" | "add_to_cart" | "purchase_now"}
+   * @type {"product" | "like" | "add-to-cart"}
    * @optional
    */
-  clickType?: "image" | "add_to_cart" | "purchase_now";
+  clickType?: "product" | "like" | "add-to-cart";
 
   /**
    * Marketplace provided ID for a campaign.
