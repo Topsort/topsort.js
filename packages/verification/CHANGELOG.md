@@ -5,6 +5,14 @@ All notable changes to `@topsort/verification` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this
 package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Classic-script browser build at `dist/verification.iife.js`, exposing the framework-neutral
+  runtime factory as `TopsortVerification.createVerificationRuntime`
+- Packed-artifact and Chromium, Firefox, and WebKit coverage for the browser global
+
 ## [0.1.0] - 2026-09-25
 
 ### Added
