@@ -11,7 +11,8 @@ interface HeadersLike {
  * Caller options are applied first, so the fields the SDK owns always win: method, body,
  * the timeout signal and every header the SDK sets (Authorization, X-UA, Content-Type, Accept).
  * Caller headers are kept unless they name one of those headers, compared case-insensitively.
- * A caller signal is kept only when no timeout is configured.
+ * When a timeout is configured, the SDK signal is used and the caller signal aborts it
+ * (see `setupTimeoutSignal`); otherwise the caller signal is used directly.
  */
 export function buildFetchInit(init: TransportRequest): Record<string, unknown> {
   const { headers: callerHeaders, signal: callerSignal, ...options } = init.options ?? {};

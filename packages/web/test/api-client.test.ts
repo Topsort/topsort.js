@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it } from "bun:test";
 import { APIClient, baseURL, type Config, type Event, endpoints } from "@topsort/sdk-core";
-import { HttpResponse, http } from "msw";
+import { delay, HttpResponse, http } from "msw";
 import { version } from "../package.json";
 import { mswServer, returnAuctionSuccess, returnStatus } from "../src/constants/handlers.constant";
 import { webTransport } from "../src/transport";
@@ -78,6 +78,29 @@ describe("apiClient", () => {
       statusText: "Too Many Requests",
       retry: true,
       body: {},
+    });
+  });
+
+  it("should cancel the request with the caller signal when a timeout is set", async () => {
+    mswServer.use(
+      http.post(`${baseURL}/${endpoints.events}`, async () => {
+        await delay(2000);
+        return HttpResponse.json({});
+      }),
+    );
+    const caller = new AbortController();
+    const pending = apiClient.post(`${baseURL}/${endpoints.events}`, {} as Event, {
+      apiKey: "apiKey",
+      timeout: 5000,
+      fetchOptions: { signal: caller.signal },
+    });
+    caller.abort();
+
+    await expect(pending).rejects.toEqual({
+      status: 500,
+      statusText: "Internal Server Error",
+      retry: true,
+      body: expect.any(String),
     });
   });
 

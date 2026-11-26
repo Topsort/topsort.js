@@ -45,10 +45,17 @@ class APIClient {
     return this.handleResponse(response);
   }
 
+  // A caller signal in fetchOptions also aborts the timeout signal, so either one cancels the request.
   private setupTimeoutSignal(config: Config): AbortSignal | undefined {
     if (config.timeout != null) {
       const controller = new AbortController();
       setTimeout(() => controller.abort(), config.timeout);
+      const callerSignal = config.fetchOptions?.signal as AbortSignal | undefined;
+      if (callerSignal?.aborted) {
+        controller.abort();
+      } else {
+        callerSignal?.addEventListener("abort", () => controller.abort());
+      }
       return controller.signal;
     }
   }
