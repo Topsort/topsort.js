@@ -172,3 +172,15 @@ Lefthook runs these checks in parallel on `pre-commit`:
   package-scoped scripts. E2E tests in `e2e/` are run separately through Playwright rather than
   by the unit-test command.
 - **MSW handlers in `src/`**: Test mock handlers (`handlers.constant.ts`) live in `src/constants/` rather than in `test/` -- be aware of this if refactoring the source tree.
+
+## Pull request size and review
+
+Claude Code Review checks every pull request. When it passes, the author can merge without a second engineer, except for the paths in `.claude/approvals.yml` that need two people. Plan pull requests so that a person reviews as little as possible, and only what needs a person.
+
+- **One change per pull request.** A bug fix, a feature or a refactor, never more than one. Aim for under about 400 changed lines, excluding generated files and lockfiles. A reviewer can check that much carefully. A larger diff gets skimmed.
+- **Keep two-person paths in their own pull request.** These include CI workflows, deploy and infrastructure config, Dockerfiles, the review policy and `CODEOWNERS`. A change to one of them makes the whole pull request wait for a second person. Open that change separately, kept small, and let the rest merge on Claude's review.
+- **Separate moves from changes.** Renames, file moves and formatting go in their own pull request, with no behaviour change, so the next diff shows only what changed.
+- **Stack dependent work.** Base each pull request on the previous branch, and merge them in order. Each one must build and pass CI on its own.
+- **Never hand-edit generated files.** Lockfiles, API dumps, codegen output and snapshots come from their tool, and CI checks that they match. Regenerate them in the same pull request as the change that caused them. Mark generated paths `linguist-generated=true` in `.gitattributes` so GitHub collapses them in the diff.
+- **Say why in the description.** Give the reason for the change, how it was tested, and what a reviewer should look at first. Name any risk you know of.
+- **Fix review findings in new commits.** Do not rewrite history the reviewer has already seen, until it merges.
