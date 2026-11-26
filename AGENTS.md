@@ -166,7 +166,7 @@ Lefthook runs these checks in parallel on `pre-commit`:
 - **Browser E2E global**: There is no web SDK IIFE bundle or `window.Topsort` namespace. The E2E
   page imports the built ESM bundle and assigns `window.TopsortClient = TopsortClient` in
   `packages/web/e2e/public/index.html`.
-- **`keepalive: true` default**: The web transport defaults `keepalive: true` when calling fetch. This is intentional for analytics/event tracking use cases where requests should survive page unloads. Consumers can override via `fetchOptions`.
+- **`keepalive: true` default**: The web transport defaults `keepalive: true` when calling fetch. This is intentional for analytics/event tracking use cases where requests should survive page unloads. Bodies over 60 KiB are sent without keepalive, because browsers reject keepalive requests above 64 KiB. Consumers can override via `fetchOptions`.
 - **`AppError` is not an `Error`**: `AppError` does not extend `Error` -- it is a plain class. `catch` blocks that check `instanceof Error` will not catch it. Always check `instanceof AppError`.
 - **Bun test discovery**: Unit tests live in each package's `test/` directory and are selected by
   package-scoped scripts. E2E tests in `e2e/` are run separately through Playwright rather than

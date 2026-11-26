@@ -73,9 +73,9 @@ describe("webTransport", () => {
   });
   afterEach(() => fetchSpy.mockRestore());
 
-  const sentInit = async (options?: Record<string, unknown>): Promise<RequestInit> => {
+  const sentInit = async (options?: Record<string, unknown>, body = "{}"): Promise<RequestInit> => {
     fetchSpy.mockResolvedValue(new Response(null, { status: 204 }));
-    await webTransport.request("https://api.topsort.com/v2/events", request({ options }));
+    await webTransport.request("https://api.topsort.com/v2/events", request({ options, body }));
     return fetchSpy.mock.calls[0][1] as RequestInit;
   };
 
@@ -88,5 +88,16 @@ describe("webTransport", () => {
     expect((await sentInit()).keepalive).toBe(true);
     fetchSpy.mockClear();
     expect((await sentInit({ keepalive: false })).keepalive).toBe(false);
+  });
+
+  it("sends keepalive up to 60 KiB and drops it for larger bodies", async () => {
+    expect((await sentInit(undefined, "a".repeat(60 * 1024))).keepalive).toBe(true);
+    fetchSpy.mockClear();
+    expect((await sentInit(undefined, "a".repeat(60 * 1024 + 1))).keepalive).toBe(false);
+  });
+
+  it("measures the body limit in bytes, not characters", async () => {
+    // "€" is three bytes in UTF-8: the body is under 60 KiB in characters but one byte over in bytes.
+    expect((await sentInit(undefined, `${"a".repeat(60 * 1024 - 2)}€`)).keepalive).toBe(false);
   });
 });
