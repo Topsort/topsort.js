@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import React, { StrictMode } from "react";
 import { act, create } from "react-test-renderer";
-import { useVerificationRef } from "../src/react";
+import { type UseVerificationRefOptions, useVerificationRef } from "../src/react";
 import type {
   RegisterVerificationInput,
   VerificationHandle,
@@ -36,23 +36,32 @@ function runtimeStub() {
   return { runtime, registrations, disposed };
 }
 
+function Banner({
+  runtime,
+  options,
+}: {
+  runtime: VerificationRuntime;
+  options: UseVerificationRefOptions;
+}) {
+  const ref = useVerificationRef(runtime, options);
+  return React.createElement("div", { ref });
+}
+
 describe("React verification ref", () => {
   it("registers the supplied element once across rerenders and cleans up", () => {
     const { runtime, registrations, disposed } = runtimeStub();
     const element = {} as HTMLElement;
-    function Banner({ keyValue }: { keyValue: string }) {
-      const ref = useVerificationRef(runtime, { verificationTag: "tag", renderKey: keyValue });
-      return React.createElement("div", { ref });
-    }
+    const banner = (renderKey: string) =>
+      React.createElement(Banner, { runtime, options: { verificationTag: "tag", renderKey } });
     let tree!: ReturnType<typeof create>;
     act(() => {
-      tree = create(React.createElement(Banner, { keyValue: "a" }), {
+      tree = create(banner("a"), {
         createNodeMock: () => element,
       });
     });
-    act(() => tree.update(React.createElement(Banner, { keyValue: "a" })));
+    act(() => tree.update(banner("a")));
     expect(registrations).toHaveLength(1);
-    act(() => tree.update(React.createElement(Banner, { keyValue: "b" })));
+    act(() => tree.update(banner("b")));
     expect(registrations).toHaveLength(2);
     expect(disposed).toEqual(["a"]);
     act(() => tree.unmount());
@@ -61,12 +70,11 @@ describe("React verification ref", () => {
 
   it("does not register without a tag or render key", () => {
     const { runtime, registrations } = runtimeStub();
-    function Banner() {
-      const ref = useVerificationRef(runtime, { verificationTag: "", renderKey: "" });
-      return React.createElement("div", { ref });
-    }
     act(() => {
-      create(React.createElement(Banner), { createNodeMock: () => ({}) });
+      create(
+        React.createElement(Banner, { runtime, options: { verificationTag: "", renderKey: "" } }),
+        { createNodeMock: () => ({}) },
+      );
     });
     expect(registrations).toHaveLength(0);
   });
@@ -74,13 +82,13 @@ describe("React verification ref", () => {
   it("keeps exactly one live registration under the supported StrictMode ref lifecycle", () => {
     const { runtime, registrations, disposed } = runtimeStub();
     const element = {} as HTMLElement;
-    function Banner() {
-      const ref = useVerificationRef(runtime, { verificationTag: "tag", renderKey: "a" });
-      return React.createElement("div", { ref });
-    }
+    const banner = React.createElement(Banner, {
+      runtime,
+      options: { verificationTag: "tag", renderKey: "a" },
+    });
     let tree!: ReturnType<typeof create>;
     act(() => {
-      tree = create(React.createElement(StrictMode, null, React.createElement(Banner)), {
+      tree = create(React.createElement(StrictMode, null, banner), {
         createNodeMock: () => element,
       });
     });
@@ -95,21 +103,22 @@ describe("React verification ref", () => {
     const element = {} as HTMLElement;
     const first: string[] = [];
     const second: string[] = [];
-    function Banner({ destination }: { destination: string[] }) {
-      const ref = useVerificationRef(runtime, {
-        verificationTag: "tag",
-        renderKey: "a",
-        onDiagnostic: ({ code }) => destination.push(code),
+    const banner = (destination: string[]) =>
+      React.createElement(Banner, {
+        runtime,
+        options: {
+          verificationTag: "tag",
+          renderKey: "a",
+          onDiagnostic: ({ code }) => destination.push(code),
+        },
       });
-      return React.createElement("div", { ref });
-    }
     let tree!: ReturnType<typeof create>;
     act(() => {
-      tree = create(React.createElement(Banner, { destination: first }), {
+      tree = create(banner(first), {
         createNodeMock: () => element,
       });
     });
-    act(() => tree.update(React.createElement(Banner, { destination: second })));
+    act(() => tree.update(banner(second)));
 
     expect(registrations).toHaveLength(1);
     registrations[0]?.onDiagnostic?.({ code: "active", provider: "ias", elapsedMs: 1 });
