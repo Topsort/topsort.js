@@ -30,3 +30,10 @@ CLAUDE.local.md @Topsort/integrations
 # Build pipeline
 buildspec.yml @Topsort/integrations
 build.sh @Topsort/integrations
+
+# API types nothing checks at runtime, and where and how the RN queue persists events
+/packages/core/src/types/ @Topsort/integrations
+/packages/web/src/types/ @Topsort/integrations
+/packages/react-native/src/queue/types.ts @Topsort/integrations
+/packages/react-native/src/types/ @Topsort/integrations
+/packages/react-native/src/queue/storage/ @Topsort/integrations

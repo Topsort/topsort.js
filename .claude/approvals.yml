@@ -44,3 +44,11 @@ rules:
     verdict: { claude: comments, seats: 2 }
     override:
       - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
+  - purpose: "The API request and response types, which nothing checks at runtime, and where and how the React Native queue persists events: someone else from Integrations approves, whatever the review says."
+    paths:
+      - "packages/core/src/types/**"
+      - "packages/web/src/types/**"
+      - "packages/react-native/src/queue/types.ts"
+      - "packages/react-native/src/types/**"
+      - "packages/react-native/src/queue/storage/**"
+    verdict: { claude: comments, seats: [{ count: 1, from: [Topsort/integrations, "!pr/authors"] }] }
