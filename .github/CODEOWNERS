@@ -30,3 +30,8 @@ CLAUDE.local.md @Topsort/integrations
 # Build pipeline
 buildspec.yml @Topsort/integrations
 build.sh @Topsort/integrations
+
+# API types nothing checks at runtime, and the persisted queue shape
+/packages/core/src/types/ @Topsort/integrations
+/packages/web/src/types/ @Topsort/integrations
+/packages/react-native/src/queue/types.ts @Topsort/integrations
